@@ -34,54 +34,54 @@ export default {
           },
         ]
     },
-    {
-      "id": "openstreetmap-water-polygons",
-      "needs": [],
-      "tasks": [
-        {
-          "type": "DownloadUrl",
-          "source": "https://osmdata.openstreetmap.de/download/water-polygons-split-3857.zip",
-          "target": "data/water-polygons-split-3857.zip"
-        },
-        {
-          "type": "DecompressFile",
-          "source": "data/water-polygons-split-3857.zip",
-          "target": "data",
-          "compression": "zip"
-        },
-        {
-          "type": "ImportShapefile",
-          "file": "data/water-polygons-split-3857/water_polygons.shp",
-          "database": config.database,
-          "fileSrid": 3857,
-          "databaseSrid": 3857
-        },
-      ]
-    },
-    {
-      "id": "openstreetmap-simplified-water-polygons",
-      "needs": [],
-      "tasks": [
-        {
-          "type": "DownloadUrl",
-          "source": "https://osmdata.openstreetmap.de/download/simplified-water-polygons-split-3857.zip",
-          "target": "data/simplified-water-polygons-split-3857.zip"
-        },
-        {
-          "type": "DecompressFile",
-          "source": "data/simplified-water-polygons-split-3857.zip",
-          "target": "data",
-          "compression": "zip"
-        },
-        {
-          "type": "ImportShapefile",
-          "file": "data/simplified-water-polygons-split-3857/simplified_water_polygons.shp",
-          "database": config.database,
-          "fileSrid": 3857,
-          "databaseSrid": 3857
-        },
-      ]
-    },
+    // {
+    //   "id": "openstreetmap-water-polygons",
+    //   "needs": [],
+    //   "tasks": [
+    //     {
+    //       "type": "DownloadUrl",
+    //       "source": "https://osmdata.openstreetmap.de/download/water-polygons-split-3857.zip",
+    //       "target": "data/water-polygons-split-3857.zip"
+    //     },
+    //     {
+    //       "type": "DecompressFile",
+    //       "source": "data/water-polygons-split-3857.zip",
+    //       "target": "data",
+    //       "compression": "zip"
+    //     },
+    //     {
+    //       "type": "ImportShapefile",
+    //       "file": "data/water-polygons-split-3857/water_polygons.shp",
+    //       "database": config.database,
+    //       "fileSrid": 3857,
+    //       "databaseSrid": 3857
+    //     },
+    //   ]
+    // },
+    // {
+    //   "id": "openstreetmap-simplified-water-polygons",
+    //   "needs": [],
+    //   "tasks": [
+    //     {
+    //       "type": "DownloadUrl",
+    //       "source": "https://osmdata.openstreetmap.de/download/simplified-water-polygons-split-3857.zip",
+    //       "target": "data/simplified-water-polygons-split-3857.zip"
+    //     },
+    //     {
+    //       "type": "DecompressFile",
+    //       "source": "data/simplified-water-polygons-split-3857.zip",
+    //       "target": "data",
+    //       "compression": "zip"
+    //     },
+    //     {
+    //       "type": "ImportShapefile",
+    //       "file": "data/simplified-water-polygons-split-3857/simplified_water_polygons.shp",
+    //       "database": config.database,
+    //       "fileSrid": 3857,
+    //       "databaseSrid": 3857
+    //     },
+    //   ]
+    // },
     {
       "id": "openstreetmap-ocean",
       "needs": [
