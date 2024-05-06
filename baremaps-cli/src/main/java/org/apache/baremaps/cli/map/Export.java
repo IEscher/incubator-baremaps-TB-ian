@@ -18,6 +18,7 @@
 package org.apache.baremaps.cli.map;
 
 
+
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.concurrent.Callable;
@@ -42,10 +43,6 @@ public class Export implements Callable<Integer> {
       required = true)
   private Path tileset;
 
-  @Option(names = {"--style"}, paramLabel = "STYLE", description = "The style file.",
-      required = true)
-  private Path style;
-
   @Option(names = {"--repository"}, paramLabel = "REPOSITORY", description = "The tile repository.",
       required = true)
   private Path repository;
@@ -59,11 +56,9 @@ public class Export implements Callable<Integer> {
 
   @Override
   public Integer call() throws Exception {
-    new ExportVectorTiles(
-        tileset.toAbsolutePath(),
-        style.toAbsolutePath(),
-        repository.toAbsolutePath(),
-        format).execute(new WorkflowContext());
+    new ExportVectorTiles(tileset.toAbsolutePath(),
+        repository.toAbsolutePath(), format)
+            .execute(new WorkflowContext());
     return 0;
   }
 }

@@ -67,6 +67,15 @@ limitations under the License.
       <artifactId>pgbulkinsert</artifactId>
     </dependency>
     <dependency>
+      <groupId>de.javagl</groupId>
+      <artifactId>jgltf-model</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>de.javagl</groupId>
+      <artifactId>jgltf-model-builder</artifactId>
+      <version>${version.lib.jgltf}</version>
+    </dependency>
+    <dependency>
       <groupId>it.unimi.dsi</groupId>
       <artifactId>fastutil</artifactId>
     </dependency>
@@ -118,6 +127,11 @@ limitations under the License.
       <groupId>org.locationtech.proj4j</groupId>
       <artifactId>proj4j</artifactId>
     </dependency>
+    <!-- TODO: Remove this dependency due to license incompatibility -->
+    <dependency>
+      <groupId>org.locationtech.proj4j</groupId>
+      <artifactId>proj4j-epsg</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
@@ -146,7 +160,7 @@ limitations under the License.
               <goal>test-compile</goal>
             </goals>
             <configuration>
-              <protocArtifact>com.google.protobuf:protoc:${version.lib.protobuf}:exe:${os.detected.classifier}</protocArtifact>
+              <protocArtifact>com.google.protobuf:protoc:3.19.3:exe:${os.detected.classifier}</protocArtifact>
             </configuration>
           </execution>
         </executions>

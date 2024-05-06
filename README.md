@@ -19,8 +19,8 @@ limitations under the License.
 # Apache Baremaps (Incubating)
 
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat&logo=github&color=2370ff&labelColor=454545)](http://makeapullrequest.com)
-![Build Passing](https://github.com/baremaps/baremaps/actions/workflows/build.yml/badge.svg)
-[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=apache_baremaps&metric=vulnerabilities)](https://sonarcloud.io/project/overview?id=apache_baremaps)
+![Build Passing](https://github.com/baremaps/baremaps/actions/workflows/build.yml/badge.svg)'
+'[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=apache_baremaps&metric=vulnerabilities)](https://sonarcloud.io/project/overview?id=apache_baremaps)
 [![Mailing List](https://img.shields.io/badge/Apache-dev_mailing_list-success.svg?logo=apache)](https://lists.apache.org/list.html?dev@baremaps.apache.org)
 
 </div>
@@ -29,7 +29,7 @@ limitations under the License.
 
 ## 🔥 Live Demo
 
-[Live Demo](https://baremaps.apache.org/map/)
+[https://demo.baremaps.com/](https://demo.baremaps.com/)
 
 ## 📖 How do I use Apache Baremaps?
 

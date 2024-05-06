@@ -23,6 +23,7 @@ examples/output/
 # Map
 basemap/data/
 basemap/cache_*/
+basemap/cache/
 basemap/local.*
 basemap/tiles.mbtiles
 basemap/tiles/
@@ -48,6 +49,9 @@ examples/openstreetmap/tiles.mbtiles
 examples/openstreetmap/tiles/
 
 examples/transformation/*.pbf
+
+# JMH
+jmh-result.json
 
 # Docs
 .jekyll-cache/
