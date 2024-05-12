@@ -32,6 +32,22 @@ import org.locationtech.jts.geom.Geometry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/*
+ id : 25685109
+ {"name": "Spörry",
+ "height": "10.5",
+ "roof:shape": "gabled",
+ "roof:colour": "red",
+ "roof:levels": "1",
+ "building:part": "yes",
+ "roof:material": "roof_tiles",
+ "building:colour": "yellow",
+ "building:levels": "3"}
+
+ "roof:levels"
+ building:levels
+ */
+
 /**
  * A read-only {@code TileStore} implementation that uses the PostgreSQL to generate 3d tiles.
  */
@@ -39,7 +55,7 @@ public class TdTilesStore {
 
   private static final Logger logger = LoggerFactory.getLogger(TdTilesStore.class);
   private static final String QUERY =
-      "select st_asbinary(geom), tags -> 'buildings:height', tags -> 'height', tags -> 'buildings:levels'  from osm_ways where tags ? 'building' and st_intersects(geom, st_makeenvelope(%1$s, %2$s, %3$s, %4$s, 4326)) LIMIT %5$s";
+      "select st_asbinary(geom), tags -> 'buildings:height', tags -> 'height', tags -> 'buildings:levels', tags ->'roof:levels' from osm_ways where tags ? 'building' and st_intersects(geom, st_makeenvelope(%1$s, %2$s, %3$s, %4$s, 4326)) LIMIT %5$s";
 
 
   private final DataSource datasource;
@@ -70,14 +86,30 @@ public class TdTilesStore {
           String buildingHeight = resultSet.getString(2);
           String height = resultSet.getString(3);
           String buildingLevels = resultSet.getString(4);
+            String roofLevels = resultSet.getString(5);
+
           float finalHeight = 10;
           if (buildingHeight != null) {
             finalHeight = Float.parseFloat(buildingHeight.replaceAll("[^0-9]", ""));
           } else if (height != null) {
             finalHeight = Float.parseFloat(height.replaceAll("[^0-9]", ""));
-          } else if (buildingLevels != null) {
-            finalHeight = Float.parseFloat(buildingLevels.replaceAll("[^0-9]", "")) * 3;
+          } else if (buildingLevels != null || roofLevels != null) {
+            finalHeight = 0;
+            if (buildingLevels != null) {
+              finalHeight += Float.parseFloat(buildingLevels.replaceAll("[^0-9]", "")) * 3;
+            }
+            if (roofLevels != null) {
+              finalHeight += Float.parseFloat(roofLevels.replaceAll("[^0-9]", "")) * 3;
+            }
           }
+//           System.out.println("buildingHeight: " + buildingHeight + " height: " + height + "
+//           buildingLevels: " + buildingLevels);
+//          if (!(buildingHeight == null && height == null && buildingLevels == null)) {
+//            System.out.println();
+//            System.out.println("buildingHeight: " + buildingHeight + " height: " + height
+//                + " buildingLevels: " + buildingLevels);
+//            finalHeight = 10000;
+//          }
 
           buildings.add(new Building(geometry, finalHeight));
         }

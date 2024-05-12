@@ -49,6 +49,8 @@ public class GltfBuilder {
    */
   public static NodeModel createNode(Building building, float tolerance) {
 
+    // System.out.println("Building: " + building);
+
     // Tessellate the vector data
     DelaunayTriangulationBuilder delaunayTriangulationBuilder = new DelaunayTriangulationBuilder();
     delaunayTriangulationBuilder.setSites(building.geometry());
@@ -69,8 +71,8 @@ public class GltfBuilder {
     List<Integer> indices = new ArrayList<>();
     List<Float> normals = new ArrayList<>();
     createRoof(building, translation, triangulation, vertices, indices);
-    HashSet<Edge> edges = getExteriorEdges(triangulation);
-    createWalls(building, translation, vertices, indices, edges);
+//    HashSet<Edge> edges = getExteriorEdges(triangulation);
+//    createWalls(building, translation, vertices, indices, edges);
     createNormals(vertices, normals);
 
     // Create a mesh from the vertices, indices and normals
@@ -87,7 +89,11 @@ public class GltfBuilder {
 
     // Create a material, and assign it to the mesh primitive
     MaterialBuilder materialBuilder = MaterialBuilder.create();
-    materialBuilder.setBaseColorFactor(1f, 1f, 1f, 1.0f);
+    if (building.height() != 10f) {
+      materialBuilder.setBaseColorFactor(0f, 1f, 0f, 1.0f);
+    } else {
+      materialBuilder.setBaseColorFactor(1f, 0f, 0f, 1.0f);
+    }
     materialBuilder.setDoubleSided(false);
     MaterialModelV2 materialModel = materialBuilder.build();
     materialModel.setMetallicFactor(0.0f);

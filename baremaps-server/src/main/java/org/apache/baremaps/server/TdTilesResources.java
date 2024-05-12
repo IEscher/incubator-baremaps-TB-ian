@@ -56,7 +56,7 @@ public class TdTilesResources {
 
   @Get("regex:^/subtrees/(?<level>[0-9]+).(?<x>[0-9]+).(?<y>[0-9]+).json")
   public HttpResponse getSubtree(@Param("level") int level, @Param("x") int x, @Param("y") int y) {
-    if (level == 18) {
+    if (level >= 19) {
       return HttpResponse.ofJson(JSON_HEADERS,
           new Subtree(new Availability(false), new Availability(true), new Availability(false)));
     }
@@ -65,17 +65,19 @@ public class TdTilesResources {
   }
 
   @Get("regex:^/content/content_(?<level>[0-9]+)__(?<x>[0-9]+)_(?<y>[0-9]+).glb")
-  public HttpResponse getContent(@Param("level") int level, @Param("x") int x, @Param("y") int y)
-      throws Exception {
+  public HttpResponse getContent(@Param("level") int level, @Param("x") int x, @Param("y") int y) throws Exception {
     if (level < 14) {
       return HttpResponse.of(GLB_HEADERS, HttpData.wrap(GltfBuilder.createGltf(new ArrayList<>())));
     }
     float[] coords = xyzToLatLonRadians(x, y, level);
     List<NodeModel> nodes = new ArrayList<>();
-    int limit = level > 17 ? 1000 : level > 16 ? 200 : level > 15 ? 30 : 10;
+    int limit = level < 15 ? 100 : level < 16 ? 50 : level < 17 ? 30 : 20; // TODO use LODs /
+                                                                             // Screen space error
+                                                                             // instead
+//    int limit = level < 15 ? 100 : 50;
     List<Building> buildings = tdTilesStore.read(coords[0], coords[1], coords[2], coords[3], limit);
+    float tolerance = level > 17 ? 0.00001f : level > 15 ? 0.00002f : 0.00004f;
     for (Building building : buildings) {
-      float tolerance = level > 17 ? 0.00001f : level > 15 ? 0.00002f : 0.00004f;
       nodes.add(GltfBuilder.createNode(building, tolerance));
     }
     return HttpResponse.of(GLB_HEADERS, HttpData.wrap(GltfBuilder.createGltf(nodes)));

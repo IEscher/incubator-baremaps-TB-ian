@@ -25,7 +25,7 @@ Adds the `JGLTF` dependency to the `baremaps-core` module.
 
 ### baremaps-core/src/main/java/org/apache/baremaps/tdtiles/GltfBuilder.java
 
-Adds the functions to use GLTF, particularly to build houses with the functions `createWalls` and `createRoof`.
+Adds the functions to use GLTF, particularly to build houses.
 
 ### baremaps-core/src/main/java/org/apache/baremaps/tdtiles/TdTilesStore.java
 

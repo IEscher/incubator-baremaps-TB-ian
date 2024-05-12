@@ -9,29 +9,49 @@
 <body>
 <div id="cesiumContainer"></div>
 <script>
-    Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJjYTZkYThmNi1iMDIxLTRkOTAtOTI4YS01OTY4YWIzYzYzOGUiLCJpZCI6MTE4MzI0LCJpYXQiOjE2NzEwMTU5NzZ9.qjN6GQvDXYjHsgTHQ6Y8BengL4GEPGmff_WKfLzrn0o';
+    Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI0Y2VmNGVjYy02ZjA5LTQ3NTMtYTZiMC1mMjA4OTFjODZkNzkiLCJpZCI6MjEzMjM1LCJpYXQiOjE3MTQ5OTY2OTZ9.Eg1Oa8FbWyNzlNYS-pbHivBe-3r7k6u3e9YbaQ6WkvE';
 
     // Initialize the Cesium Viewer in the HTML element with the `cesiumContainer` ID.
     const viewer = new Cesium.Viewer('cesiumContainer', {
         //terrainProvider: Cesium.createWorldTerrain()
     });
 
+    // Create a ScreenSpaceEventHandler to handle mouse events
+    const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+
     // Create the tileset in the viewer
     const tileset =
         new Cesium.Cesium3DTileset({
             url: "http://localhost:9000/tileset.json",
-            debugShowBoundingVolume: false,
+            debugShowBoundingVolume: true,
             debugShowGeometricError: false,
             debugShowUrl: false,
-            debugWireframe: false
+            debugWireframe: false,
+            preferLeaves : true
         });
 
     viewer.scene.primitives.add(tileset);
 
     // Set initial position
     viewer.camera.setView({
-        destination : Cesium.Cartesian3.fromDegrees(6.6323, 46.5197, 300)
+        destination : Cesium.Cartesian3.fromDegrees(6.62, 46.5, 4326)
     });
+
+    // Add left click input to select a building to and extract its coordinates
+    handler.setInputAction(function (movement) {
+        console.log(movement.position);
+        // viewer.selectedEntity = undefined;
+        // const pickedBuilding = viewer.scene.pick(movement.position);
+        // if (pickedBuilding) {
+        //     const pickedLatitude = pickedBuilding.getProperty(
+        //         "cesium#latitude"
+        //     );
+        //     const pickedLongitude = pickedBuilding.getProperty(
+        //         "cesium#longitude"
+        //     );
+        //     colorByDistanceToCoordinate(pickedLatitude, pickedLongitude);
+        // }
+    }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 </script>
 </div>
 </body>

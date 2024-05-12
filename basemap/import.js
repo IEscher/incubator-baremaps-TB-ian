@@ -82,30 +82,30 @@ export default {
     //     },
     //   ]
     // },
-    {
-      "id": "openstreetmap-ocean",
-      "needs": [
-        "openstreetmap-water-polygons",
-        "openstreetmap-simplified-water-polygons",
-      ],
-      "tasks": [
-        {
-          "type": "ExecuteSql",
-          "file": "layers/ocean/clean.sql",
-          "database": config.database,
-        },
-        {
-          "type": "ExecuteSql",
-          "file": "layers/ocean/prepare.sql",
-          "database": config.database,
-        },
-        {
-          "type": "ExecuteSql",
-          "file": "layers/ocean/index.sql",
-          "database": config.database,
-        },
-      ]
-    },
+    // {
+    //   "id": "openstreetmap-ocean",
+    //   "needs": [
+    //     "openstreetmap-water-polygons",
+    //     "openstreetmap-simplified-water-polygons",
+    //   ],
+    //   "tasks": [
+    //     {
+    //       "type": "ExecuteSql",
+    //       "file": "layers/ocean/clean.sql",
+    //       "database": config.database,
+    //     },
+    //     {
+    //       "type": "ExecuteSql",
+    //       "file": "layers/ocean/prepare.sql",
+    //       "database": config.database,
+    //     },
+    //     {
+    //       "type": "ExecuteSql",
+    //       "file": "layers/ocean/index.sql",
+    //       "database": config.database,
+    //     },
+    //   ]
+    // },
     {
       "id": "openstreetmap-data",
       "needs": [],
