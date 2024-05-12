@@ -71,8 +71,8 @@ public class GltfBuilder {
     List<Integer> indices = new ArrayList<>();
     List<Float> normals = new ArrayList<>();
     createRoof(building, translation, triangulation, vertices, indices);
-//    HashSet<Edge> edges = getExteriorEdges(triangulation);
-//    createWalls(building, translation, vertices, indices, edges);
+    // HashSet<Edge> edges = getExteriorEdges(triangulation);
+    // createWalls(building, translation, vertices, indices, edges);
     createNormals(vertices, normals);
 
     // Create a mesh from the vertices, indices and normals

@@ -33,19 +33,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /*
- id : 25685109
- {"name": "Spörry",
- "height": "10.5",
- "roof:shape": "gabled",
- "roof:colour": "red",
- "roof:levels": "1",
- "building:part": "yes",
- "roof:material": "roof_tiles",
- "building:colour": "yellow",
- "building:levels": "3"}
-
- "roof:levels"
- building:levels
+ * id : 25685109 {"name": "Spörry", "height": "10.5", "roof:shape": "gabled", "roof:colour": "red",
+ * "roof:levels": "1", "building:part": "yes", "roof:material": "roof_tiles", "building:colour":
+ * "yellow", "building:levels": "3"}
+ * 
+ * "roof:levels" building:levels
  */
 
 /**
@@ -86,7 +78,7 @@ public class TdTilesStore {
           String buildingHeight = resultSet.getString(2);
           String height = resultSet.getString(3);
           String buildingLevels = resultSet.getString(4);
-            String roofLevels = resultSet.getString(5);
+          String roofLevels = resultSet.getString(5);
 
           float finalHeight = 10;
           if (buildingHeight != null) {
@@ -102,14 +94,14 @@ public class TdTilesStore {
               finalHeight += Float.parseFloat(roofLevels.replaceAll("[^0-9]", "")) * 3;
             }
           }
-//           System.out.println("buildingHeight: " + buildingHeight + " height: " + height + "
-//           buildingLevels: " + buildingLevels);
-//          if (!(buildingHeight == null && height == null && buildingLevels == null)) {
-//            System.out.println();
-//            System.out.println("buildingHeight: " + buildingHeight + " height: " + height
-//                + " buildingLevels: " + buildingLevels);
-//            finalHeight = 10000;
-//          }
+          // System.out.println("buildingHeight: " + buildingHeight + " height: " + height + "
+          // buildingLevels: " + buildingLevels);
+          // if (!(buildingHeight == null && height == null && buildingLevels == null)) {
+          // System.out.println();
+          // System.out.println("buildingHeight: " + buildingHeight + " height: " + height
+          // + " buildingLevels: " + buildingLevels);
+          // finalHeight = 10000;
+          // }
 
           buildings.add(new Building(geometry, finalHeight));
         }
