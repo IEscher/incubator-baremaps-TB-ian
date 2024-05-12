@@ -18,8 +18,6 @@
 package org.apache.baremaps.tdtiles.building;
 
 import org.apache.baremaps.tdtiles.utils.Color;
-import org.locationtech.jts.geom.Geometry;
 
-public record Building(Geometry geometry, float height, float minHeight, Color color, Roof roof) {
-
+public record Roof(float height, String shape, Color color, float angle) {
 }

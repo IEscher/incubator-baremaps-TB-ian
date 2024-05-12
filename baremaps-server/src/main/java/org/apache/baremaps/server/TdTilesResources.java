@@ -56,7 +56,6 @@ public class TdTilesResources {
 
   @Get("regex:^/subtrees/(?<level>[0-9]+).(?<x>[0-9]+).(?<y>[0-9]+).json")
   public HttpResponse getSubtree(@Param("level") int level, @Param("x") int x, @Param("y") int y) {
-    System.out.println("getSubtree");
     if (level >= 19) {
       return HttpResponse.ofJson(JSON_HEADERS,
           new Subtree(new Availability(false), new Availability(true), new Availability(false)));

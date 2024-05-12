@@ -89,11 +89,8 @@ public class GltfBuilder {
 
     // Create a material, and assign it to the mesh primitive
     MaterialBuilder materialBuilder = MaterialBuilder.create();
-    if (building.height() != 10f) {
-      materialBuilder.setBaseColorFactor(0f, 1f, 0f, 1.0f);
-    } else {
-      materialBuilder.setBaseColorFactor(1f, 0f, 0f, 1.0f);
-    }
+    materialBuilder.setBaseColorFactor(building.color().r(), building.color().g(),
+        building.color().b(), 1.0f);
     materialBuilder.setDoubleSided(false);
     MaterialModelV2 materialModel = materialBuilder.build();
     materialModel.setMetallicFactor(0.0f);

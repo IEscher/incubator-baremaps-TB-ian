@@ -60,3 +60,16 @@ HTML file for the webpage. Downloads Cesium JS and uses it to display the 3D Til
 JSON file defining the parameters for displaying the 3D Tiles. Notable parameter : ` "subdivisionScheme" : "QUADTREE"`
 
 ### examples/tdtiles/README.md
+
+
+## Cahier de route
+
+### 12.05.2024
+
+- Création du système de couleurs `baremaps-core/src/main/java/org/apache/baremaps/tdtiles/utils`
+- Création des records Roof et Color, modif de Building et Création de ColorUtility pour parse les noms des couleures en value rgb
+- Modification de la requête SQL dans `TdTilesStore.java` pour récupérer tous les types de bâtiments, toutes leurs parties, leur toit et les attributs de leur toit
+
+#### Problème aperçu
+
+- les requètes SQL ne prennent que les premiers bâtiements dans les quadtrees donc on se retrouve avec des trous entre les quadtrees car les bâtiments ne sont pas séléctionnés en fonction de leur distance
