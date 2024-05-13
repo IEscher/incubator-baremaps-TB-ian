@@ -29,6 +29,15 @@
             debugWireframe: false
         });
 
+    /*
+    * X positive is in direction left
+    * Y positive is in direction up
+    * Z positive is in direction towards the screen
+     */
+    viewer.scene.light = new Cesium.DirectionalLight({
+        direction: new Cesium.Cartesian3(-1.0, 1.0, -1.0)
+    });
+
     viewer.scene.primitives.add(tileset);
 
     // Set initial position

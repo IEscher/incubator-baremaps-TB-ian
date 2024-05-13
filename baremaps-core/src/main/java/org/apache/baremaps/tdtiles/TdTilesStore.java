@@ -64,7 +64,9 @@ public class TdTilesStore {
           "tags -> 'roof:angle', " + // 14
           "tags -> 'roof:direction', " + // 15
           "tags -> 'amenity' " + // 16
-          "from osm_ways where (tags ? 'building' or tags ? 'building:part' or tags ? 'amenity') and "
+          // "from osm_ways where (tags ? 'building' or tags ? 'building:part' or tags ? 'amenity')
+          // and "
+          "from osm_ways where (tags ? 'building' or tags ? 'building:part') and "
           +
           "st_intersects(geom, st_makeenvelope(%1$s, %2$s, %3$s, %4$s, 4326)) LIMIT %5$s";
 
@@ -107,12 +109,12 @@ public class TdTilesStore {
           String roofMaterial = resultSet.getString(13);
           String roofAngle = resultSet.getString(14);
           String roofDirection = resultSet.getString(15);
-          String amenity = resultSet.getString(16);
+          // String amenity = resultSet.getString(16);
 
           Color finalColor = new Color(1f, 1f, 1f);
           // if no attribute is found, make the building red
           if (height == null && buildingLevels == null && buildingMinLevels == null
-              && buildingColor == null && buildingMaterial == null&& roofShape == null
+              && buildingColor == null && buildingMaterial == null && roofShape == null
               && roofLevels == null && roofHeight == null && roofColor == null
               && roofMaterial == null && roofAngle == null && roofDirection == null) {
             finalColor = new Color(1f, 0f, 0f);

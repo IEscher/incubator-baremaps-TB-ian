@@ -70,6 +70,16 @@ JSON file defining the parameters for displaying the 3D Tiles. Notable parameter
 - Création des records Roof et Color, modif de Building et Création de ColorUtility pour parse les noms des couleures en value rgb
 - Modification de la requête SQL dans `TdTilesStore.java` pour récupérer tous les types de bâtiments, toutes leurs parties, leur toit et les attributs de leur toit
 
-#### Problème aperçu
+#### Problèmes aperçus
 
 - les requètes SQL ne prennent que les premiers bâtiements dans les quadtrees donc on se retrouve avec des trous entre les quadtrees car les bâtiments ne sont pas séléctionnés en fonction de leur distance
+
+### 13.05.2024
+
+- Implémentation de la hauteur des bâtiments dans `TdTilesStore.java` selon la documentation de 3D Tiles
+- Changement de "triangulator" pour le calcul des géométries des bâtiments permettant de render les géométries concaves
+- Fix du "winding order" pour les triangles du nouveau "triangulator", leurs faces étaient à l'envers. Pas de changement au niveau des normales n'a ensuite été nécessaire
+
+#### Problèmes aperçus
+
+- Un problème existe peut-être dans la disposition des triangles des parrois

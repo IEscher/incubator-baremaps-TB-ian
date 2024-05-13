@@ -37,7 +37,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.geomgraph.Edge;
 import org.locationtech.jts.math.Vector3D;
-import org.locationtech.jts.triangulate.DelaunayTriangulationBuilder;
+import org.locationtech.jts.triangulate.polygon.PolygonTriangulator;
 
 public class GltfBuilder {
 
@@ -50,10 +50,11 @@ public class GltfBuilder {
   public static NodeModel createNode(Building building, float tolerance) {
 
     // Tessellate the vector data
-    DelaunayTriangulationBuilder delaunayTriangulationBuilder = new DelaunayTriangulationBuilder();
-    delaunayTriangulationBuilder.setSites(building.geometry());
-    delaunayTriangulationBuilder.setTolerance(tolerance);
-    Geometry triangulation = delaunayTriangulationBuilder.getTriangles(new GeometryFactory());
+    Geometry triangulation = PolygonTriangulator.triangulate(building.geometry()); // TODO use
+                                                                                   // ConstrainedDelaunayTriangulator
+                                                                                   // for better
+                                                                                   // LODs
+
     if (triangulation.getNumGeometries() == 0) {
       return new DefaultNodeModel();
     }
@@ -69,8 +70,8 @@ public class GltfBuilder {
     List<Integer> indices = new ArrayList<>();
     List<Float> normals = new ArrayList<>();
     createRoof(building, translation, triangulation, vertices, indices);
-    // HashSet<Edge> edges = getExteriorEdges(triangulation);
-    // createWalls(building, translation, vertices, indices, edges);
+    HashSet<Edge> edges = getExteriorEdges(triangulation);
+    createWalls(building, translation, vertices, indices, edges);
     createNormals(vertices, normals);
 
     // Create a mesh from the vertices, indices and normals
@@ -91,9 +92,9 @@ public class GltfBuilder {
         building.color().b(), 1.0f);
     materialBuilder.setDoubleSided(false);
     MaterialModelV2 materialModel = materialBuilder.build();
-    materialModel.setMetallicFactor(0.0f);
-    materialModel.setOcclusionStrength(0.0f);
-    materialModel.setRoughnessFactor(1.0f);
+    materialModel.setMetallicFactor(0f);
+    materialModel.setOcclusionStrength(0f);
+    materialModel.setRoughnessFactor(0.5f);
     meshPrimitiveModel.setMaterialModel(materialModel);
 
     // Create a mesh with the mesh primitive
@@ -179,27 +180,29 @@ public class GltfBuilder {
       vertices.add(pos0[0]);
       vertices.add(pos0[1]);
       vertices.add(pos0[2]);
+      // The winding order of the vertices is reversed so had to swap pos1 and pos2
       indices.add(vertices.size() / 3);
-      vertices.add(pos1[0]);
-      vertices.add(pos1[1]);
-      vertices.add(pos1[2]);
-      indices.add(vertices.size() / 3);
-      vertices.add(pos2[0]);
+      vertices.add(pos2[0]); // Changed from pos1 to pos2
       vertices.add(pos2[1]);
       vertices.add(pos2[2]);
+      indices.add(vertices.size() / 3);
+      vertices.add(pos1[0]); // Changed from pos2 to pos1
+      vertices.add(pos1[1]);
+      vertices.add(pos1[2]);
 
       indices.add(vertices.size() / 3);
       vertices.add(pos2[0]);
       vertices.add(pos2[1]);
       vertices.add(pos2[2]);
+      // The winding order of the vertices is reversed so had to swap pos1 and pos3
       indices.add(vertices.size() / 3);
-      vertices.add(pos1[0]);
-      vertices.add(pos1[1]);
-      vertices.add(pos1[2]);
-      indices.add(vertices.size() / 3);
-      vertices.add(pos3[0]);
+      vertices.add(pos3[0]); // Changed from pos1 to pos3
       vertices.add(pos3[1]);
       vertices.add(pos3[2]);
+      indices.add(vertices.size() / 3);
+      vertices.add(pos1[0]); // Changed from pos2 to pos1
+      vertices.add(pos1[1]);
+      vertices.add(pos1[2]);
     }
   }
 
@@ -254,8 +257,8 @@ public class GltfBuilder {
     for (int i = 0; i < triangulation.getNumGeometries(); i++) {
       Geometry triangle = triangulation.getGeometryN(i);
       Coordinate corner1 = triangle.getCoordinates()[0];
-      Coordinate corner2 = triangle.getCoordinates()[1];
-      Coordinate corner3 = triangle.getCoordinates()[2];
+      Coordinate corner2 = triangle.getCoordinates()[2];
+      Coordinate corner3 = triangle.getCoordinates()[1];
 
       float[] pos0 = cartesian3FromDegrees((float) corner1.y, (float) corner1.x, building.height());
       pos0[0] -= translation[0];
