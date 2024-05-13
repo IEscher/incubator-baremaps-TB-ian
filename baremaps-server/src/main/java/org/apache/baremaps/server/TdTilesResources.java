@@ -75,7 +75,6 @@ public class TdTilesResources {
     int limit = level < 15 ? 100 : level < 16 ? 50 : level < 17 ? 30 : 20; // TODO use LODs /
                                                                            // Screen space error
                                                                            // instead
-    // int limit = level < 15 ? 100 : 50;
     List<Building> buildings = tdTilesStore.read(coords[0], coords[1], coords[2], coords[3], limit);
     float tolerance = level > 17 ? 0.00001f : level > 15 ? 0.00002f : 0.00004f;
     for (Building building : buildings) {

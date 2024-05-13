@@ -49,8 +49,6 @@ public class GltfBuilder {
    */
   public static NodeModel createNode(Building building, float tolerance) {
 
-    // System.out.println("Building: " + building);
-
     // Tessellate the vector data
     DelaunayTriangulationBuilder delaunayTriangulationBuilder = new DelaunayTriangulationBuilder();
     delaunayTriangulationBuilder.setSites(building.geometry());
