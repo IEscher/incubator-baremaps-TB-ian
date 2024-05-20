@@ -83,3 +83,14 @@ JSON file defining the parameters for displaying the 3D Tiles. Notable parameter
 #### Problèmes aperçus
 
 - Un problème existe peut-être dans la disposition des triangles des parrois
+
+### Probablement le 17.05.2024
+
+- Profiling de l'application -> "writeBinary" de Gltf prend énormément de temps
+- Multithreading pour le calcul des géométries des bâtiments ("createNode" de GltfBuilder)
+
+### 19-20.05.2024
+
+- Optimisation de "levels" du Implicit Tiling pour avoir une quantité équilibrée
+- Recherche d'une solution pour l'utilisation de LODs (et geomertic error) mais ne semble pas être compatible avec le implicit tiling
+- Création d'un système de compression des géométries des bâtiments en fonction de leur "levels" pour réduire la taille du fichier GLTF

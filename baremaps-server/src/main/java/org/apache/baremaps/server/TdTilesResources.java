@@ -29,14 +29,25 @@ import com.linecorp.armeria.server.annotation.Param;
 import de.javagl.jgltf.model.NodeModel;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import javax.sql.DataSource;
 import org.apache.baremaps.tdtiles.GltfBuilder;
 import org.apache.baremaps.tdtiles.TdTilesStore;
 import org.apache.baremaps.tdtiles.building.Building;
 import org.apache.baremaps.tdtiles.subtree.Availability;
 import org.apache.baremaps.tdtiles.subtree.Subtree;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TdTilesResources {
+
+  private static final Logger logger = LoggerFactory.getLogger(TdTilesStore.class);
+
+  private static final int minLevel = 14;
+  private static final int maxLevel = 18;
 
   private static final ResponseHeaders GLB_HEADERS = ResponseHeaders.builder(200)
       .add(CONTENT_TYPE, BINARY)
@@ -56,7 +67,8 @@ public class TdTilesResources {
 
   @Get("regex:^/subtrees/(?<level>[0-9]+).(?<x>[0-9]+).(?<y>[0-9]+).json")
   public HttpResponse getSubtree(@Param("level") int level, @Param("x") int x, @Param("y") int y) {
-    if (level >= 19) {
+    // https://github.com/CesiumGS/3d-tiles/blob/main/specification/ImplicitTiling/README.adoc#subtrees
+    if (level >= maxLevel) {
       return HttpResponse.ofJson(JSON_HEADERS,
           new Subtree(new Availability(false), new Availability(true), new Availability(false)));
     }
@@ -67,20 +79,74 @@ public class TdTilesResources {
   @Get("regex:^/content/content_(?<level>[0-9]+)__(?<x>[0-9]+)_(?<y>[0-9]+).glb")
   public HttpResponse getContent(@Param("level") int level, @Param("x") int x, @Param("y") int y)
       throws Exception {
-    if (level < 14) {
+    if (level < minLevel) {
       return HttpResponse.of(GLB_HEADERS, HttpData.wrap(GltfBuilder.createGltf(new ArrayList<>())));
     }
     float[] coords = xyzToLatLonRadians(x, y, level);
-    List<NodeModel> nodes = new ArrayList<>();
-    int limit = level < 15 ? 100 : level < 16 ? 50 : level < 17 ? 30 : 20; // TODO use LODs /
-                                                                           // Screen space error
-                                                                           // instead
-    List<Building> buildings = tdTilesStore.read(coords[0], coords[1], coords[2], coords[3], limit);
-    float tolerance = level > 17 ? 0.00001f : level > 15 ? 0.00002f : 0.00004f;
-    for (Building building : buildings) {
-      nodes.add(GltfBuilder.createNode(building, tolerance));
+    // System.out.println("coords: " + coords[0] + ", " + coords[1] + ", " + coords[2] + ", " +
+    // coords[3]);
+    // int limit = level < 15 ? 100 : level < 16 ? 50 : level < 17 ? 30 : 20; // TODO use LODs /
+    // // Screen space error
+    // // instead
+    int limit = 1000;
+    float range = 0.00001f;
+    List<Building> buildings;
+    // buildings = tdTilesStore.read(coords[0], coords[1], coords[2], coords[3], limit);
+    // buildings = tdTilesStore.read(coords[0] - range, coords[1] + range, coords[2] - range,
+    // coords[3] + range, limit);
+    int levelDelta = maxLevel - minLevel;
+    int compression = (maxLevel - level) * GltfBuilder.MAX_COMPRESSION / levelDelta;
+    if (level != maxLevel) {
+      buildings = tdTilesStore.read(coords[0], coords[1], coords[2], coords[3], limit);
+    } else {
+      buildings = tdTilesStore.read(coords[0] - range, coords[1] + range, coords[2] - range,
+          coords[3] + range, limit);
     }
+
+    // float tolerance = level > 17 ? 0.00001f : level > 15 ? 0.00002f : 0.00004f;
+    // List<NodeModel> nodes = new ArrayList<>();
+    // for (Building building : buildings) {
+    // nodes.add(GltfBuilder.createNode(building, level));
+    // }
+
+    List<NodeModel> nodes = createNodes(buildings, compression);
+
     return HttpResponse.of(GLB_HEADERS, HttpData.wrap(GltfBuilder.createGltf(nodes)));
+  }
+
+  /**
+   * Create nodes from buildings in parallel.
+   * 
+   * @param buildings
+   * @param level
+   * @return
+   * @throws Exception
+   */
+  private static List<NodeModel> createNodes(List<Building> buildings, int level) throws Exception {
+    int numCores = Runtime.getRuntime().availableProcessors();
+    ExecutorService EXEC = Executors.newFixedThreadPool(numCores);
+    List<Callable<NodeModel>> tasks = new ArrayList<Callable<NodeModel>>();
+    for (final Building building : buildings) {
+      Callable<NodeModel> c = new Callable<NodeModel>() {
+        @Override
+        public NodeModel call() throws Exception {
+          return GltfBuilder.createNode(building, level);
+        }
+      };
+      tasks.add(c);
+    }
+
+    List<Future<NodeModel>> results = EXEC.invokeAll(tasks);
+    List<NodeModel> nodes = new ArrayList<NodeModel>();
+
+    for (Future<NodeModel> f : results) {
+      try {
+        nodes.add(f.get());
+      } catch (Exception e) {
+        logger.error("Error creating node", e);
+      }
+    }
+    return nodes;
   }
 
   /**

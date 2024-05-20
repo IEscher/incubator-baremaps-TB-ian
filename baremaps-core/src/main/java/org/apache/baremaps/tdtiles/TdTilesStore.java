@@ -112,12 +112,14 @@ public class TdTilesStore {
           // String amenity = resultSet.getString(16);
 
           Color finalColor = new Color(1f, 1f, 1f);
+          Boolean informationFound = true;
           // if no attribute is found, make the building red
           if (height == null && buildingLevels == null && buildingMinLevels == null
               && buildingColor == null && buildingMaterial == null && roofShape == null
               && roofLevels == null && roofHeight == null && roofColor == null
               && roofMaterial == null && roofAngle == null && roofDirection == null) {
             finalColor = new Color(1f, 0f, 0f);
+            informationFound = false;
           }
 
           if (buildingColor != null) {
@@ -154,7 +156,7 @@ public class TdTilesStore {
             finalHeight = 0;
           }
 
-          buildings.add(new Building(geometry, finalHeight, 0, finalColor, null));
+          buildings.add(new Building(geometry, informationFound, finalHeight, 0, finalColor, null));
         }
       }
       return buildings;

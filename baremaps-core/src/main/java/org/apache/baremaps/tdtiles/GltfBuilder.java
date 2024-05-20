@@ -37,9 +37,12 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.geomgraph.Edge;
 import org.locationtech.jts.math.Vector3D;
+import org.locationtech.jts.simplify.DouglasPeuckerSimplifier;
 import org.locationtech.jts.triangulate.polygon.PolygonTriangulator;
 
 public class GltfBuilder {
+
+  public static final int MAX_COMPRESSION = 3;
 
   /**
    * Create a node from a building.
@@ -47,21 +50,36 @@ public class GltfBuilder {
    * @param building
    * @return
    */
-  public static NodeModel createNode(Building building, float tolerance) {
+  public static NodeModel createNode(Building building, int compression) {
+    if (building.geometry() == null) {
+      return new DefaultNodeModel();
+    }
+    Geometry geometry = building.geometry();
+
+    switch (compression) {
+      case 0:
+        break;
+      case 1:
+        geometry = DouglasPeuckerSimplifier.simplify(building.geometry(), 0.00005);
+        break;
+      case 2:
+        geometry = DouglasPeuckerSimplifier.simplify(building.geometry(), 0.0001);
+        break;
+      case 3:
+        if (!building.informationFound()) {
+          return new DefaultNodeModel();
+        }
+    }
 
     // Tessellate the vector data
-    Geometry triangulation = PolygonTriangulator.triangulate(building.geometry()); // TODO use
-                                                                                   // ConstrainedDelaunayTriangulator
-                                                                                   // for better
-                                                                                   // LODs
-
+    Geometry triangulation = PolygonTriangulator.triangulate(geometry);
     if (triangulation.getNumGeometries() == 0) {
       return new DefaultNodeModel();
     }
 
     // Compute a translation for the origin of the building. If the building is too far from the
-    // origin, it will
-    // suffer from jittering. https://help.agi.com/AGIComponents/html/BlogPrecisionsPrecisions.htm
+    // origin, it will suffer from jittering.
+    // https://help.agi.com/AGIComponents/html/BlogPrecisionsPrecisions.htm
     float[] translation = cartesian3FromDegrees((float) building.geometry().getCoordinates()[0].y,
         (float) building.geometry().getCoordinates()[0].x, 0);
 
@@ -70,8 +88,10 @@ public class GltfBuilder {
     List<Integer> indices = new ArrayList<>();
     List<Float> normals = new ArrayList<>();
     createRoof(building, translation, triangulation, vertices, indices);
-    HashSet<Edge> edges = getExteriorEdges(triangulation);
-    createWalls(building, translation, vertices, indices, edges);
+    if (compression == 0 || compression == 1 || building.informationFound()) {
+      HashSet<Edge> edges = getExteriorEdges(triangulation);
+      createWalls(building, translation, vertices, indices, edges);
+    }
     createNormals(vertices, normals);
 
     // Create a mesh from the vertices, indices and normals
@@ -88,8 +108,22 @@ public class GltfBuilder {
 
     // Create a material, and assign it to the mesh primitive
     MaterialBuilder materialBuilder = MaterialBuilder.create();
-    materialBuilder.setBaseColorFactor(building.color().r(), building.color().g(),
-        building.color().b(), 1.0f);
+    switch (compression) { // TODO remove after debug
+      case 0:
+        materialBuilder.setBaseColorFactor(1.0f, 0.0f, 0.0f, 1.0f);
+        break;
+      case 1:
+        materialBuilder.setBaseColorFactor(0.0f, 1.0f, 0.0f, 1.0f);
+        break;
+      case 2:
+        materialBuilder.setBaseColorFactor(0.0f, 0.0f, 1.0f, 1.0f);
+        break;
+      case 3:
+        materialBuilder.setBaseColorFactor(1.0f, 1.0f, 1.0f, 1.0f);
+        break;
+    }
+    // materialBuilder.setBaseColorFactor(building.color().r(), building.color().g(),
+    // building.color().b(), 1.0f);
     materialBuilder.setDoubleSided(false);
     MaterialModelV2 materialModel = materialBuilder.build();
     materialModel.setMetallicFactor(0f);
