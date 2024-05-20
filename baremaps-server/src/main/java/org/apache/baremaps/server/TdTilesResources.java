@@ -82,18 +82,11 @@ public class TdTilesResources {
     if (level < minLevel) {
       return HttpResponse.of(GLB_HEADERS, HttpData.wrap(GltfBuilder.createGltf(new ArrayList<>())));
     }
+
     float[] coords = xyzToLatLonRadians(x, y, level);
-    // System.out.println("coords: " + coords[0] + ", " + coords[1] + ", " + coords[2] + ", " +
-    // coords[3]);
-    // int limit = level < 15 ? 100 : level < 16 ? 50 : level < 17 ? 30 : 20; // TODO use LODs /
-    // // Screen space error
-    // // instead
     int limit = 1000;
     float range = 0.00001f;
     List<Building> buildings;
-    // buildings = tdTilesStore.read(coords[0], coords[1], coords[2], coords[3], limit);
-    // buildings = tdTilesStore.read(coords[0] - range, coords[1] + range, coords[2] - range,
-    // coords[3] + range, limit);
     int levelDelta = maxLevel - minLevel;
     int compression = (maxLevel - level) * GltfBuilder.MAX_COMPRESSION / levelDelta;
     if (level != maxLevel) {
@@ -102,12 +95,6 @@ public class TdTilesResources {
       buildings = tdTilesStore.read(coords[0] - range, coords[1] + range, coords[2] - range,
           coords[3] + range, limit);
     }
-
-    // float tolerance = level > 17 ? 0.00001f : level > 15 ? 0.00002f : 0.00004f;
-    // List<NodeModel> nodes = new ArrayList<>();
-    // for (Building building : buildings) {
-    // nodes.add(GltfBuilder.createNode(building, level));
-    // }
 
     List<NodeModel> nodes = createNodes(buildings, compression);
 
