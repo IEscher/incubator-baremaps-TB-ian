@@ -3,31 +3,45 @@
 <head>
     <meta charset="utf-8">
     <!-- Include the CesiumJS JavaScript and CSS files -->
-    <script src="https://cesium.com/downloads/cesiumjs/releases/1.100/Build/Cesium/Cesium.js"></script>
-    <link href="https://cesium.com/downloads/cesiumjs/releases/1.100/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.117/Build/Cesium/Cesium.js"></script>
+    <link href="https://cesium.com/downloads/cesiumjs/releases/1.117/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
 </head>
 <body>
 <div id="cesiumContainer"></div>
+<div id="loadingOverlay"><h1>Loading...</h1></div>
 <script>
     Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIxMzM1NmNmOC05NzQ5LTQ4ZDUtYmI4Ni04ZTU1ZTM0ODk4ZTIiLCJpZCI6MjEzMjM1LCJpYXQiOjE3MTU1MjAxNjB9.71gsAsNjaH4-7ySA6CqzqfNslPlFzaaZBV0ZqddKJYc';
 
     // Initialize the Cesium Viewer in the HTML element with the `cesiumContainer` ID.
     const viewer = new Cesium.Viewer('cesiumContainer', {
-        //terrainProvider: Cesium.createWorldTerrain()
+        // terrain: Cesium.Terrain.fromWorldTerrain(),
     });
 
     // Create a ScreenSpaceEventHandler to handle mouse events
     const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
 
-    // Create the tileset in the viewer
-    const tileset =
-        new Cesium.Cesium3DTileset({
-            url: "http://localhost:9000/tileset.json",
-            debugShowBoundingVolume: false,
-            debugShowGeometricError: false,
-            debugShowUrl: false,
-            debugWireframe: false
-        });
+    async function loadTileset() {
+        const tileset = await Cesium.Cesium3DTileset.fromUrl(
+            "http://localhost:9000/tileset.json",
+            {
+                skipLevelOfDetail: true,
+                baseScreenSpaceError: 1024,
+                skipScreenSpaceErrorFactor: 16,
+                skipLevels: 1,
+                preferLeaves: true,
+                immediatelyLoadDesiredLevelOfDetail: true,
+                loadSiblings: true,
+                cullWithChildrenBounds: true,
+                debugShowContentBoundingVolume: true,
+                enableCollision: true,
+                enablePick: true,
+            }
+        );
+
+        viewer.scene.primitives.add(tileset);
+    }
+
+    loadTileset();
 
     /*
     * X positive is in direction left
@@ -38,28 +52,20 @@
         direction: new Cesium.Cartesian3(-1.0, 1.0, -1.0)
     });
 
-    viewer.scene.primitives.add(tileset);
-
     // Set initial position
-    viewer.camera.setView({
+    viewer.camera.flyTo({
         destination : Cesium.Cartesian3.fromDegrees(9.52, 47.156, 4326)
     });
 
     // Add left click input to select a building to and extract its coordinates
-    // handler.setInputAction(function (movement) {
-    //     console.log(movement.position);
-    //     // viewer.selectedEntity = undefined;
-    //     // const pickedBuilding = viewer.scene.pick(movement.position);
-    //     // if (pickedBuilding) {
-    //     //     const pickedLatitude = pickedBuilding.getProperty(
-    //     //         "cesium#latitude"
-    //     //     );
-    //     //     const pickedLongitude = pickedBuilding.getProperty(
-    //     //         "cesium#longitude"
-    //     //     );
-    //     //     colorByDistanceToCoordinate(pickedLatitude, pickedLongitude);
-    //     // }
-    // }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+    handler.setInputAction(function (movement) {
+        console.log(movement.position);
+        viewer.selectedEntity = undefined;
+        const pickedBuilding = viewer.scene.pick(movement.position);
+        if (pickedBuilding) {
+            console.log(pickedBuilding);;
+        }
+    }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 </script>
 </div>
 </body>
