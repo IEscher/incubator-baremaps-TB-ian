@@ -1,0 +1,71 @@
+Le plus gros problème lors de l'utilisation de l'application actuellement est que lorsque l'on déplace la caméra dans une nouvelle zone de la carte, les bâtiments prennent parfois plus d'une dizaine de secondes à s'afficher tout en bloquant le site web. De plus, les bâtiments apparaissent de manière à priori aléatoire et non au plus proche de la caméra.
+
+Je vais, dans ce chapitre, aborder différentes possibilités d'optimisation.
+
+\newpage
+\section{Implicit tiling}
+\label{sec:implicit-tiling}
+
+Avant de chercher à optimiser l'affichage des bâtiments, il est important de comprendre comment les bâtiments sont actuellement affichés. La procédure entière comporte plusieurs étapes. Le client Cesium JS commence par charger le fichier \texttt{tileset.json}\footnote{baremaps-server/src/main/resources/tdtiles/tileset.json} qui contient les informations sur la manière dont il doit charger les tuiles. Parmi ces informations, on trouve les URI auxquelles il doit envoyer des requêtes pour obtenir les tuiles mais aussi les informations nécessaires à définir l'\texttt{implicit tiling} :
+
+\begin{verbatim}
+"implicitTiling" : {
+    "subdivisionScheme" : "QUADTREE",
+    "subtreeLevels" : 6,
+    "availableLevels" : 18,
+    "subtrees" : {
+        "uri" : "/subtrees/{level}.{x}.{y}.json"
+    }
+}
+\end{verbatim}
+
+L'\Gls{implicit tiling} est une technique qui consiste à diviser la carte en tuiles de manière récursive. Tant que le \texttt{level} de division n'a pas atteint la valeur maximum \texttt{availableLevels}, on divise la tuile dans laquelle nous nous trouvons en quatre tuiles de même taille. On peut voir un exemple de cette division sur la figure \ref{quadtree.pdf}.
+
+\fig[H, width=1\textwidth]{Exemple de quadtree utilisé par Cesium JS}{quadtree.pdf}
+
+\newpage
+La notion de \texttt{levels} est directement liée au \texttt{quadtree} lui même. À chaque division, le \texttt{level} augmente de 1. Ainsi, une tuile de \texttt{level} 0 est la tuile de base, une tuile de \texttt{level} 1 est une tuile résultant de la division de la tuile de \texttt{level} 0, etc. Nous trouverons donc les tuiles de \texttt{level} le plus élevé à l'endroit où nous nous trouvons.
+
+Sachant cela, nous pouvons maintenant comprendre comment les bâtiments sont affichés. Lorsque le client Cesium JS charge une tuile, il envoie une requête au serveur Baremaps pour obtenir les bâtiments de cette tuile. Le serveur Baremaps va alors vérifier que le \texttt{level} de la tuile est suffisamment élevé pour que les bâtiments soient affichés. Si tel est le cas, il va alors effectuer la requête SQL vu au chapitre \ref{sec:extraction} avec néanmoins une limite au nombre de bâtiments retournés (ce nombre dépendant du \texttt{level}). Les bâtiments retournés sont alors convertit en \texttt{glTF} et envoyés au client Cesium JS qui les affiche.
+
+Cette approche est la source du problème causant les bâtiments à s'afficher de manière ressemblant à de l'aléatoire. Si nous imposons une limite de bâtiments par tuile, alors la requête SQL ne retournera que les premiers bâtiments dans sa liste, peu importe qu'ils soient proches de la caméra ou non.
+
+J'ai donc modifié ce fonctionnement pour que lorsqu'une tuile soit demandée à être affichée, le serveur Baremaps retourne tous les bâtiments de cette tuile. Néanmoins, un changement est donc aussi nécessaire quand à quelle tuile doit être affichée ou non. Générer tous les bâtiments d'une tuile trop grande ne fera que bloquer le client Cesium JS le temps quel la tuile lui soit fournie. En augmentant le \texttt{level} à partir duquel les bâtiments sont affichés, nous pouvons garantir que tous les bâtiments affichés sont proches de la caméra tout en évitant de prendre trop de temps à les générer.
+
+\newpage
+\section{Profiling}
+
+Afin de voir exactement quelle partie du code bloque lorsque l'on déplace la caméra, j'ai utilisé l'outil de \texttt{profiling} lié à l'IDE IntelliJ. Cet outil permet de voir le temps passé dans chaque méthode du code. J'ai donc lancé le \texttt{profiler} et j'ai déplacé la caméra dans une zone de la carte où les bâtiments mettent du temps à s'afficher. Les résultats sont visibles sur la figure \ref{profiling.pdf}.
+
+\fig[H, width=1\textwidth]{Résultats du profiling}{profiling.pdf}
+
+Grâce à ces résultats, nous pouvons observer que c'est l'écriture en fichiers binaire \texttt{glTF} des bâtiments qui prend le plus de temps. Malheureusement, cette fonction \texttt{writeBinary}\footnote{de.javagl.jgltf.model.io.v2.GltfAssetWriterV2} ne peut pas être plus optimisée que ce qu'elle est déjà. Je parle néanmoins dans la section suivante d'une manière de lui alléger la tâche.
+
+On remarque aussi que la méthode \texttt{createNode}\footnote{baremaps-core/src/main/java/org/apache/baremaps/tdtiles/GltfBuilder.java} prend aussi beaucoup de temps. Ici il est possible de \textit{multithreader} cette méthode pour gagner du temps. J'ai donc écrit la méthode \texttt{createNodes}\footnote{baremaps-server/src/main/java/org/apache/baremaps/server/TdTilesResources.java} qui permet de le faire en prenant en compte le nombre de CPUs disponibles.
+
+\newpage
+\section{Système de compression des géométries des bâtiments}
+
+Comme vu à la section précédente, l'écriture des bâtiments en fichiers binaires \texttt{glTF} est une des étapes les plus longues. Une manière de réduire le temps passé dans cette étape est de simplement réduire la quantité de donnée que la fonction prend en paramètre. Pour cela, j'utilise un système de \textit{Level of details} (LOD) pour les géométries des bâtiments.
+
+Ce système se base sur les \texttt{levels} des tuiles discutés au chapitre \ref{sec:implicit-tiling}. Plus le \texttt{level} est élevé, plus les bâtiments sont proches de la caméra et donc plus les bâtiments doivent être détaillés. En fonction du \texttt{level} de leur tuile, les bâtiments subissent jusqu'à 3 niveau de compression :
+
+\begin{itemize}
+    \item \texttt{level} 0 : Les bâtiments sont affichés en 3D avec toutes les géométries.
+    \item \texttt{level} 1 : Les bâtiments sont affichés en 3D avec une géométrie simplifiée.
+    \item \texttt{level} 2 : Les bâtiments sont affichés en 2D.
+    \item \texttt{level} 3 : Les bâtiments sont affichés en 3D avec toutes les géométries uniquement si ils ont des caractéristiques spécifiques enregistrées dans la base de données OpenStreetMap.
+\end{itemize}
+
+Pour visualiser les différences entre les niveaux de compression, je vous invite à regarder la figure \ref{levelsofdetails.pdf} où chaque niveau de détail est simbolisé par une couleur :
+
+\begin{itemize}
+    \item \texttt{level} 0 : rouge
+    \item \texttt{level} 1 : vert
+    \item \texttt{level} 2 : bleu
+    \item \texttt{level} 3 : blanc
+\end{itemize}
+
+\fig[H, width=1\textwidth]{Niveaux de détails des bâtiments}{levelsofdetails.pdf}
+
+Faire ainsi permet de réduire drastiquement le temps passé à générer ces bâtiments tout en gardant une qualité d'affichage correcte.

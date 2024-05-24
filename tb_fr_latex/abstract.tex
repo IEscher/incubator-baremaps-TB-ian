@@ -1,7 +1,14 @@
-% Francais
-\lipsum[1]
+Le travail devant être effectué durant ce travail consiste à utiliser la spécification \href{https://cesium.com/blog/2021/11/10/introducing-3d-tiles-next/}{3D Tiles Next}\footnote{https://cesium.com/blog/2021/11/10/introducing-3d-tiles-next/} de \href{https://cesium.com/}{Cesium}\footnote{https://cesium.com/} pour \textit{streamer} un rendu 3D de tuiles vectorielles à l'intérieur du \href{https://github.com/baremaps/baremaps}{framework Baremaps}\footnote{https://github.com/baremaps/baremaps} existant. Le produit final sera un prototype du support de cette spécification en utilisant une base de données \href{https://postgis.net/}{Postgis}\footnote{https://postgis.net/}. Les fonctionnalités offertes 3D Tiles Next seront pleinement utilisées pour produire un rendu de haute qualité et performant.
 
-\asterism
+Les rendus 3D que propose Cesium peuvent être distribués en deux catégories :
 
-% English
-\lipsum[3]
+\begin{itemize}
+    \item[1.] Le terrain géographique
+    \item[2.] Les bâtiments
+\end{itemize}
+
+Produire le rendu du terrain ainsi que le rendu des bâtiments comporte chacun ses propres difficultés d'optimisation. Un système de \textit{level of details} devra être implémenté pour maintenir de hautes performances, même avec un nombre important de géométries affichées à l'écran.
+
+Cependant, dans le cadre de ce travail, seul l'affichage des bâtiments sera traité. Pour cela, la spécification 3D Tiles Next propose une solution d'optimisation interne à son fonctionnement avec Cesium. Néanmoins, beaucoup reste à être fait quant à l'affichage des bâtiments ainsi que pour créer un système permettant de \textit{streamer} les informations de la base de données d'OpenStreetMap vers Cesium.
+
+% \asterism
