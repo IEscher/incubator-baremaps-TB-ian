@@ -15,10 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.baremaps.tdtiles.subtree;
+package org.apache.baremaps.tdtiles.tileset;
 
-public record Subtree(Availability tileAvailability,
-    Availability contentAvailability,
-    Availability childSubtreeAvailability) {
-
+public record BoundingVolume(Float[] region) {
 }

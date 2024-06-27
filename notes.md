@@ -62,35 +62,17 @@ JSON file defining the parameters for displaying the 3D Tiles. Notable parameter
 ### examples/tdtiles/README.md
 
 
-## Cahier de route
+## Cache
 
-### 12.05.2024
+Caffeine ne sert qu'à alléger la db
 
-- Création du système de couleurs `baremaps-core/src/main/java/org/apache/baremaps/tdtiles/utils`
-- Création des records Roof et Color, modif de Building et Création de ColorUtility pour parse les noms des couleures en value rgb
-- Modification de la requête SQL dans `TdTilesStore.java` pour récupérer tous les types de bâtiments, toutes leurs parties, leur toit et les attributs de leur toit
+### manière de stocker
 
-#### Problèmes aperçus
+Les gltf sont générés par bâtiment et non pas par subtree. Cela évite que les bâtiments doivent être stockés plusieurs fois, par exemple, plusieurs subtree peuvent demander la c3 d'un bâtiment. De plus, de cette manière, il est possible de vérifier, si le bâtiment est à cheval entre deux subtrees, que le bâtiment ne soit par délivré deux fois dans deux subtree différents.
 
-- les requètes SQL ne prennent que les premiers bâtiements dans les quadtrees donc on se retrouve avec des trous entre les quadtrees car les bâtiments ne sont pas séléctionnés en fonction de leur distance
+Eh bah non en fait c'est pas une bonne idée. Cesium implicit tiling n'a pas été designé pour ça. Il faudrait créer un buffer "content" par bâtiment pour tout les bâtiments que contient un subtree. Le seul avantage à ça serait qu'il serait possible d'avoir une granularité très élevée, par bâtiment, pour les metadata. Mais comme cela ne fait pas vraiment partie du cahier des charges, tant-pis. Aussi, générer un metadata par bâtiment est un enfer et prendrait beaucoup trop de place.
 
-### 13.05.2024
+Soit dit en passant, store les bitstream dans des buffer plutôt que directement des int dans le JSON ne fait sens que pour des cas ou il existe énormément de availableLevels.
 
-- Implémentation de la hauteur des bâtiments dans `TdTilesStore.java` selon la documentation de 3D Tiles
-- Changement de "triangulator" pour le calcul des géométries des bâtiments permettant de render les géométries concaves
-- Fix du "winding order" pour les triangles du nouveau "triangulator", leurs faces étaient à l'envers. Pas de changement au niveau des normales n'a ensuite été nécessaire
 
-#### Problèmes aperçus
 
-- Un problème existe peut-être dans la disposition des triangles des parrois
-
-### Probablement le 17.05.2024
-
-- Profiling de l'application -> "writeBinary" de Gltf prend énormément de temps
-- Multithreading pour le calcul des géométries des bâtiments ("createNode" de GltfBuilder)
-
-### 19-20.05.2024
-
-- Optimisation de "levels" du Implicit Tiling pour avoir une quantité équilibrée
-- Recherche d'une solution pour l'utilisation de LODs (et geomertic error) mais ne semble pas être compatible avec le implicit tiling
-- Création d'un système de compression des géométries des bâtiments en fonction de leur "levels" pour réduire la taille du fichier GLTF

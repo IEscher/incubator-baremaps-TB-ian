@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <!-- Include the CesiumJS JavaScript and CSS files -->
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.117/Build/Cesium/Cesium.js"></script>
+    <link href="https://cesium.com/downloads/cesiumjs/releases/1.117/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+</head>
+<body>
+<div id="cesiumContainer"></div>
+<script>
+    Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIxMzM1NmNmOC05NzQ5LTQ4ZDUtYmI4Ni04ZTU1ZTM0ODk4ZTIiLCJpZCI6MjEzMjM1LCJpYXQiOjE3MTU1MjAxNjB9.71gsAsNjaH4-7ySA6CqzqfNslPlFzaaZBV0ZqddKJYc';
+
+    // Initialize the Cesium Viewer in the HTML element with the `cesiumContainer` ID.
+    const viewer = new Cesium.Viewer('cesiumContainer', {
+        // terrain: Cesium.Terrain.fromWorldTerrain(),
+    });
+
+    // Create a ScreenSpaceEventHandler to handle mouse events
+    const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+
+    function loadTileset() {
+        const tileset = viewer.scene.primitives.add(new Cesium.Cesium3DTileset({
+            url: "http://localhost:9000/tileset.json",
+            skipLevelOfDetail: true,
+            baseScreenSpaceError: 1024,
+            skipScreenSpaceErrorFactor: 16,
+            skipLevels: 1,
+            preferLeaves: true,
+            immediatelyLoadDesiredLevelOfDetail: true,
+            loadSiblings: true,
+            cullWithChildrenBounds: true,
+            debugShowContentBoundingVolume: true,
+            enableCollision: true,
+            enablePick: true,
+        }));
+
+        tileset.readyPromise.then(function(tileset) {
+            var boundingSphere = tileset.boundingSphere;
+            viewer.camera.viewBoundingSphere(boundingSphere, new Cesium.HeadingPitchRange(0.0, -0.5, boundingSphere.radius));
+
+            tileset.maximumScreenSpaceError = 2;
+
+            tileset.update = function(frameState) {
+                var root = this._root;
+                if (!root) {
+                    return;
+                }
+
+                var camera = frameState.camera;
+                var position = camera.positionWC;
+                var direction = camera.directionWC;
+                var frustum = camera.frustum;
+
+                // Define a zone or multiple points
+                var zone = new Cesium.BoundingSphere(position, 1000.0);
+
+                // Select tiles within the zone
+                selectTilesInZone(root, zone, frameState);
+            };
+
+            function selectTilesInZone(tile, zone, frameState) {
+                if (!tile || !zone) {
+                    return;
+                }
+
+                // Check if the tile intersects with the zone
+                var tileBoundingVolume = tile.contentBoundingVolume || tile.boundingVolume;
+                if (tileBoundingVolume.intersect(zone) !== Cesium.Intersect.OUTSIDE) {
+                    // Add the tile to the list of visible tiles if it intersects with the zone
+                    frameState.commandList.push(tile.contentReadyCommand);
+                }
+
+                // Recursively check child tiles
+                var children = tile.children;
+                if (children) {
+                    for (var i = 0; i < children.length; i++) {
+                        selectTilesInZone(children[i], zone, frameState);
+                    }
+                }
+            }
+        });
+    }
+
+    loadTileset();
+
+    /*
+    * X positive is in direction left
+    * Y positive is in direction up
+    * Z positive is in direction towards the screen
+     */
+    viewer.scene.light = new Cesium.DirectionalLight({
+        direction: new Cesium.Cartesian3(-1.0, 1.0, -1.0)
+    });
+
+    // Set initial position
+    viewer.camera.flyTo({
+        destination : Cesium.Cartesian3.fromDegrees(9.52, 47.156, 4326)
+    });
+
+    // Add left click input to select a building to and extract its coordinates
+    handler.setInputAction(function (movement) {
+        console.log(movement.position);
+        viewer.selectedEntity = undefined;
+        const pickedBuilding = viewer.scene.pick(movement.position);
+        if (pickedBuilding) {
+            console.log(pickedBuilding);;
+        }
+    }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+</script>
+</div>
+</body>
+</html>

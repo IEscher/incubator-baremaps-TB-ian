@@ -17,10 +17,10 @@
 
 package org.apache.baremaps.tdtiles.building;
 
+import java.util.List;
 import org.apache.baremaps.tdtiles.utils.Color;
 import org.locationtech.jts.geom.Geometry;
 
 public record Building(Geometry geometry, boolean informationFound, float height, float minHeight,
     Color color, Roof roof) {
-
 }

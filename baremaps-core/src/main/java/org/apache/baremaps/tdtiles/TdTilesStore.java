@@ -18,12 +18,10 @@
 package org.apache.baremaps.tdtiles;
 
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.*;
 import javax.sql.DataSource;
+
 import org.apache.baremaps.tdtiles.building.Building;
 import org.apache.baremaps.tdtiles.utils.Color;
 import org.apache.baremaps.tdtiles.utils.ColorUtility;
@@ -47,7 +45,8 @@ import org.slf4j.LoggerFactory;
 public class TdTilesStore {
 
   private static final Logger logger = LoggerFactory.getLogger(TdTilesStore.class);
-  private static final String QUERY =
+
+  private static final String FIND_QUERY =
       "select st_asbinary(geom), " + // 1
           "tags -> 'building', " + // 2
           "tags -> 'height', " + // 3
@@ -62,31 +61,36 @@ public class TdTilesStore {
           "tags -> 'roof:color', " + // 12
           "tags -> 'roof:material'," + // 13
           "tags -> 'roof:angle', " + // 14
-          "tags -> 'roof:direction', " + // 15
-          "tags -> 'amenity' " + // 16
-          // "from osm_ways where (tags ? 'building' or tags ? 'building:part' or tags ? 'amenity')
-          // and "
+          "tags -> 'roof:direction' " + // 15
           "from osm_ways where (tags ? 'building' or tags ? 'building:part') and "
           +
           "st_intersects(geom, st_makeenvelope(%1$s, %2$s, %3$s, %4$s, 4326)) LIMIT %5$s";
 
+  private static final String UPSERT_QUERY =
+      "INSERT INTO td_tile_gltf (x, y, level, gltf_binary) " +
+          "VALUES (?, ?, ?, ?) " +
+          "ON CONFLICT (x, y, level) DO UPDATE SET gltf_binary = ?";
+
+  private static final String READ_QUERY = "SELECT gltf_binary FROM td_tile_gltf WHERE x = ? AND y = ? AND level = ?";
 
   private final DataSource datasource;
+  private final int maxCompression;
 
-  public TdTilesStore(DataSource datasource) {
+  public TdTilesStore(DataSource datasource, int maxCompression) {
     this.datasource = datasource;
+    this.maxCompression = maxCompression;
   }
 
-  public List<Building> read(float xmin, float xmax, float ymin, float ymax, int limit)
+  public List<Building> findBuildings(float xmin, float xmax, float ymin, float ymax, int limit)
       throws TileStoreException {
     try (Connection connection = datasource.getConnection();
-        Statement statement = connection.createStatement()) {
+         Statement statement = connection.createStatement()) {
 
-      String sql = String.format(QUERY, ymin * 180 / (float) Math.PI, xmin * 180 / (float) Math.PI,
+      String sql = String.format(FIND_QUERY, ymin * 180 / (float) Math.PI, xmin * 180 / (float) Math.PI,
           ymax * 180 / (float) Math.PI, xmax * 180 / (float) Math.PI, limit);
 
       logger.debug("Executing query: {}", sql);
-      // System.out.println(sql);
+//       System.out.println("osm_ways: " + sql);
 
       List<Building> buildings = new ArrayList<>();
 
@@ -109,10 +113,9 @@ public class TdTilesStore {
           String roofMaterial = resultSet.getString(13);
           String roofAngle = resultSet.getString(14);
           String roofDirection = resultSet.getString(15);
-          // String amenity = resultSet.getString(16);
 
           Color finalColor = new Color(1f, 1f, 1f);
-          Boolean informationFound = true;
+          boolean informationFound = true;
           // if no attribute is found, make the building red
           if (height == null && buildingLevels == null && buildingMinLevels == null
               && buildingColor == null && buildingMaterial == null && roofShape == null
@@ -126,7 +129,7 @@ public class TdTilesStore {
             try {
               finalColor = ColorUtility.parseName(buildingColor);
             } catch (Exception e) {
-              System.out.println("Error parsing color: " + e);
+//              System.out.println("osm_ways: Error parsing color: " + e); // TODO reput
             }
           }
 
@@ -156,13 +159,58 @@ public class TdTilesStore {
             finalHeight = 0;
           }
 
-          buildings.add(new Building(geometry, informationFound, finalHeight, 0, finalColor, null));
+          buildings.add(new Building(
+              geometry,
+              informationFound,
+              finalHeight,
+              0,
+              finalColor,
+              null));
         }
       }
       return buildings;
+
     } catch (SQLException e) {
       throw new TileStoreException(e);
     }
   }
 
+  public void update(int x, int y, int level, byte[] data) throws TileStoreException {
+    try (Connection connection = datasource.getConnection()) {
+      logger.debug("Executing query: {}", UPSERT_QUERY);
+      try (PreparedStatement preparedStatement = connection.prepareStatement(UPSERT_QUERY)) {
+        preparedStatement.setInt(1, x);
+        preparedStatement.setInt(2, y);
+        preparedStatement.setInt(3, level);
+        preparedStatement.setBytes(4, data);
+        preparedStatement.setBytes(5, data); // for the update part
+//        System.out.println("td_tile_gltf: " + preparedStatement.toString());
+        preparedStatement.executeUpdate();
+        System.out.println("td_tile_gltf: Updated tile with x=" + x + ", y=" + y + " and level=" + level);
+      }
+    } catch (SQLException e) {
+      throw new TileStoreException(e);
+    }
+  }
+
+  public byte[] read(int x, int y, int level) throws TileStoreException {
+    try (Connection connection = datasource.getConnection();
+         PreparedStatement statement = connection.prepareStatement(READ_QUERY)) {
+      statement.setInt(1, x);
+      statement.setInt(2, y);
+      statement.setInt(3, level);
+      logger.debug("Executing query: {}", READ_QUERY);
+      try (ResultSet resultSet = statement.executeQuery()) {
+        if (resultSet.next()) {
+//          System.out.println("td_tile_gltf: Tile found with x=" + x + ", y=" + y + " and level=" + level);
+          return resultSet.getBytes("gltf_binary");
+        } else {
+//          System.out.println("td_tile_gltf: Tile not found with x=" + x + ", y=" + y + " and level=" + level);
+          return null;
+        }
+      }
+    } catch (SQLException e) {
+      throw new TileStoreException(e);
+    }
+  }
 }

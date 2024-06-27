@@ -7,27 +7,17 @@
     "boundingVolume" : {
       "region" : [ -3.141592653589793238, -1.57079632679, 3.141592653589793238, 1.57079632679, 0, 10000]
     },
-    "geometricError" : 32.0,
+    "geometricError" : 320.0,
     "refine" : "REPLACE",
     "content" : {
-      "uri" : "/content/content_{level}__{x}_{y}.glb",
-      "extensions": {
-        "EXT_mesh_gpu_instancing": {
-          "attributes": {
-            "TRANSLATION": 0,
-            "ROTATION": 1,
-            "SCALE": 2,
-            "_ID" : 3
-          }
-        }
-      }
+      "uri" : "/content/content_{level}__{x}_{y}.json"
     },
     "implicitTiling" : {
       "subdivisionScheme" : "QUADTREE",
-      "subtreeLevels" : 6,
-      "availableLevels" : 18,
+      "subtreeLevels" : 4,
+      "availableLevels" : 3,
       "subtrees" : {
-        "uri" : "/subtrees/{level}.{x}.{y}.json"
+        "uri" : "/subtrees/{level}.{x}.{y}.subtree"
       }
     }
   }

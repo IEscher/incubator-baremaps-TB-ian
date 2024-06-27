@@ -460,5 +460,18 @@ export default {
         },
       ]
     },
+    {
+      "id": "caching-gltf",
+      "needs": [
+        "openstreetmap-nodes"
+      ],
+      "tasks": [
+        {
+          "type": "ExecuteSqlScript",
+          "file": "queries/tdTiles.sql",
+          "database": config.database,
+        },
+      ]
+    },
   ]
 }

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.baremaps.tdtiles.subtree;
+package org.apache.baremaps.tdtiles.tileset;
 
-public record Availability(boolean constant) {
+public record Tile(BoundingVolume boundingVolume, String uri) {
 }

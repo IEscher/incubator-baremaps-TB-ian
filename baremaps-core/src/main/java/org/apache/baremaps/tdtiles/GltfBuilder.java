@@ -42,18 +42,19 @@ import org.locationtech.jts.triangulate.polygon.PolygonTriangulator;
 
 public class GltfBuilder {
 
-  public static final int MAX_COMPRESSION = 3;
-
   /**
    * Create a node from a building.
    *
    * @param building
+   * @param compression 0 = no compression, 1 = low compression, 2 = high compression + only roof, 3
+   *        = only important buildings
    * @return
    */
   public static NodeModel createNode(Building building, int compression) {
     if (building.geometry() == null) {
       return new DefaultNodeModel();
     }
+
     Geometry geometry = building.geometry();
 
     switch (compression) {
@@ -329,20 +330,36 @@ public class GltfBuilder {
    * @return
    * @throws Exception
    */
-  public static byte[] createGltf(List<NodeModel> nodes) throws Exception {
-    DefaultSceneModel sceneModel = new DefaultSceneModel();
+  public static byte[] createGltfList(List<NodeModel> nodes) throws Exception {
+     DefaultSceneModel sceneModel = new DefaultSceneModel();
 
-    for (NodeModel node : nodes) {
-      sceneModel.addNode(node);
-    }
+     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+     for (NodeModel node : nodes) {
+     sceneModel.addNode(node);
+     }
+
+     GltfModelBuilder gltfModelBuilder = GltfModelBuilder.create();
+     gltfModelBuilder.addSceneModel(sceneModel);
+     DefaultGltfModel gltfModel = gltfModelBuilder.build();
+     GltfAssetV2 asset = GltfAssetsV2.createEmbedded(gltfModel);
+
+     GltfAssetWriterV2 gltfAssetWriter = new GltfAssetWriterV2();
+     gltfAssetWriter.writeBinary(asset, outputStream);
+
+     return outputStream.toByteArray();
+  }
+
+  public static byte[] createGltf(NodeModel node) throws Exception {
+    DefaultSceneModel sceneModel = new DefaultSceneModel();
+    sceneModel.addNode(node);
 
     GltfModelBuilder gltfModelBuilder = GltfModelBuilder.create();
     gltfModelBuilder.addSceneModel(sceneModel);
     DefaultGltfModel gltfModel = gltfModelBuilder.build();
-
-    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     GltfAssetV2 asset = GltfAssetsV2.createEmbedded(gltfModel);
 
+    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     GltfAssetWriterV2 gltfAssetWriter = new GltfAssetWriterV2();
     gltfAssetWriter.writeBinary(asset, outputStream);
 

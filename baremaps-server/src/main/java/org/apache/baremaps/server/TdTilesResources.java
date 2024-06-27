@@ -26,30 +26,44 @@ import com.linecorp.armeria.common.HttpResponse;
 import com.linecorp.armeria.common.ResponseHeaders;
 import com.linecorp.armeria.server.annotation.Get;
 import com.linecorp.armeria.server.annotation.Param;
-import de.javagl.jgltf.model.NodeModel;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+
 import javax.sql.DataSource;
+
+import de.javagl.jgltf.model.NodeModel;
 import org.apache.baremaps.tdtiles.GltfBuilder;
+import org.apache.baremaps.tdtiles.TdSubtreeStore;
 import org.apache.baremaps.tdtiles.TdTilesStore;
 import org.apache.baremaps.tdtiles.building.Building;
-import org.apache.baremaps.tdtiles.subtree.Availability;
-import org.apache.baremaps.tdtiles.subtree.Subtree;
+//import org.apache.baremaps.tdtiles.subtree.Subtree;
+import org.apache.baremaps.tdtiles.tileset.*;
+import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.LinkedList;
+import java.util.List;
+
 public class TdTilesResources {
+
+  // 0 = no compression, 1 = low compression, 2 = high compression + only roof, 3 = only important buildings
+  // If changing this value, changes must also be made in TdTiledStore.java, TdSubtreeStore.java, and gltf.sql
+  private static final int MAX_COMPRESSION = 3;
+
+  private static final int MIN_LEVEL = 0;
+  private static final int MAX_LEVEL = 3; // Cannot be over Integer.BYTES * 8
+
+  // Levels to which the compression is increased
+  private static final int[] COMPRESSION_LEVELS = {2, 1, 0};
+
+  // Subtree levels
+  // See: https://github.com/CesiumGS/3d-tiles/issues/576 for subtree division
+  private static final int AVAILABLE_LEVELS = MAX_LEVEL; // AVAILABLE_LEVELS + 1 should be a multiple of SUBTREE_LEVELS
+  private static final int SUBTREE_LEVELS = 4;
+  private static final int RANK_AMOUNT = (AVAILABLE_LEVELS + 1) / SUBTREE_LEVELS;
 
   private static final Logger logger = LoggerFactory.getLogger(TdTilesStore.class);
 
-  private static final int minLevel = 14;
-  private static final int maxLevel = 18;
-
-  private static final ResponseHeaders GLB_HEADERS = ResponseHeaders.builder(200)
+  private static final ResponseHeaders BINARY_HEADERS = ResponseHeaders.builder(200)
       .add(CONTENT_TYPE, BINARY)
       .add(ACCESS_CONTROL_ALLOW_ORIGIN, "*")
       .build();
@@ -60,85 +74,116 @@ public class TdTilesResources {
       .build();
 
   private final TdTilesStore tdTilesStore;
+  private final TdSubtreeStore tdSubtreeStore;
 
   public TdTilesResources(DataSource dataSource) {
-    this.tdTilesStore = new TdTilesStore(dataSource);
+    this.tdTilesStore = new TdTilesStore(dataSource, MAX_COMPRESSION);
+    this.tdSubtreeStore = new TdSubtreeStore(dataSource, MAX_COMPRESSION, MIN_LEVEL, MAX_LEVEL, COMPRESSION_LEVELS,
+        AVAILABLE_LEVELS, SUBTREE_LEVELS, RANK_AMOUNT);
   }
 
-  @Get("regex:^/subtrees/(?<level>[0-9]+).(?<x>[0-9]+).(?<y>[0-9]+).json")
+  @Get("regex:^/subtrees/(?<level>[0-9]+).(?<x>[0-9]+).(?<y>[0-9]+).subtree")
   public HttpResponse getSubtree(@Param("level") int level, @Param("x") int x, @Param("y") int y) {
-    // https://github.com/CesiumGS/3d-tiles/blob/main/specification/ImplicitTiling/README.adoc#subtrees
-    if (level >= maxLevel) {
-      return HttpResponse.ofJson(JSON_HEADERS,
-          new Subtree(new Availability(false), new Availability(true), new Availability(false)));
+    // See: https://github.com/CesiumGS/3d-tiles/blob/main/specification/ImplicitTiling/README.adoc#subtrees
+    try {
+      return HttpResponse.of(BINARY_HEADERS, HttpData.wrap(tdSubtreeStore.getSubtree(level, x, y)));
+    } catch (Exception e) {
+      logger.error("Error getting subtree", e);
+      System.err.println("Error getting subtree: " + e);
+      return HttpResponse.of(BINARY_HEADERS, HttpData.empty());
     }
-    return HttpResponse.ofJson(JSON_HEADERS,
-        new Subtree(new Availability(true), new Availability(true), new Availability(true)));
   }
 
-  @Get("regex:^/content/content_(?<level>[0-9]+)__(?<x>[0-9]+)_(?<y>[0-9]+).glb")
-  public HttpResponse getContent(@Param("level") int level, @Param("x") int x, @Param("y") int y)
+  @Get("regex:^/content/content_(?<level>[0-9]+)__(?<x>[0-9]+)_(?<y>[0-9]+).json")
+  public HttpResponse getTileset(@Param("level") int level, @Param("x") int x, @Param("y") int y)
       throws Exception {
-    if (level < minLevel) {
-      return HttpResponse.of(GLB_HEADERS, HttpData.wrap(GltfBuilder.createGltf(new ArrayList<>())));
+    if (level < MIN_LEVEL) {
+//      Tile example = new Tile(
+//          new BoundingVolume(new Float[]{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f}),
+//          "/content/content_building_id_1.glb",
+//          0
+//      );
+      Tileset tileset = new Tileset(
+          new Asset("1.1"),
+          100f,
+          new Root(
+              new BoundingVolume(new Float[]{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f}),
+              0f,
+              "ADD",
+              new Tile[0]
+//            new Tile[]{example}
+          ));
+      return HttpResponse.ofJson(JSON_HEADERS, tileset);
     }
 
-    float[] coords = xyzToLatLonRadians(x, y, level);
-    int limit = 1000;
-    float range = 0.00001f;
-    List<Building> buildings;
-    int levelDelta = maxLevel - minLevel;
-    int compression = (maxLevel - level) * GltfBuilder.MAX_COMPRESSION / levelDelta;
-    if (level != maxLevel) {
-      buildings = tdTilesStore.read(coords[0], coords[1], coords[2], coords[3], limit);
-    } else {
-      buildings = tdTilesStore.read(coords[0] - range, coords[1] + range, coords[2] - range,
-          coords[3] + range, limit);
+    // Retrieve the gltf in the database if it exists
+    byte[] tileExists = tdTilesStore.read(level, x, y);
+
+    if (tileExists == null) {
+      // Find the unprocessed buildings in the tile
+      System.out.println("Creating tile at level: " + level + ", x: " + x + ", y: " + y);
+      float[] coords = xyzToLatLonRadians(x, y, level);
+      int limit = 5000;
+      List<Building> buildings;
+      int levelDelta = MAX_LEVEL - MIN_LEVEL;
+      int compression = (MAX_LEVEL - level) * MAX_COMPRESSION / levelDelta;
+      buildings = tdTilesStore.findBuildings(coords[0], coords[1], coords[2], coords[3], limit);
+      List<NodeModel> nodes = new LinkedList<>();
+      for (Building building : buildings) {
+        nodes.add(GltfBuilder.createNode(building, compression));
+      }
+
+      // Update the database with the tile
+      byte[] glb = GltfBuilder.createGltfList(nodes);
+      tdTilesStore.update(level, x, y, glb);
     }
 
-    List<NodeModel> nodes = createNodes(buildings, compression);
+    // Create the tiles
+    Tile tile = new Tile(
+          new BoundingVolume(new Float[]{-1.2419052957251926f,
+              0.7395016240301894f,
+              -1.2f,
+              0.7396563300150859f,
+              0f,
+              20.4f}),
+          "/content/content_glb_" + level + "__" + x + "_" + y + ".glb"
+      );
 
-    return HttpResponse.of(GLB_HEADERS, HttpData.wrap(GltfBuilder.createGltf(nodes)));
+    // Create the tileset
+    Tileset tileset = new Tileset(
+        new Asset("1.1"),
+        100f,
+        new Root(
+            new BoundingVolume(new Float[]{-1.2419052957251926f,
+                0.7f,
+                -1.2415404f,
+                0.7f,
+                0f,
+                20.0f}),
+            100f,
+            "REPLACE",
+            new Tile[]{tile}
+        ));
+
+    return HttpResponse.ofJson(JSON_HEADERS, tileset);
+
   }
 
-  /**
-   * Create nodes from buildings in parallel.
-   * 
-   * @param buildings
-   * @param level
-   * @return
-   * @throws Exception
-   */
-  private static List<NodeModel> createNodes(List<Building> buildings, int level) throws Exception {
-    int numCores = Runtime.getRuntime().availableProcessors();
-    ExecutorService EXEC = Executors.newFixedThreadPool(numCores);
-    List<Callable<NodeModel>> tasks = new ArrayList<Callable<NodeModel>>();
-    for (final Building building : buildings) {
-      Callable<NodeModel> c = new Callable<NodeModel>() {
-        @Override
-        public NodeModel call() throws Exception {
-          return GltfBuilder.createNode(building, level);
-        }
-      };
-      tasks.add(c);
+  @Get("regex:^/content/content_glb_(?<level>[0-9]+)__(?<x>[0-9]+)_(?<y>[0-9]+).glb")
+  public HttpResponse getGlb(@Param("level") int level, @Param("x") int x, @Param("y") int y) throws Exception {
+    byte[] glb = tdTilesStore.read(level, x, y);
+    if (glb != null) {
+      System.out.println("--------------------------------- Giving building: " + level + "__" + x + "_" + y);
+      return HttpResponse.of(BINARY_HEADERS, HttpData.wrap(glb));
+    } else {
+      System.err.println("Giving empty glb for level: " + level + ", x: " + x + ", y: " + y);
+      return HttpResponse.of(BINARY_HEADERS, HttpData.empty());
     }
-
-    List<Future<NodeModel>> results = EXEC.invokeAll(tasks);
-    List<NodeModel> nodes = new ArrayList<NodeModel>();
-
-    for (Future<NodeModel> f : results) {
-      try {
-        nodes.add(f.get());
-      } catch (Exception e) {
-        logger.error("Error creating node", e);
-      }
-    }
-    return nodes;
   }
 
   /**
    * Convert XYZ tile coordinates to lat/lon in radians.
-   * 
+   *
    * @param x
    * @param y
    * @param z
