@@ -13,6 +13,8 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
+import java.util.Base64;
+import java.util.BitSet;
 
 public class TdSubtreeStore {
 
@@ -24,7 +26,6 @@ public class TdSubtreeStore {
   private final int availableLevels;
   private final int subtreeLevels;
   private final int rankAmount;
-//  private final byte[] defaultSubtree;
 
   private static final Logger logger = LoggerFactory.getLogger(TdTilesStore.class);
 
@@ -53,17 +54,23 @@ public class TdSubtreeStore {
    * @param childSubtreeAvailability
    * @param level
    */
-  private record SubtreeLevel(int tileAvailability, int contentAvailability, int availableCount, int childSubtreeAvailability,
+  private record SubtreeLevel(BitSet tileAvailability, BitSet contentAvailability, int availableCount, BitSet childSubtreeAvailability,
                               int level) {
   }
+  
+  private static class ByteWrapper {
+    byte[] buffer;
 
-  private class BufferBinary {
-    public byte[] buffer;
-    public long length;
-
-    public BufferBinary(byte[] buffer, long length) {
+    public ByteWrapper(byte[] buffer) {
       this.buffer = buffer;
-      this.length = length;
+    }
+
+    public byte[] getBuffer() {
+      return buffer;
+    }
+
+    public void setBuffer(byte[] buffer) {
+      this.buffer = buffer;
     }
   }
 
@@ -76,7 +83,6 @@ public class TdSubtreeStore {
     this.availableLevels = availableLevels;
     this.subtreeLevels = subtreeLevels;
     this.rankAmount = rankAmount;
-//    this.defaultSubtree = subtreeToJSONBinary(defaultSubtree(0));
   }
 
   public byte[] getSubtree(int level, int x, int y) throws TileStoreException {
@@ -108,7 +114,7 @@ public class TdSubtreeStore {
 //    updateSubtree(mortonIndex, level, binary); // TODO reput that
 
     // Transform subtree to binary format
-    if (newSubtree.contentAvailability() != 0 || newSubtree.tileAvailability() != 0 || newSubtree.childSubtreeAvailability() != 0) {
+    if (!newSubtree.contentAvailability().isEmpty() || !newSubtree.tileAvailability().isEmpty() || !newSubtree.childSubtreeAvailability().isEmpty()) {
       System.out.println("Subtree created: " + level + "." + x + "." + y);
     }
     return binary;
@@ -125,37 +131,43 @@ public class TdSubtreeStore {
 
   // See: https://docs.ogc.org/cs/22-025r4/22-025r4.html#toc39
   private byte[] subtreeToJSONBinary(SubtreeLevel subtree) {
-    BufferBinary buffer = new BufferBinary(new byte[0], 0);
+    ByteWrapper buffer = new ByteWrapper(new byte[0]);
     JSONObject subtreeJSON = subtreeToJSON(subtree, buffer);
     String jsonString = subtreeJSON.toJSONString();
 
     int magic = 0x74627573;
     int version = 1;
-    long JSONByteLength = jsonString.length();
 
-    return createBinaryHeader(magic, version, JSONByteLength, buffer.length, jsonString, buffer.buffer);
+    return createBinaryHeader(magic, version, jsonString, buffer.getBuffer());
   }
 
   // See: https://docs.ogc.org/cs/22-025r4/22-025r4.html#toc38
-  private JSONObject subtreeToJSON(SubtreeLevel subtree, BufferBinary buffer) {
+  private JSONObject subtreeToJSON(SubtreeLevel subtree, ByteWrapper buffer) {
     int length = ((int) Math.pow(4, subtreeLevels) - 1) / 3;
     int lengthShort = (int) Math.pow(4, subtreeLevels - 1);
+    int longBitstreamLength = (int) Math.ceil((double) length / 8.0);
+    int shortBitstreamLength = (int) Math.ceil((double) lengthShort / 8.0);
     int numberOfBitstreams = 0;
-//    int minimumByteLength = Math.max(Integer.BYTES, 8);
-    int minimumByteLength = 11;
+    int[] bitstreamLengths = new int[3];
+    int[] bitstreamOffsets = new int[3];
 
     JSONObject json = new JSONObject();
     byte[][] tmpBuffers = new byte[3][];
 
     // Tile availability
     JSONObject tileAvailability = new JSONObject();
-    if (subtree.tileAvailability() == 0) {
+    if (subtree.tileAvailability().isEmpty()) {
       tileAvailability.put("constant", 0);
-    } else if (bitstreamFull(subtree.tileAvailability(), length)) {
+    } else if (subtree.tileAvailability().cardinality() == length) {
       tileAvailability.put("constant", 1);
     } else {
       tileAvailability.put("bitstream", numberOfBitstreams);
-      tmpBuffers[numberOfBitstreams] = ByteBuffer.allocate(minimumByteLength).putInt(subtree.tileAvailability()).array();
+      ByteBuffer tmp = ByteBuffer.allocate(longBitstreamLength);
+//      tmp.order(ByteOrder.LITTLE_ENDIAN);
+      tmp.put(subtree.tileAvailability().toByteArray());
+      tmpBuffers[numberOfBitstreams] = tmp.array();
+      bitstreamLengths[numberOfBitstreams] = longBitstreamLength;
+      bitstreamOffsets[numberOfBitstreams] = numberOfBitstreams * longBitstreamLength;
       numberOfBitstreams++;
     }
 
@@ -163,9 +175,9 @@ public class TdSubtreeStore {
     JSONObject contentAvailability = new JSONObject();
     JSONArray contentAvailabilityArray = new JSONArray();
     boolean contentAvailabilityConstant = true;
-    if (subtree.contentAvailability() == 0) {
+    if (subtree.contentAvailability().isEmpty()) {
       contentAvailability.put("constant", 0);
-    } else if (bitstreamFull(subtree.contentAvailability(), lengthShort)) {
+    } else if (subtree.contentAvailability().cardinality() == length) {
       contentAvailability.put("constant", 1);
     } else {
       contentAvailabilityConstant = false;
@@ -174,36 +186,49 @@ public class TdSubtreeStore {
       contentAvailabilityObject.put("availableCount", subtree.availableCount());
       contentAvailabilityArray.add(contentAvailabilityObject);
 
-      tmpBuffers[numberOfBitstreams] = ByteBuffer.allocate(minimumByteLength).putInt(subtree.contentAvailability()).array();
+      ByteBuffer tmp = ByteBuffer.allocate(longBitstreamLength);
+//      tmp.order(ByteOrder.LITTLE_ENDIAN);
+      tmp.put(subtree.tileAvailability().toByteArray());
+      tmpBuffers[numberOfBitstreams] = tmp.array();
+      bitstreamLengths[numberOfBitstreams] = longBitstreamLength;
+      bitstreamOffsets[numberOfBitstreams] = numberOfBitstreams * longBitstreamLength;
       numberOfBitstreams++;
     }
 
     // Child subtree availability
     JSONObject childSubtreeAvailability = new JSONObject();
-    if (subtree.childSubtreeAvailability() == 0) {
+    if (subtree.childSubtreeAvailability().isEmpty()) {
       childSubtreeAvailability.put("constant", 0);
-    } else if (bitstreamFull(subtree.childSubtreeAvailability(), length)) {
+    } else if (subtree.childSubtreeAvailability().cardinality() == length) {
       childSubtreeAvailability.put("constant", 1);
     } else {
       childSubtreeAvailability.put("bitstream", numberOfBitstreams);
-      tmpBuffers[numberOfBitstreams] = ByteBuffer.allocate(minimumByteLength).putInt(subtree.childSubtreeAvailability()).array();
+      ByteBuffer tmp = ByteBuffer.allocate(shortBitstreamLength);
+//      tmp.order(ByteOrder.LITTLE_ENDIAN);
+      tmp.put(subtree.tileAvailability().toByteArray());
+      tmpBuffers[numberOfBitstreams] = tmp.array();
+      bitstreamLengths[numberOfBitstreams] = shortBitstreamLength;
+      bitstreamOffsets[numberOfBitstreams] = numberOfBitstreams * shortBitstreamLength;
       numberOfBitstreams++;
     }
 
 
     // Put the temporary buffers into the buffer of the adequate size
-    byte[] availabilityBuffer = new byte[numberOfBitstreams * minimumByteLength];
+    int totalLength = 0;
     for (int i = 0; i < numberOfBitstreams; i++) {
-      System.arraycopy(tmpBuffers[i], 0, availabilityBuffer, i, minimumByteLength);
+      totalLength += bitstreamLengths[i];
     }
-    buffer.buffer = availabilityBuffer;
-    buffer.length = (long) numberOfBitstreams * minimumByteLength;
+    byte[] availabilityBuffer = new byte[totalLength];
+    for (int i = 0; i < numberOfBitstreams; i++) {
+      System.arraycopy(tmpBuffers[i], 0, availabilityBuffer, bitstreamOffsets[i], bitstreamLengths[i]);
+    }
+    buffer.setBuffer(availabilityBuffer);
 
     // buffer
     JSONArray buffers = new JSONArray();
     JSONObject internalBuffer = new JSONObject();
     internalBuffer.put("name", "Internal Buffer");
-    internalBuffer.put("byteLength", numberOfBitstreams * minimumByteLength);
+    internalBuffer.put("byteLength", totalLength);
     buffers.add(internalBuffer);
     json.put("buffers", buffers);
 
@@ -212,8 +237,8 @@ public class TdSubtreeStore {
     for (int i = 0; i < numberOfBitstreams; i++) {
       JSONObject bufferView = new JSONObject();
       bufferView.put("buffer", 0);
-      bufferView.put("byteOffset", i * minimumByteLength);
-      bufferView.put("byteLength", minimumByteLength);
+      bufferView.put("byteOffset", bitstreamOffsets[i]);
+      bufferView.put("byteLength", bitstreamLengths[i]);
       bufferViews.add(bufferView);
     }
     json.put("bufferViews", bufferViews);
@@ -229,40 +254,22 @@ public class TdSubtreeStore {
     return json;
   }
 
-  private static boolean bitstreamFull(int bitstream, int length) {
-    boolean full = true;
-    for (int i = 0; i < length; i++) {
-      if ((bitstream & (1 << i)) == 0) {
-        full = false;
-        break;
-      }
-    }
-    return full;
-  }
-
-  private static int countBits(Integer n) {
-    int count = 0;
-    while (n > 0) {
-      count += n & 1;
-      n >>= 1;
-    }
-    return count;
-  }
-
-  private static byte[] createBinaryHeader(int magic, int version, long JSONByteLength, long binaryByteLength,
+  private static byte[] createBinaryHeader(int magic, int version,
                                            String jsonString, byte[] buffer) {
+    long JSONByteLength = jsonString.getBytes(StandardCharsets.UTF_8).length;
     int jsonPadding = (8 - (int) JSONByteLength % 8) % 8;
     int bufferPadding = (8 - buffer.length % 8) % 8;
 
     // Create ByteBuffer with the correct capacity
-    ByteBuffer byteBuffer = ByteBuffer.allocate(4 + 4 + 8 + 8 + (int) JSONByteLength + jsonPadding + buffer.length + bufferPadding);
+    ByteBuffer byteBuffer = ByteBuffer.allocate(4 + 4 + 8 + 8 + (int) JSONByteLength + jsonPadding +
+        buffer.length + bufferPadding);
     byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
 
     // Write data
     byteBuffer.putInt(magic);
     byteBuffer.putInt(version);
     byteBuffer.putLong(JSONByteLength);
-    byteBuffer.putLong(binaryByteLength);
+    byteBuffer.putLong(buffer.length);
 
     byteBuffer.put(jsonString.getBytes(StandardCharsets.UTF_8));
     for (int i = 0; i < jsonPadding; i++) {
@@ -271,7 +278,7 @@ public class TdSubtreeStore {
 
     byteBuffer.put(buffer);
     for (int i = 0; i < bufferPadding; i++) {
-      byteBuffer.put((byte) 0x20); // Padding with spaces
+      byteBuffer.put((byte) 0x00); // Padding with zeros
     }
 
     return byteBuffer.array();
@@ -299,11 +306,12 @@ public class TdSubtreeStore {
     // Get the amount of buildings in the tile
     try {
       int buildingAmount = readBuildingCount(x, y, globalLevel);
-      int subtreeAvailability = buildingAmount > 0 ? 1 : 0;
-      if (subtreeAvailability == 1) {
-        System.out.println("Created a leaf with building amount = " + buildingAmount);
+      BitSet subtreeAvailability = new BitSet();
+      subtreeAvailability.set(0, buildingAmount > 0);
+      if (buildingAmount > 0) {
+        System.out.println("Created a max rank subtree leaf with building amount = " + buildingAmount);
       }
-      return new SubtreeLevel(subtreeAvailability, subtreeAvailability, buildingAmount, 0, globalLevel);
+      return new SubtreeLevel(subtreeAvailability, subtreeAvailability, buildingAmount, new BitSet(), globalLevel);
 
     } catch (TileStoreException e) {
       throw new TileStoreException(e);
@@ -368,31 +376,44 @@ public class TdSubtreeStore {
     JSONParser parser = new JSONParser();
     JSONObject subtreeJSON = (JSONObject) parser.parse(jsonString);
 
-    int tileAvailability = ((Long) subtreeJSON.get("tileAvailability")).intValue();
-    int childSubtreeAvailability = ((Long) subtreeJSON.get("childSubtreeAvailability")).intValue();
+    byte[] tileAvailabilityBytes = Base64.getDecoder().decode((String) subtreeJSON.get("tileAvailability"));
+    BitSet tileAvailability = BitSet.valueOf(tileAvailabilityBytes);
+
+    byte[] childSubtreeAvailabilityBytes = Base64.getDecoder().decode((String) subtreeJSON.get("childSubtreeAvailability"));
+    BitSet childSubtreeAvailability = BitSet.valueOf(childSubtreeAvailabilityBytes);
 
     // Get the first object in the contentAvailability array
     JSONArray contentAvailabilityArray = (JSONArray) subtreeJSON.get("contentAvailability");
     JSONObject contentAvailabilityObject = (JSONObject) contentAvailabilityArray.get(0);
-    int contentAvailability = ((Long) contentAvailabilityObject.get("bitstream")).intValue();
+    byte[] contentAvailabilityBytes = Base64.getDecoder().decode((String) contentAvailabilityObject.get("bitstream"));
+    BitSet contentAvailability = BitSet.valueOf(contentAvailabilityBytes);
+
     int maxContentAmount = ((Long) contentAvailabilityObject.get("availableCount")).intValue();
 
     return new SubtreeLevel(tileAvailability, contentAvailability, maxContentAmount, childSubtreeAvailability, level);
   }
 
   private static SubtreeLevel getSimplifiedSubtree(SubtreeLevel subtree) {
-    int tileAvailability = subtree.tileAvailability() == 0 ? 0 : 1;
-    int contentAvailability = subtree.contentAvailability() == 0 ? 0 : 1;
-    int childSubtreeAvailability = subtree.childSubtreeAvailability() == 0 ? 0 : 1;
+    int tileAvailability = subtree.tileAvailability().isEmpty() ? 0 : 1;
+    int contentAvailability = subtree.contentAvailability().isEmpty() ? 0 : 1;
+//    int childSubtreeAvailability = subtree.childSubtreeAvailability() == 0 ? 0 : 1;
 
-    return new SubtreeLevel(tileAvailability, contentAvailability, contentAvailability, childSubtreeAvailability,
+    BitSet tileBitSet = new BitSet();
+    tileBitSet.set(0, tileAvailability == 1);
+    BitSet contentBitSet = new BitSet();
+    contentBitSet.set(0, contentAvailability == 1);
+
+    return new SubtreeLevel(tileBitSet, contentBitSet, contentAvailability, tileBitSet,
         subtree.level() - 1);
   }
 
   private SubtreeLevel concatenateSubtreeLevel(SubtreeLevel[] subtrees, int childGlobalLevel) {
-    int[] tileAvailability = new int[4];
-    int[] contentAvailability = new int[4];
-    int[] childSubtreeAvailability = new int[4];
+    if (subtrees.length != 4) {
+      throw new IllegalArgumentException("The subtrees array must have exactly 4 elements.");
+    }
+    BitSet[] tileAvailability = new BitSet[4];
+    BitSet[] contentAvailability = new BitSet[4];
+    BitSet[] childSubtreeAvailability = new BitSet[4];
     int totalContentAmount = 0;
     for (int i = 0; i < 4; i++) {
       totalContentAmount += subtrees[i].availableCount();
@@ -403,9 +424,9 @@ public class TdSubtreeStore {
 
     int childLocalLevel = childGlobalLevel % subtreeLevels;
 
-    int parentTileAvailability = concatenateBitStreams(tileAvailability, childLocalLevel, true);
-    int parentContentAvailability = concatenateBitStreams(contentAvailability, childLocalLevel, true);
-    int parentChildSubtreeAvailability = concatenateBitStreams(childSubtreeAvailability, childLocalLevel, false);
+    BitSet parentTileAvailability = concatenateBitStreams(tileAvailability, childLocalLevel, true);
+    BitSet parentContentAvailability = concatenateBitStreams(contentAvailability, childLocalLevel, true);
+    BitSet parentChildSubtreeAvailability = concatenateBitStreams(childSubtreeAvailability, childLocalLevel, false);
 
     return new SubtreeLevel(parentTileAvailability, parentContentAvailability, totalContentAmount, parentChildSubtreeAvailability,
         childGlobalLevel - 1);
@@ -461,7 +482,7 @@ public class TdSubtreeStore {
         if (resultSet.next()) {
           int result = resultSet.getInt(1);
           if (result > 0) {
-            System.err.println("osm_ways: Buildings found: " + result);
+//            System.out.println("osm_ways: Buildings found: " + result);
           }
           return result;
         } else {
@@ -504,69 +525,38 @@ public class TdSubtreeStore {
     return result;
   }
 
-  private int concatenateBitStreams(int[] bitstreams, int childLocalLevel, boolean putActivationBit) {
-    int result = 0;
+  private BitSet concatenateBitStreams(BitSet[] bitstreams, int childLocalLevel, boolean putActivationBit) {
+    if (bitstreams.length != 4) {
+      throw new IllegalArgumentException("The bitstreams array must have exactly 4 BitSet elements.");
+    }
+
+    BitSet result = new BitSet();
     int length;
     if (putActivationBit) {
       length = ((int) Math.pow(4, childLocalLevel + 1) - 1) / 3;
     } else {
       length = (int) Math.pow(4, childLocalLevel);
     }
-    boolean activated = false;
 
-    // append all bitstreams
+    boolean activated = false;
+    int offset = putActivationBit ? 1 : 0;
+
+    // Append all bitstreams
     for (int i = 0; i < 4; i++) {
-      result |= bitstreams[i] << (length * i);
-      if (bitstreams[i] != 0) {
+      for (int j = bitstreams[i].nextSetBit(0); j >= 0; j = bitstreams[i].nextSetBit(j + 1)) {
+        result.set(j + (length * i) + offset);
+      }
+      if (!bitstreams[i].isEmpty()) {
         activated = true;
       }
     }
 
     if (putActivationBit) {
-      // append the activation bit
-      result <<= 1;
-      result |= activated ? 1 : 0;
+      // Append the activation bit at position 0
+      result.set(0, activated);
     }
+
     return result;
-  }
-
-  /**
-   * Subtree where all bits are set to 1
-   *
-   * @return
-   */
-  private SubtreeLevel defaultSubtree(int level) {
-//    JSONObject subtree = new JSONObject();
-//    JSONObject tileAvailability = new JSONObject();
-//    tileAvailability.put("constant", 1);
-//    JSONObject contentAvailability = new JSONObject();
-//    contentAvailability.put("constant", 1);
-//    JSONObject childSubtreeAvailability = new JSONObject();
-//    childSubtreeAvailability.put("constant", 1);
-//
-//    // Add buffer
-//    JSONArray buffers = new JSONArray();
-//    JSONObject internalBuffer = new JSONObject();
-//    internalBuffer.put("name", "Internal Buffer");
-//    internalBuffer.put("byteLength", 0); // Set byteLength to 0 for default subtree
-//    buffers.add(internalBuffer);
-//    subtree.put("buffers", buffers);
-//
-//    // Add bufferViews
-//    JSONArray bufferViews = new JSONArray();
-//    JSONObject bufferView = new JSONObject();
-//    bufferView.put("buffer", 0);
-//    bufferView.put("byteOffset", 0);
-//    bufferView.put("byteLength", 0); // Set byteLength to 0 for default subtree
-//    bufferViews.add(bufferView);
-//    subtree.put("bufferViews", bufferViews);
-//
-//    subtree.put("tileAvailability", tileAvailability);
-//    subtree.put("contentAvailability", contentAvailability);
-//    subtree.put("childSubtreeAvailability", childSubtreeAvailability);
-
-    int maxInt = Integer.MAX_VALUE;
-    return new SubtreeLevel(maxInt, 0, 0, maxInt, level);
   }
 
   /**
@@ -596,23 +586,5 @@ public class TdSubtreeStore {
   }
 
 }
-
-/*
-  "tileAvailability": {
-    "constant": 1
-  },
-  "contentAvailability": [
-    {
-      "constant": 1
-    },
-    {
-      "bitstream": 0,
-      "availableCount": 52
-    }
-  ],
-  "childSubtreeAvailability": {
-    "constant": 1
-  }
- */
 
 
