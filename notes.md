@@ -74,5 +74,46 @@ Eh bah non en fait c'est pas une bonne idée. Cesium implicit tiling n'a pas ét
 
 Soit dit en passant, store les bitstream dans des buffer plutôt que directement des int dans le JSON ne fait sens que pour des cas ou il existe énormément de availableLevels.
 
+## Subtrees
 
+### 3d-tiles-validator
+
+03.07.2024
+
+```json
+Validating tileset /home/ian/HES/3d-tiles-validator/content/tileset.json
+Validation result:
+{
+"date": "2024-07-03T12:56:07.025Z",
+"numErrors": 4,
+"numWarnings": 0,
+"numInfos": 0,
+"issues": [
+{
+"type": "SUBTREE_AVAILABILITY_INCONSISTENT",
+"path": "./subtrees/0.0.0.subtree/tileAvailability",
+"message": "Tile availability declares tile at (level 2, (1,3)) with index 16 to be available, but its parent tile at (level 1, (0,1)) with index 3 is not available",
+"severity": "ERROR"
+},
+{
+"type": "SUBTREE_AVAILABILITY_INCONSISTENT",
+"path": "./subtrees/0.0.0.subtree/tileAvailability",
+"message": "Tile availability declares tile at (level 3, (2,5)) with index 59 to be available, but its parent tile at (level 2, (1,2)) with index 14 is not available",
+"severity": "ERROR"
+},
+{
+"type": "SUBTREE_AVAILABILITY_INCONSISTENT",
+"path": "./subtrees/0.0.0.subtree/tileAvailability",
+"message": "Tile availability declares tile at (level 3, (3,5)) with index 60 to be available, but its parent tile at (level 2, (1,2)) with index 14 is not available",
+"severity": "ERROR"
+},
+{
+"type": "SUBTREE_AVAILABILITY_INCONSISTENT",
+"path": "./subtrees/0.0.0.subtree/contentAvailability/0",
+"message": "The content availability 0 declares an 'availableCount' of 17899 but the number of available elements is 4",
+"severity": "ERROR"
+}
+]
+}
+```
 
