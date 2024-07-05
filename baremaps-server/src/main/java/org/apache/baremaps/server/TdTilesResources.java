@@ -49,11 +49,23 @@ public class TdTilesResources {
   // If changing this value, changes must also be made in TdTiledStore.java, TdSubtreeStore.java, and gltf.sql
   private static final int MAX_COMPRESSION = 3;
 
+//  private static final int MIN_LEVEL = 15;
+//  private static final int MAX_LEVEL = 19; // Cannot be over Integer.BYTES * 8
+//
+//  // Levels to which the compression is increased
+//  private static final int[] COMPRESSION_LEVELS = {18, 17, 16};
+//
+//  // Subtree levels
+//  // See: https://github.com/CesiumGS/3d-tiles/issues/576 for subtree division
+//  private static final int AVAILABLE_LEVELS = MAX_LEVEL; // AVAILABLE_LEVELS + 1 should be a multiple of SUBTREE_LEVELS
+//  private static final int SUBTREE_LEVELS = 5;
+
+
   private static final int MIN_LEVEL = 0;
   private static final int MAX_LEVEL = 3; // Cannot be over Integer.BYTES * 8
 
   // Levels to which the compression is increased
-  private static final int[] COMPRESSION_LEVELS = {2, 1, 0};
+  private static final int[] COMPRESSION_LEVELS = {0, 1, 2};
 
   // Subtree levels
   // See: https://github.com/CesiumGS/3d-tiles/issues/576 for subtree division
@@ -140,12 +152,12 @@ public class TdTilesResources {
 
     // Create the tiles
     Tile tile = new Tile(
-          new BoundingVolume(new Float[]{-1.2419052957251926f,
-              0.7395016240301894f,
-              -1.2f,
-              0.7396563300150859f,
+          new BoundingVolume(new Float[]{0f,
               0f,
-              20.4f}),
+              0f,
+              0f,
+              0f,
+              0f}),
           "/content/content_glb_" + level + "__" + x + "_" + y + ".glb"
       );
 
@@ -154,12 +166,12 @@ public class TdTilesResources {
         new Asset("1.1"),
         100f,
         new Root(
-            new BoundingVolume(new Float[]{-1.2419052957251926f,
-                0.7f,
-                -1.2415404f,
-                0.7f,
-                0f,
-                20.0f}),
+            new BoundingVolume(new Float[]{-1f, // west
+                -1f, // south
+                1f, // east
+                1f, // north
+                -1f, // min height
+                1f}), // max height
             100f,
             "REPLACE",
             new Tile[]{tile}

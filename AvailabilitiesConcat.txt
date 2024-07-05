@@ -1,8 +1,6 @@
-package org.apache.baremaps.tdtiles.Subtree;
-
 import java.util.BitSet;
 
-public class Availability {
+class Availability {
 
   private final BitSet[] availabilities;
   private final int length;
@@ -62,12 +60,13 @@ public class Availability {
   }
 
   public BitSet getBitSet() {
-    BitSet bitSet = new BitSet(length);
+    BitSet bitSet = new BitSet();
     int pos = 0;
-    for (int i = 0; i < levels; i++) {
-      int length = (int) Math.pow(4, i);
-      for (int j = 0; j < length; j++) {
-        bitSet.set(pos, availabilities[i].get(j));
+    for (int i = 0; i < availabilities.length; i++) {
+      for (int j = 0; j < availabilities[i].length(); j++) {
+        if (availabilities[i].get(j)) {
+          bitSet.set(pos);
+        }
         pos++;
       }
     }
@@ -129,9 +128,9 @@ public class Availability {
       }
     }
 
+    // Concatenate each level separately
     BitSet[] concatenatedAvailabilities;
     if (isChildren) {
-      // Directly concatenate the availabilities
       concatenatedAvailabilities = new BitSet[1];
       concatenatedAvailabilities[0] = new BitSet();
       for (int i = 0; i < 4; i++) {
@@ -142,14 +141,15 @@ public class Availability {
         }
       }
     } else {
-      // Concatenate each level separately
       concatenatedAvailabilities = new BitSet[levels + 1];
       for (int i = 0; i < levels; i++) {
+        concatenatedAvailabilities[i + 1] = new BitSet();
         int length = (int) Math.pow(4, i);
-        concatenatedAvailabilities[i + 1] = new BitSet(length * 4);
         for (int j = 0; j < 4; j++) {
           for (int k = 0; k < length; k++) {
-            concatenatedAvailabilities[i + 1].set(j * length + k, availabilities[j].getAvailability(i).get(k));
+            if (availabilities[j].getAvailability(i).get(k)) {
+              concatenatedAvailabilities[i + 1].set(j * length + k);
+            }
           }
         }
       }
@@ -157,11 +157,13 @@ public class Availability {
 
     // Set the availability of the root node
     if(!isChildren) {
-      concatenatedAvailabilities[0] = new BitSet(1);
-      concatenatedAvailabilities[0].set(0, !concatenatedAvailabilities[1].isEmpty());
+      concatenatedAvailabilities[0] = new BitSet();
+      if (!concatenatedAvailabilities[1].isEmpty()) {
+        concatenatedAvailabilities[0].set(0);
+      }
     }
 
-    int totalLength;
+    int totalLength;// = ((int) Math.pow(4, levels + 1) - 1) / 3; // TODO vérifier
     if (isChildren) {
       totalLength = 4 * availabilities[0].getLength();
     } else {
@@ -170,4 +172,37 @@ public class Availability {
 
     return new Availability(concatenatedAvailabilities, totalLength, isChildren);
   }
+}
+
+public class MyClass {
+    public static void main(String args[]) {
+      BitSet b = new BitSet();
+      b.set(3);
+      b.set(8);
+      b.set(13);
+      b.set(15);
+
+      Availability a = Availability.generateAvailabilities(b, 16, false);
+      BitSet[] bs = a.getAvailabilities();
+      for(int i = 0; i < bs.length; i++) {
+          System.out.println(bs[i].toString());
+      }
+
+      System.out.println("--------------");
+      System.out.println(a.getBitSet().toString());
+      System.out.println("a levels: " + a.getLevels());
+      System.out.println("--------------");
+
+      Availability[] as = {a,a,a,a};
+      Availability A = Availability.concatenateAvailabilities(as, false);
+      BitSet[] Bs = A.getAvailabilities();
+      for(int i = 0; i < Bs.length; i++) {
+          System.out.println(Bs[i].toString());
+      }
+      System.out.println("--------------");
+      System.out.println(A.getBitSet().toString());
+      System.out.println("A levels: " + A.getLevels());
+      System.out.println(A.getLength());
+      System.out.println("--------------");
+    }
 }
