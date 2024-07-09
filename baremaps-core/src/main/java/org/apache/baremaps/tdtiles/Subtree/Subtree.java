@@ -18,6 +18,12 @@ public class Subtree {
     this.availableCount = availableCount;
     this.childSubtreeAvailability = childSubtreeAvailability;
     this.levels = levels;
+    if (levels != tileAvailability.getAvailabilities().length
+        || levels != contentAvailability.getAvailabilities().length) {
+      throw new IllegalArgumentException("The number of levels (" + levels +
+          ") must be equal to the number of availabilities (tile: " + tileAvailability.getAvailabilities().length +
+          ", content: " + contentAvailability.getAvailabilities().length + ").");
+    }
   }
 
   public Availability getTileAvailability() {
@@ -96,15 +102,11 @@ public class Subtree {
         new Availability(contentBitSet, 1, false),
         subtree.getContentAvailability().isAvailable() ? 1 : 0,
         new Availability(childSubtreeBitSet, 4, true),
-        subtree.getLevels() - 1
+        1
     );
   }
 
   public void displayTileAvailability() {
-    if (levels != tileAvailability.getAvailabilities().length) {
-      throw new IllegalArgumentException("The number of levels (" + levels +
-          ") must be equal to the number of availabilities (" + tileAvailability.getAvailabilities().length + ").");
-    }
     for (int i = 0; i < tileAvailability.getAvailabilities().length; i++) {
       System.out.println("Level " + i + ": " + tileAvailability.getAvailability(i).toString());
     }

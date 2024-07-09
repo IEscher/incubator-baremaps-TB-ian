@@ -15,7 +15,7 @@
     "implicitTiling" : {
       "subdivisionScheme" : "QUADTREE",
       "subtreeLevels" : 5,
-      "availableLevels" : 3,
+      "availableLevels" : 19,
       "subtrees" : {
         "uri" : "/subtrees/{level}.{x}.{y}.subtree"
       }

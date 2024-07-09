@@ -8,7 +8,7 @@ DROP TABLE IF EXISTS td_subtrees;
 DROP TABLE IF EXISTS td_max_rank_subtrees;
 CREATE TABLE td_subtrees
 (
-    morton_index integer,
+    morton_index bigint,
     level        integer,
     binary_file  bytea,
     UNIQUE (morton_index, level)
@@ -17,8 +17,8 @@ CREATE TABLE td_subtrees
 DROP TABLE IF EXISTS td_tile_gltf;
 CREATE TABLE td_tile_gltf
 (
-    x           integer,
-    y           integer,
+    x           bigint,
+    y           bigint,
     level       integer,
     gltf_binary bytea,
     UNIQUE (x, y, level)

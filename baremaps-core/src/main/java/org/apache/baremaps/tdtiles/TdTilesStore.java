@@ -175,12 +175,12 @@ public class TdTilesStore {
     }
   }
 
-  public void update(int x, int y, int level, byte[] data) throws TileStoreException {
+  public void update(long x, long y, int level, byte[] data) throws TileStoreException {
     try (Connection connection = datasource.getConnection()) {
       logger.debug("Executing query: {}", UPSERT_QUERY);
       try (PreparedStatement preparedStatement = connection.prepareStatement(UPSERT_QUERY)) {
-        preparedStatement.setInt(1, x);
-        preparedStatement.setInt(2, y);
+        preparedStatement.setLong(1, x);
+        preparedStatement.setLong(2, y);
         preparedStatement.setInt(3, level);
         preparedStatement.setBytes(4, data);
         preparedStatement.setBytes(5, data); // for the update part
@@ -193,11 +193,11 @@ public class TdTilesStore {
     }
   }
 
-  public byte[] read(int x, int y, int level) throws TileStoreException {
+  public byte[] read(long x, long y, int level) throws TileStoreException {
     try (Connection connection = datasource.getConnection();
          PreparedStatement statement = connection.prepareStatement(READ_QUERY)) {
-      statement.setInt(1, x);
-      statement.setInt(2, y);
+      statement.setLong(1, x);
+      statement.setLong(2, y);
       statement.setInt(3, level);
       logger.debug("Executing query: {}", READ_QUERY);
       try (ResultSet resultSet = statement.executeQuery()) {

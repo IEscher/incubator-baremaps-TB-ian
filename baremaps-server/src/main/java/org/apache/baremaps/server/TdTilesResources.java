@@ -49,28 +49,31 @@ public class TdTilesResources {
   // If changing this value, changes must also be made in TdTiledStore.java, TdSubtreeStore.java, and gltf.sql
   private static final int MAX_COMPRESSION = 3;
 
-//  private static final int MIN_LEVEL = 15;
-//  private static final int MAX_LEVEL = 19; // Cannot be over Integer.BYTES * 8
-//
-//  // Levels to which the compression is increased
-//  private static final int[] COMPRESSION_LEVELS = {18, 17, 16};
-//
-//  // Subtree levels
-//  // See: https://github.com/CesiumGS/3d-tiles/issues/576 for subtree division
-//  private static final int AVAILABLE_LEVELS = MAX_LEVEL; // AVAILABLE_LEVELS + 1 should be a multiple of SUBTREE_LEVELS
-//  private static final int SUBTREE_LEVELS = 5;
-
-
-  private static final int MIN_LEVEL = 0;
-  private static final int MAX_LEVEL = 3; // Cannot be over Integer.BYTES * 8
+  private static final int MIN_LEVEL = 15;
+  private static final int MAX_LEVEL = 19; // Cannot be over Long.BYTES * 8 * 2 because it uses 2 bits per level
+  // todo mettre le calcul correcte dans le rapport (level - Math.floorDiv(level, subtreeLevels))
 
   // Levels to which the compression is increased
-  private static final int[] COMPRESSION_LEVELS = {0, 1, 2};
+  private static final int[] COMPRESSION_LEVELS = {18, 17, 16};
 
   // Subtree levels
   // See: https://github.com/CesiumGS/3d-tiles/issues/576 for subtree division
   private static final int AVAILABLE_LEVELS = MAX_LEVEL; // AVAILABLE_LEVELS + 1 should be a multiple of SUBTREE_LEVELS
-  private static final int SUBTREE_LEVELS = 4;
+  private static final int SUBTREE_LEVELS = 5;
+
+
+//  private static final int MIN_LEVEL = 0;
+//  private static final int MAX_LEVEL = 3; // Cannot be over Integer.BYTES * 8
+//
+//  // Levels to which the compression is increased
+//  private static final int[] COMPRESSION_LEVELS = {0, 1, 2};
+//
+//  // Subtree levels
+//  // See: https://github.com/CesiumGS/3d-tiles/issues/576 for subtree division
+//  private static final int AVAILABLE_LEVELS = MAX_LEVEL; // AVAILABLE_LEVELS + 1 should be a multiple of SUBTREE_LEVELS
+//  private static final int SUBTREE_LEVELS = 4;
+
+
   private static final int RANK_AMOUNT = (AVAILABLE_LEVELS + 1) / SUBTREE_LEVELS;
 
   private static final Logger logger = LoggerFactory.getLogger(TdTilesStore.class);
@@ -95,7 +98,7 @@ public class TdTilesResources {
   }
 
   @Get("regex:^/subtrees/(?<level>[0-9]+).(?<x>[0-9]+).(?<y>[0-9]+).subtree")
-  public HttpResponse getSubtree(@Param("level") int level, @Param("x") int x, @Param("y") int y) {
+  public HttpResponse getSubtree(@Param("level") int level, @Param("x") long x, @Param("y") long y) {
     // See: https://github.com/CesiumGS/3d-tiles/blob/main/specification/ImplicitTiling/README.adoc#subtrees
     try {
       return HttpResponse.of(BINARY_HEADERS, HttpData.wrap(tdSubtreeStore.getSubtree(level, x, y)));
@@ -107,7 +110,7 @@ public class TdTilesResources {
   }
 
   @Get("regex:^/content/content_(?<level>[0-9]+)__(?<x>[0-9]+)_(?<y>[0-9]+).json")
-  public HttpResponse getTileset(@Param("level") int level, @Param("x") int x, @Param("y") int y)
+  public HttpResponse getTileset(@Param("level") int level, @Param("x") long x, @Param("y") long y)
       throws Exception {
     if (level < MIN_LEVEL) {
 //      Tile example = new Tile(
@@ -129,7 +132,7 @@ public class TdTilesResources {
     }
 
     // Retrieve the gltf in the database if it exists
-    byte[] tileExists = tdTilesStore.read(level, x, y);
+    byte[] tileExists = tdTilesStore.read(x, y, level);
 
     if (tileExists == null) {
       // Find the unprocessed buildings in the tile
@@ -147,7 +150,7 @@ public class TdTilesResources {
 
       // Update the database with the tile
       byte[] glb = GltfBuilder.createGltfList(nodes);
-      tdTilesStore.update(level, x, y, glb);
+      tdTilesStore.update(x, y, level, glb);
     }
 
     // Create the tiles
@@ -201,7 +204,7 @@ public class TdTilesResources {
    * @param z
    * @return
    */
-  public static float[] xyzToLatLonRadians(int x, int y, int z) {
+  public static float[] xyzToLatLonRadians(long x, long y, int z) {
     float[] answer = new float[4];
     int subdivision = 1 << z;
     float yWidth = (float) Math.PI / subdivision;
