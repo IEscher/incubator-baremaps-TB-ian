@@ -31,7 +31,7 @@ public class Subtree {
   }
 
   public BitSet getTileBitSet() {
-    return tileAvailability.getBitSet();
+    return tileAvailability.getBitSet(false);
   }
 
   public Availability getContentAvailability() {
@@ -39,7 +39,7 @@ public class Subtree {
   }
 
   public BitSet getContentBitSet() {
-    return contentAvailability.getBitSet();
+    return contentAvailability.getBitSet(false);
   }
 
   public int getAvailableCount() {
@@ -51,13 +51,16 @@ public class Subtree {
   }
 
   public BitSet getChildSubtreeBitSet() {
-    return childSubtreeAvailability.getBitSet();
+    return childSubtreeAvailability.getBitSet(true);
   }
 
-  public BitSet getSimplifiedChildSubtreeBitSet() {
+  public BitSet getEquivalentChildSubtreeBitSet() {
+    if (levels < 2) {
+      throw new RuntimeException("Subtree is too small to have a child subtree.");
+    }
     BitSet simplifiedBitSet = new BitSet(4);
     for (int i = 0; i < 4; i++) {
-      simplifiedBitSet.set(i, !childSubtreeAvailability.getBitSet().get(i * 4, (i + 1) * 4).isEmpty());
+      simplifiedBitSet.set(i, tileAvailability.getAvailability(1).get(i));
     }
     return simplifiedBitSet;
   }
@@ -83,7 +86,11 @@ public class Subtree {
     Availability parentTileAvailability = Availability.concatenateAvailabilities(tileAvailabilities, false);
     Availability parentContentAvailability = Availability.concatenateAvailabilities(contentAvailabilities, false);
     Availability parentChildSubtreeAvailability = Availability.concatenateAvailabilities(childSubtreeAvailabilities, true);
-    int contentCount = parentContentAvailability.getBitSet().cardinality();
+    int contentCount = parentContentAvailability.getBitSet(false).cardinality();
+
+    if (parentChildSubtreeAvailability.getBitSet(true).isEmpty()) {
+      System.out.println("Empty child subtree availability: " + parentChildSubtreeAvailability.getBitSet(true).toString());
+    }
 
     return new Subtree(parentTileAvailability, parentContentAvailability, contentCount, parentChildSubtreeAvailability,
         subtrees[0].getLevels() + 1);
@@ -95,7 +102,7 @@ public class Subtree {
     tileBitSet.set(0, subtree.getTileAvailability().isAvailable());
     BitSet contentBitSet = new BitSet(1);
     contentBitSet.set(0, subtree.getContentAvailability().isAvailable());
-    BitSet childSubtreeBitSet = subtree.getSimplifiedChildSubtreeBitSet();
+    BitSet childSubtreeBitSet = subtree.getEquivalentChildSubtreeBitSet();
 
     return new Subtree(
         new Availability(tileBitSet, 1, false),
@@ -110,6 +117,10 @@ public class Subtree {
     for (int i = 0; i < tileAvailability.getAvailabilities().length; i++) {
       System.out.println("Level " + i + ": " + tileAvailability.getAvailability(i).toString());
     }
-    System.out.println("All levels: " + tileAvailability.getBitSet().toString());
+    System.out.println("All levels: " + getTileBitSet().toString());
+  }
+
+  public void displayChildAvailability() {
+    System.out.println("Children availability: " + getChildSubtreeBitSet().toString());
   }
 }

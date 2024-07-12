@@ -175,7 +175,7 @@ public class TdTilesStore {
     }
   }
 
-  public void update(long x, long y, int level, byte[] data) throws TileStoreException {
+  public void update(int level, long x, long y, byte[] data) throws TileStoreException {
     try (Connection connection = datasource.getConnection()) {
       logger.debug("Executing query: {}", UPSERT_QUERY);
       try (PreparedStatement preparedStatement = connection.prepareStatement(UPSERT_QUERY)) {
@@ -186,14 +186,14 @@ public class TdTilesStore {
         preparedStatement.setBytes(5, data); // for the update part
 //        System.out.println("td_tile_gltf: " + preparedStatement.toString());
         preparedStatement.executeUpdate();
-        System.out.println("td_tile_gltf: Updated tile with x=" + x + ", y=" + y + " and level=" + level);
+        System.out.println("td_tile_gltf: Updated tile: " + level + "__" + x + "_" + y);
       }
     } catch (SQLException e) {
       throw new TileStoreException(e);
     }
   }
 
-  public byte[] read(long x, long y, int level) throws TileStoreException {
+  public byte[] read(int level, long x, long y) throws TileStoreException {
     try (Connection connection = datasource.getConnection();
          PreparedStatement statement = connection.prepareStatement(READ_QUERY)) {
       statement.setLong(1, x);
@@ -202,10 +202,10 @@ public class TdTilesStore {
       logger.debug("Executing query: {}", READ_QUERY);
       try (ResultSet resultSet = statement.executeQuery()) {
         if (resultSet.next()) {
-//          System.out.println("td_tile_gltf: Tile found with x=" + x + ", y=" + y + " and level=" + level);
+//          System.out.println("td_tile_gltf: Tile found: " + level + "__" + x + "_" + y);
           return resultSet.getBytes("gltf_binary");
         } else {
-//          System.out.println("td_tile_gltf: Tile not found with x=" + x + ", y=" + y + " and level=" + level);
+//          System.out.println("td_tile_gltf: Tile not found: " + level + "__" + x + "_" + y);
           return null;
         }
       }

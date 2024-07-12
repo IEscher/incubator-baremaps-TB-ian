@@ -21,8 +21,9 @@ public class Availability {
 
   public Availability(BitSet availability, int totalLength, boolean isChildren) {
     this.isChildren = isChildren;
-    if (availability.length() > totalLength) {
-      throw new IllegalArgumentException("Availability's length must be less than or equal to the total length.");
+    if (availability.length() - 1 > totalLength) {
+      throw new IllegalArgumentException("Availability's length (" + availability.length() +
+          ") must be less than or equal to the total length (" + totalLength + ").");
     }
     this.length = totalLength;
 
@@ -61,7 +62,10 @@ public class Availability {
     return availabilities[level];
   }
 
-  public BitSet getBitSet() {
+  public BitSet getBitSet(boolean isChildren) {
+    if (isChildren) {
+      return availabilities[0];
+    }
     BitSet bitSet = new BitSet(length);
     int pos = 0;
     for (int i = 0; i < levels; i++) {
@@ -90,10 +94,33 @@ public class Availability {
     return availabilities[0].get(0);
   }
 
-  public static Availability generateAvailabilities(BitSet availability, int length, boolean isChildren) {
-    if (isChildren) {
-      return new Availability(availability, length, true);
+  public static Availability generateTileAvailability(BitSet availability, int length) {
+    if (availability.length() - 1 > length) {
+      throw new IllegalArgumentException("Availability's length (" + availability.length() +
+          ") must be less than or equal to the total length (" + length + ").");
     }
+    double levelsDouble = Math.log(length) / Math.log(4) + 1;
+    if (levelsDouble % 1 != 0) {
+      throw new IllegalArgumentException("Length must be a power of 4.");
+    }
+    int levels = (int) levelsDouble;
+    int totalLength = ((int) Math.pow(4, levels) - 1) / 3;
+    BitSet[] availabilities = new BitSet[levels];
+
+    availabilities[levels - 1] = availability;
+    for (int i = levels - 2; i >= 0; i--) {
+      availabilities[i] = new BitSet((int) Math.pow(4, i));
+      for (int j = 0; j < (int) Math.pow(4, i + 1); j += 4) {
+        if (!availabilities[i + 1].get(j, j + 4).isEmpty()) {
+          availabilities[i].set(j / 4);
+        }
+      }
+    }
+
+    return new Availability(availabilities, totalLength, false);
+  }
+
+  public static Availability generateContentAvailability(BitSet availability, int length, int minLevel) {
     if (availability.length() > length) {
       throw new IllegalArgumentException("Availability's length must be less than or equal to the total length.");
     }
@@ -109,7 +136,7 @@ public class Availability {
     for (int i = levels - 2; i >= 0; i--) {
       availabilities[i] = new BitSet((int) Math.pow(4, i));
       for (int j = 0; j < (int) Math.pow(4, i + 1); j += 4) {
-        if (!availabilities[i + 1].get(j, j + 4).isEmpty()) {
+        if (!availabilities[i + 1].get(j, j + 4).isEmpty() && i >= minLevel) {
           availabilities[i].set(j / 4);
         }
       }

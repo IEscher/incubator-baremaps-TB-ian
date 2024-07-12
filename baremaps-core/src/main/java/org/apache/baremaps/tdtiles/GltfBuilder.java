@@ -331,23 +331,23 @@ public class GltfBuilder {
    * @throws Exception
    */
   public static byte[] createGltfList(List<NodeModel> nodes) throws Exception {
-     DefaultSceneModel sceneModel = new DefaultSceneModel();
+    DefaultSceneModel sceneModel = new DefaultSceneModel();
 
-     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
-     for (NodeModel node : nodes) {
-     sceneModel.addNode(node);
-     }
+    for (NodeModel node : nodes) {
+      sceneModel.addNode(node);
+    }
 
-     GltfModelBuilder gltfModelBuilder = GltfModelBuilder.create();
-     gltfModelBuilder.addSceneModel(sceneModel);
-     DefaultGltfModel gltfModel = gltfModelBuilder.build();
-     GltfAssetV2 asset = GltfAssetsV2.createEmbedded(gltfModel);
+    GltfModelBuilder gltfModelBuilder = GltfModelBuilder.create();
+    gltfModelBuilder.addSceneModel(sceneModel);
+    DefaultGltfModel gltfModel = gltfModelBuilder.build();
+    GltfAssetV2 asset = GltfAssetsV2.createEmbedded(gltfModel);
 
-     GltfAssetWriterV2 gltfAssetWriter = new GltfAssetWriterV2();
-     gltfAssetWriter.writeBinary(asset, outputStream);
+    GltfAssetWriterV2 gltfAssetWriter = new GltfAssetWriterV2();
+    gltfAssetWriter.writeBinary(asset, outputStream);
 
-     return outputStream.toByteArray();
+    return outputStream.toByteArray();
   }
 
   public static byte[] createGltf(NodeModel node) throws Exception {

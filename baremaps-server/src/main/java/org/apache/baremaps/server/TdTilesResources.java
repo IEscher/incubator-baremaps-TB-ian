@@ -132,11 +132,11 @@ public class TdTilesResources {
     }
 
     // Retrieve the gltf in the database if it exists
-    byte[] tileExists = tdTilesStore.read(x, y, level);
-
-    if (tileExists == null) {
+//    byte[] tileExists = tdTilesStore.read(level, x, y);
+//
+//    if (tileExists == null) {
       // Find the unprocessed buildings in the tile
-      System.out.println("Creating tile at level: " + level + ", x: " + x + ", y: " + y);
+      System.out.println("Creating tile: " + level + "__" + x + "_" + y);
       float[] coords = xyzToLatLonRadians(x, y, level);
       int limit = 5000;
       List<Building> buildings;
@@ -150,17 +150,17 @@ public class TdTilesResources {
 
       // Update the database with the tile
       byte[] glb = GltfBuilder.createGltfList(nodes);
-      tdTilesStore.update(x, y, level, glb);
-    }
+      tdTilesStore.update(level, x, y, glb);
+//    }
 
     // Create the tiles
     Tile tile = new Tile(
-          new BoundingVolume(new Float[]{0f,
-              0f,
-              0f,
-              0f,
-              0f,
-              0f}),
+          new BoundingVolume(new Float[]{-0.1f, // west
+              -0.1f, // south
+              0.1f, // east
+              0.1f, // north
+              -0.1f, // min height
+              0.1f}), // max height
           "/content/content_glb_" + level + "__" + x + "_" + y + ".glb"
       );
 
@@ -176,7 +176,7 @@ public class TdTilesResources {
                 -1f, // min height
                 1f}), // max height
             100f,
-            "REPLACE",
+            "ADD",
             new Tile[]{tile}
         ));
 
@@ -185,13 +185,13 @@ public class TdTilesResources {
   }
 
   @Get("regex:^/content/content_glb_(?<level>[0-9]+)__(?<x>[0-9]+)_(?<y>[0-9]+).glb")
-  public HttpResponse getGlb(@Param("level") int level, @Param("x") int x, @Param("y") int y) throws Exception {
+  public HttpResponse getGlb(@Param("level") int level, @Param("x") long x, @Param("y") long y) throws Exception {
     byte[] glb = tdTilesStore.read(level, x, y);
     if (glb != null) {
-      System.out.println("--------------------------------- Giving building: " + level + "__" + x + "_" + y);
+//      System.out.println("--------------------------------- Giving building: " + level + "__" + x + "_" + y);
       return HttpResponse.of(BINARY_HEADERS, HttpData.wrap(glb));
     } else {
-      System.err.println("Giving empty glb for level: " + level + ", x: " + x + ", y: " + y);
+      System.err.println("Giving empty glb for level: " + level + "__" + x + "_" + y);
       return HttpResponse.of(BINARY_HEADERS, HttpData.empty());
     }
   }

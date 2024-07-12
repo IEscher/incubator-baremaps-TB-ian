@@ -8,7 +8,7 @@
       "region" : [ -3.141592653589793238, -1.57079632679, 3.141592653589793238, 1.57079632679, 0, 10000]
     },
     "geometricError" : 320.0,
-    "refine" : "REPLACE",
+    "refine" : "ADD",
     "content" : {
       "uri" : "/content/content_{level}__{x}_{y}.json"
     },
