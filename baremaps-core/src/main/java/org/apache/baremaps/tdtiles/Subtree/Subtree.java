@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to you under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.apache.baremaps.tdtiles.Subtree;
 
 
@@ -11,8 +28,9 @@ public class Subtree {
   private final Availability childSubtreeAvailability;
   private final int levels;
 
-  public Subtree(Availability tileAvailability, Availability contentAvailability, int availableCount,
-                 Availability childSubtreeAvailability, int levels) {
+  public Subtree(Availability tileAvailability, Availability contentAvailability,
+      int availableCount,
+      Availability childSubtreeAvailability, int levels) {
     this.tileAvailability = tileAvailability;
     this.contentAvailability = contentAvailability;
     this.availableCount = availableCount;
@@ -21,7 +39,8 @@ public class Subtree {
     if (levels != tileAvailability.getAvailabilities().length
         || levels != contentAvailability.getAvailabilities().length) {
       throw new IllegalArgumentException("The number of levels (" + levels +
-          ") must be equal to the number of availabilities (tile: " + tileAvailability.getAvailabilities().length +
+          ") must be equal to the number of availabilities (tile: "
+          + tileAvailability.getAvailabilities().length +
           ", content: " + contentAvailability.getAvailabilities().length + ").");
     }
   }
@@ -98,16 +117,21 @@ public class Subtree {
       childSubtreeAvailabilities[i] = subtrees[i].getChildSubtreeAvailability();
     }
 
-    Availability parentTileAvailability = Availability.concatenateAvailabilities(tileAvailabilities, false, false);
-    Availability parentContentAvailability = Availability.concatenateAvailabilities(contentAvailabilities, false, true);
-    Availability parentChildSubtreeAvailability = Availability.concatenateAvailabilities(childSubtreeAvailabilities, true, false);
+    Availability parentTileAvailability =
+        Availability.concatenateAvailabilities(tileAvailabilities, false, false);
+    Availability parentContentAvailability =
+        Availability.concatenateAvailabilities(contentAvailabilities, false, true);
+    Availability parentChildSubtreeAvailability =
+        Availability.concatenateAvailabilities(childSubtreeAvailabilities, true, false);
     int contentCount = parentContentAvailability.getBitSet(false).cardinality();
 
     if (parentChildSubtreeAvailability.getBitSet(true).isEmpty()) {
-      System.err.println("Empty child subtree availability: " + parentChildSubtreeAvailability.getBitSet(true).toString());
+      System.err.println("Empty child subtree availability: "
+          + parentChildSubtreeAvailability.getBitSet(true).toString());
     }
 
-    return new Subtree(parentTileAvailability, parentContentAvailability, contentCount, parentChildSubtreeAvailability,
+    return new Subtree(parentTileAvailability, parentContentAvailability, contentCount,
+        parentChildSubtreeAvailability,
         subtrees[0].getLevels() + 1);
   }
 
@@ -124,8 +148,7 @@ public class Subtree {
         new Availability(contentBitSet, 1, false),
         subtree.getContentAvailability().isAvailable() ? 1 : 0,
         new Availability(childSubtreeBitSet, 4, true),
-        1
-    );
+        1);
   }
 
   public void displayTileAvailability() {

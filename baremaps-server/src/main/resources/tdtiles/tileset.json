@@ -2,27 +2,113 @@
   "asset" : {
     "version" : "1.1"
   },
-  "geometricError" : 2048.0,
+  "geometricError": 10000,
+  "extensionsUsed": [
+    "3DTILES_bounding_volume_S2"
+  ],
+  "extensionsRequired": [
+    "3DTILES_bounding_volume_S2"
+  ],
   "root" : {
-    "boundingVolume" : {
-      "region" : [
-        -3.141592653589793238,
-        -1.57079632679,
-        3.141592653589793238,
-        1.57079632679,
-        -100,
-        400
+    "boundingVolume": {
+      "region": [
+        -3.141592653589793,
+        -1.5707963267948966,
+        3.141592653589793,
+        1.5707963267948966,
+        0,
+        250000
       ]
     },
-    "geometricError" : 2048.0,
-    "refine" : "REPLACE",
-    "content" : {
-      "uri" : "/content/content_{level}__{x}_{y}.json"
+    "refine": "REPLACE",
+    "geometricError": 10000,
+    "children": [
+      {
+        "boundingVolume": {
+          "extensions": {
+            "3DTILES_bounding_volume_S2": {
+              "token": "1",
+              "minimumHeight": 0,
+              "maximumHeight": 1000000
+            }
+          }
+        },
+        "refine": "REPLACE",
+        "geometricError": 5000
+      },
+      {
+        "boundingVolume": {
+          "extensions": {
+            "3DTILES_bounding_volume_S2": {
+              "token": "3",
+              "minimumHeight": 0,
+              "maximumHeight": 1000000
+            }
+          }
+        },
+        "refine": "REPLACE",
+        "geometricError": 5000
+      },
+      {
+        "boundingVolume": {
+          "extensions": {
+            "3DTILES_bounding_volume_S2": {
+              "token": "5",
+              "minimumHeight": 0,
+              "maximumHeight": 1000000
+            }
+          }
+        },
+        "refine": "REPLACE",
+        "geometricError": 5000
+      },
+      {
+        "boundingVolume": {
+          "extensions": {
+            "3DTILES_bounding_volume_S2": {
+              "token": "7",
+              "minimumHeight": 0,
+              "maximumHeight": 1000000
+            }
+          }
+        },
+        "refine": "REPLACE",
+        "geometricError": 5000
+      },
+      {
+        "boundingVolume": {
+          "extensions": {
+            "3DTILES_bounding_volume_S2": {
+              "token": "9",
+              "minimumHeight": 0,
+              "maximumHeight": 1000000
+            }
+          }
+        },
+        "refine": "REPLACE",
+        "geometricError": 5000
+      },
+      {
+        "boundingVolume": {
+          "extensions": {
+            "3DTILES_bounding_volume_S2": {
+              "token": "b",
+              "minimumHeight": 0,
+              "maximumHeight": 1000000
+            }
+          }
+        },
+        "refine": "REPLACE",
+        "geometricError": 5000
+      }
+    ],
+    "content": {
+      "uri" : "/content/content_glb_{level}__{x}_{y}.glb"
     },
     "implicitTiling" : {
       "subdivisionScheme" : "QUADTREE",
-      "subtreeLevels" : 5,
-      "availableLevels" : 19,
+      "subtreeLevels" : 6,
+      "availableLevels" : 17,
       "subtrees" : {
         "uri" : "/subtrees/{level}.{x}.{y}.subtree"
       }

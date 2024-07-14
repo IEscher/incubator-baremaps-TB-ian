@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to you under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.apache.baremaps.tdtiles.Subtree;
 
 import java.util.BitSet;
@@ -120,9 +137,11 @@ public class Availability {
     return new Availability(availabilities, totalLength, false);
   }
 
-  public static Availability generateContentAvailability(BitSet availability, int length, int minLevel) {
+  public static Availability generateContentAvailability(BitSet availability, int length,
+      int minLevel) {
     if (availability.length() > length) {
-      throw new IllegalArgumentException("Availability's length must be less than or equal to the total length.");
+      throw new IllegalArgumentException(
+          "Availability's length must be less than or equal to the total length.");
     }
     double levelsDouble = Math.log(length) / Math.log(4) + 1;
     if (levelsDouble % 1 != 0) {
@@ -144,24 +163,27 @@ public class Availability {
 
     }
 
-//    for (int i = 0; i < levels; i++) {
-//      availabilities[i] = new BitSet((int) Math.pow(4, i));
-//    }
-//    if (!availability.isEmpty()) {
-//      availabilities[0].set(0);
-//    }
+    // for (int i = 0; i < levels; i++) {
+    // availabilities[i] = new BitSet((int) Math.pow(4, i));
+    // }
+    // if (!availability.isEmpty()) {
+    // availabilities[0].set(0);
+    // }
 
     return new Availability(availabilities, totalLength, false);
   }
 
-  public static Availability concatenateAvailabilities(Availability[] availabilities, boolean isChildren, boolean isContent) {
+  public static Availability concatenateAvailabilities(Availability[] availabilities,
+      boolean isChildren, boolean isContent) {
     if (availabilities.length != 4) {
-      throw new IllegalArgumentException("The availabilities array must have exactly 4 Availability elements.");
+      throw new IllegalArgumentException(
+          "The availabilities array must have exactly 4 Availability elements.");
     }
     int levels = availabilities[0].getLevels();
     for (int i = 1; i < availabilities.length; i++) {
       if (availabilities[i].getLevels() != levels) {
-        throw new IllegalArgumentException("The availabilities must have the same number of levels.");
+        throw new IllegalArgumentException(
+            "The availabilities must have the same number of levels.");
       }
     }
 
@@ -185,14 +207,15 @@ public class Availability {
         concatenatedAvailabilities[i + 1] = new BitSet(length * 4);
         for (int j = 0; j < 4; j++) {
           for (int k = 0; k < length; k++) {
-            concatenatedAvailabilities[i + 1].set(j * length + k, availabilities[j].getAvailability(i).get(k));
+            concatenatedAvailabilities[i + 1].set(j * length + k,
+                availabilities[j].getAvailability(i).get(k));
           }
         }
       }
     }
 
     // Set the availability of the root node
-    if(!isChildren) {
+    if (!isChildren) {
       concatenatedAvailabilities[0] = new BitSet(1);
       if (!isContent) {
         concatenatedAvailabilities[0].set(0, !concatenatedAvailabilities[1].isEmpty());

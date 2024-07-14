@@ -17,7 +17,6 @@
 
 package org.apache.baremaps.tdtiles.building;
 
-import java.util.List;
 import org.apache.baremaps.tdtiles.utils.Color;
 import org.locationtech.jts.geom.Geometry;
 

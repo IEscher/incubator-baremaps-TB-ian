@@ -23,14 +23,13 @@
         const tileset = await Cesium.Cesium3DTileset.fromUrl(
             "http://localhost:9000/tileset.json",
             {
-                // skipLevelOfDetail: true,
-                // baseScreenSpaceError: 1024,
-                // skipScreenSpaceErrorFactor: 16,
-                // skipLevels: 1,
+                // Tree optimization
+                skipLevelOfDetail: true,
                 // preferLeaves: true,
                 // immediatelyLoadDesiredLevelOfDetail: true,
                 // loadSiblings: true,
-                // cullWithChildrenBounds: true,
+
+                // debug
                 debugShowContentBoundingVolume: true,
                 enableCollision: true,
                 enablePick: true,
@@ -53,7 +52,7 @@
 
     // Set initial position
     viewer.camera.flyTo({
-        destination : Cesium.Cartesian3.fromDegrees(9.52, 47.156, 3000)
+        destination : Cesium.Cartesian3.fromDegrees(9.512, 47.165, 3000)
         // destination : Cesium.Cartesian3.fromDegrees(-0.1347, 51.4952, 1000) // London
     });
 

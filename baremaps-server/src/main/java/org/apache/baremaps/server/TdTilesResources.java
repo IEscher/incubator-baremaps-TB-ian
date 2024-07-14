@@ -26,9 +26,7 @@ import com.linecorp.armeria.common.HttpResponse;
 import com.linecorp.armeria.common.ResponseHeaders;
 import com.linecorp.armeria.server.annotation.Get;
 import com.linecorp.armeria.server.annotation.Param;
-
 import javax.sql.DataSource;
-
 import org.apache.baremaps.tdtiles.TdSubtreeStore;
 import org.apache.baremaps.tdtiles.TdTilesStore;
 import org.slf4j.Logger;
@@ -36,33 +34,38 @@ import org.slf4j.LoggerFactory;
 
 public class TdTilesResources {
 
-  // 0 = no compression, 1 = low compression, 2 = high compression + only roof, 3 = only important buildings
-  // If changing this value, changes must also be made in TdTiledStore.java, TdSubtreeStore.java, and gltf.sql
+  // 0 = no compression, 1 = low compression, 2 = high compression + only roof, 3 = only important
+  // buildings
+  // If changing this value, changes must also be made in TdTiledStore.java, TdSubtreeStore.java,
+  // and gltf.sql
   private static final int MAX_COMPRESSION = 3;
 
-  private static final int MIN_LEVEL = 15;
-  private static final int MAX_LEVEL = 19; // Cannot be over Long.BYTES * 8 * 2 because it uses 2 bits per level
+  private static final int MIN_LEVEL = 12;
+  private static final int MAX_LEVEL = 17; // Cannot be over Long.BYTES * 8 / 2 because it uses 2
+                                           // bits per level
   // todo mettre le calcul correcte dans le rapport (level - Math.floorDiv(level, subtreeLevels))
 
   // Levels to which the compression is increased
-  private static final int[] COMPRESSION_LEVELS = {MAX_LEVEL-1, MAX_LEVEL-2, MAX_LEVEL-3};
+  private static final int[] COMPRESSION_LEVELS = {MAX_LEVEL - 2, MAX_LEVEL - 3, MAX_LEVEL - 4};
 
   // Subtree levels
   // See: https://github.com/CesiumGS/3d-tiles/issues/576 for subtree division
-  private static final int AVAILABLE_LEVELS = MAX_LEVEL; // AVAILABLE_LEVELS + 1 should be a multiple of SUBTREE_LEVELS
-  private static final int SUBTREE_LEVELS = 5;
+  private static final int AVAILABLE_LEVELS = MAX_LEVEL; // AVAILABLE_LEVELS + 1 should be a
+                                                         // multiple of SUBTREE_LEVELS
+  private static final int SUBTREE_LEVELS = 6;
 
 
-//  private static final int MIN_LEVEL = 0;
-//  private static final int MAX_LEVEL = 3; // Cannot be over Integer.BYTES * 8
-//
-//  // Levels to which the compression is increased
-//  private static final int[] COMPRESSION_LEVELS = {0, 1, 2};
-//
-//  // Subtree levels
-//  // See: https://github.com/CesiumGS/3d-tiles/issues/576 for subtree division
-//  private static final int AVAILABLE_LEVELS = MAX_LEVEL; // AVAILABLE_LEVELS + 1 should be a multiple of SUBTREE_LEVELS
-//  private static final int SUBTREE_LEVELS = 4;
+  // private static final int MIN_LEVEL = 0;
+  // private static final int MAX_LEVEL = 3; // Cannot be over Integer.BYTES * 8
+  //
+  // // Levels to which the compression is increased
+  // private static final int[] COMPRESSION_LEVELS = {0, 1, 2};
+  //
+  // // Subtree levels
+  // // See: https://github.com/CesiumGS/3d-tiles/issues/576 for subtree division
+  // private static final int AVAILABLE_LEVELS = MAX_LEVEL; // AVAILABLE_LEVELS + 1 should be a
+  // multiple of SUBTREE_LEVELS
+  // private static final int SUBTREE_LEVELS = 4;
 
 
   private static final int RANK_AMOUNT = (AVAILABLE_LEVELS + 1) / SUBTREE_LEVELS;
@@ -83,14 +86,17 @@ public class TdTilesResources {
   private final TdSubtreeStore tdSubtreeStore;
 
   public TdTilesResources(DataSource dataSource) {
-    this.tdTilesStore = new TdTilesStore(dataSource, MAX_COMPRESSION, COMPRESSION_LEVELS, MIN_LEVEL, MAX_LEVEL);
-    this.tdSubtreeStore = new TdSubtreeStore(dataSource, MAX_COMPRESSION, COMPRESSION_LEVELS, MIN_LEVEL, MAX_LEVEL,
+    this.tdTilesStore =
+        new TdTilesStore(dataSource, MAX_COMPRESSION, COMPRESSION_LEVELS, MIN_LEVEL, MAX_LEVEL);
+    this.tdSubtreeStore = new TdSubtreeStore(dataSource, MAX_COMPRESSION, MIN_LEVEL, MAX_LEVEL,
         AVAILABLE_LEVELS, SUBTREE_LEVELS, RANK_AMOUNT);
   }
 
   @Get("regex:^/subtrees/(?<level>[0-9]+).(?<x>[0-9]+).(?<y>[0-9]+).subtree")
-  public HttpResponse getSubtree(@Param("level") int level, @Param("x") long x, @Param("y") long y) {
-    // See: https://github.com/CesiumGS/3d-tiles/blob/main/specification/ImplicitTiling/README.adoc#subtrees
+  public HttpResponse getSubtree(@Param("level") int level, @Param("x") long x,
+      @Param("y") long y) {
+    // See:
+    // https://github.com/CesiumGS/3d-tiles/blob/main/specification/ImplicitTiling/README.adoc#subtrees
     try {
       return HttpResponse.of(BINARY_HEADERS, HttpData.wrap(tdSubtreeStore.getSubtree(level, x, y)));
     } catch (Exception e) {
@@ -100,17 +106,13 @@ public class TdTilesResources {
     }
   }
 
-  @Get("regex:^/content/content_(?<level>[0-9]+)__(?<x>[0-9]+)_(?<y>[0-9]+).json")
-  public HttpResponse getTileset(@Param("level") int level, @Param("x") long x, @Param("y") long y)
-      throws Exception {
-    return HttpResponse.ofJson(JSON_HEADERS, tdTilesStore.getTileset(level, x, y));
-  }
-
   @Get("regex:^/content/content_glb_(?<level>[0-9]+)__(?<x>[0-9]+)_(?<y>[0-9]+).glb")
-  public HttpResponse getGlb(@Param("level") int level, @Param("x") long x, @Param("y") long y) throws Exception {
-    byte[] glb = tdTilesStore.read(level, x, y);
+  public HttpResponse getGlb(@Param("level") int level, @Param("x") long x, @Param("y") long y)
+      throws Exception {
+    byte[] glb = tdTilesStore.getGlb(level, x, y);
     if (glb != null) {
-//      System.out.println("--------------------------------- Giving building: " + level + "__" + x + "_" + y);
+      // System.out.println("--------------------------------- Giving building: " + level + "__" + x
+      // + "_" + y);
       return HttpResponse.of(BINARY_HEADERS, HttpData.wrap(glb));
     } else {
       System.err.println("Giving empty glb for level: " + level + "__" + x + "_" + y);

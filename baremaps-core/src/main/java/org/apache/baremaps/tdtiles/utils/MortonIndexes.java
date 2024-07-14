@@ -1,8 +1,26 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to you under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.apache.baremaps.tdtiles.utils;
 
 public class MortonIndexes {
   /**
-   * See: https://github.com/CesiumGS/3d-tiles/blob/main/specification/ImplicitTiling/AVAILABILITY.adoc
+   * See:
+   * https://github.com/CesiumGS/3d-tiles/blob/main/specification/ImplicitTiling/AVAILABILITY.adoc
    *
    * @param x
    * @param y
@@ -10,7 +28,7 @@ public class MortonIndexes {
    * @return The morton index of the two coordinates at the given level
    */
   public static long interleaveBits(long x, long y, int level) {
-//    int trueLevel = level - Math.floorDiv(level, subtreeLevels);
+    // int trueLevel = level - Math.floorDiv(level, subtreeLevels);
     long result = 0;
     int length = (int) Math.pow(2, level);
     for (int i = 0; i < length; i++) {
@@ -20,7 +38,7 @@ public class MortonIndexes {
   }
 
   public static long[] mortonIndexToXY(long mortonIndex, int level) {
-//    int trueLevel = level - Math.floorDiv(level, subtreeLevels);
+    // int trueLevel = level - Math.floorDiv(level, subtreeLevels);
     long[] result = new long[2];
     int length = (int) Math.pow(2, level);
     long x = 0;

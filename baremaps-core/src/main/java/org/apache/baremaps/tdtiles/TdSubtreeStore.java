@@ -1,21 +1,37 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to you under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.apache.baremaps.tdtiles;
 
-import org.apache.baremaps.tdtiles.Subtree.Subtree;
-import org.apache.baremaps.tdtiles.Subtree.Availability;
-import org.apache.baremaps.tilestore.TileStoreException;
 import static org.apache.baremaps.tdtiles.utils.MortonIndexes.*;
 
-import org.json.simple.JSONArray;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.json.simple.JSONObject;
-
-import javax.sql.DataSource;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.util.BitSet;
+import javax.sql.DataSource;
+import org.apache.baremaps.tdtiles.Subtree.Availability;
+import org.apache.baremaps.tdtiles.Subtree.Subtree;
+import org.apache.baremaps.tilestore.TileStoreException;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TdSubtreeStore {
 
@@ -23,7 +39,6 @@ public class TdSubtreeStore {
   private final int maxCompression;
   private final int minLevel;
   private final int maxLevel;
-  private final int[] compressionLevels;
   private final int availableLevels;
   private final int subtreeLevels;
   private final int rankAmount;
@@ -45,7 +60,7 @@ public class TdSubtreeStore {
       "select count(*) " +
           "from osm_ways where (tags ? 'building' or tags ? 'building:part') and " +
           "st_intersects(geom, st_makeenvelope(%1$s, %2$s, %3$s, %4$s, 4326))";
-  
+
   private static class ByteWrapper {
     byte[] buffer;
 
@@ -62,12 +77,12 @@ public class TdSubtreeStore {
     }
   }
 
-  public TdSubtreeStore(DataSource datasource, int maxCompression, int[] compressionLevels, int minLevel, int maxLevel, int availableLevels, int subtreeLevels, int rankAmount) {
+  public TdSubtreeStore(DataSource datasource, int maxCompression, int minLevel, int maxLevel,
+      int availableLevels, int subtreeLevels, int rankAmount) {
     this.datasource = datasource;
     this.maxCompression = maxCompression;
     this.minLevel = minLevel;
     this.maxLevel = maxLevel;
-    this.compressionLevels = compressionLevels;
     this.availableLevels = availableLevels;
     this.subtreeLevels = subtreeLevels;
     this.rankAmount = rankAmount;
@@ -75,7 +90,8 @@ public class TdSubtreeStore {
 
   public byte[] getSubtree(int level, long x, long y) throws TileStoreException {
     if (!isRoot(level)) {
-      throw new TileStoreException(String.format("The subtree at level %d is not a root of a subtree.", level));
+      throw new TileStoreException(
+          String.format("The subtree at level %d is not a root of a subtree.", level));
     }
     System.out.println("Getting subtree: " + level + "__" + x + "_" + y);
 
@@ -83,7 +99,7 @@ public class TdSubtreeStore {
     long mortonIndex = interleaveBits(x, y, level);
     byte[] subtree = readSubtree(mortonIndex, level); // TODO reput that
     if (subtree != null) {
-//      System.out.println("td_subtrees: Subtree found in db: " + level + "__" + x + "_" + y);
+      // System.out.println("td_subtrees: Subtree found in db: " + level + "__" + x + "_" + y);
       return subtree;
     }
 
@@ -99,7 +115,8 @@ public class TdSubtreeStore {
     newSubtree.displayTileAvailability();
     newSubtree.displayChildAvailability();
     // Transform subtree to binary format
-    byte[] binary = subtreeToJSONBinary(newSubtree); // Getting subtree at level 5 with coordinates: 16, 24
+    byte[] binary = subtreeToJSONBinary(newSubtree); // Getting subtree at level 5 with coordinates:
+                                                     // 16, 24
 
     // Update the subtree in the database
     updateSubtree(mortonIndex, level, binary);
@@ -150,7 +167,7 @@ public class TdSubtreeStore {
     } else {
       tileAvailability.put("bitstream", numberOfBitstreams);
       ByteBuffer tmp = ByteBuffer.allocate(bitstreamLength);
-//      tmp.order(ByteOrder.LITTLE_ENDIAN);
+      // tmp.order(ByteOrder.LITTLE_ENDIAN);
       tmp.put(subtree.getTileBitSet().toByteArray());
       tmpBuffers[numberOfBitstreams] = tmp.array();
       bitstreamLengths[numberOfBitstreams] = bitstreamLength;
@@ -174,14 +191,14 @@ public class TdSubtreeStore {
       contentAvailabilityArray.add(contentAvailabilityObject);
 
       ByteBuffer tmp = ByteBuffer.allocate(bitstreamLength);
-//      tmp.order(ByteOrder.LITTLE_ENDIAN);
+      // tmp.order(ByteOrder.LITTLE_ENDIAN);
       tmp.put(subtree.getContentBitSet().toByteArray());
       tmpBuffers[numberOfBitstreams] = tmp.array();
       bitstreamLengths[numberOfBitstreams] = bitstreamLength;
       for (int i = 0; i < numberOfBitstreams; i++) {
         bitstreamOffsets[numberOfBitstreams] += bitstreamLengths[i];
       }
-//      bitstreamOffsets[numberOfBitstreams] = numberOfBitstreams * bitstreamLength;
+      // bitstreamOffsets[numberOfBitstreams] = numberOfBitstreams * bitstreamLength;
       numberOfBitstreams++;
     }
 
@@ -194,14 +211,14 @@ public class TdSubtreeStore {
     } else {
       childSubtreeAvailability.put("bitstream", numberOfBitstreams);
       ByteBuffer tmp = ByteBuffer.allocate(childrenBitstreamLength);
-//      tmp.order(ByteOrder.LITTLE_ENDIAN);
+      // tmp.order(ByteOrder.LITTLE_ENDIAN);
       tmp.put(subtree.getChildSubtreeBitSet().toByteArray());
       tmpBuffers[numberOfBitstreams] = tmp.array();
       bitstreamLengths[numberOfBitstreams] = childrenBitstreamLength;
       for (int i = 0; i < numberOfBitstreams; i++) {
         bitstreamOffsets[numberOfBitstreams] += bitstreamLengths[i];
       }
-//      bitstreamOffsets[numberOfBitstreams] = numberOfBitstreams * childrenBitstreamLength;
+      // bitstreamOffsets[numberOfBitstreams] = numberOfBitstreams * childrenBitstreamLength;
       numberOfBitstreams++;
     }
 
@@ -213,7 +230,8 @@ public class TdSubtreeStore {
     }
     byte[] availabilityBuffer = new byte[totalLength];
     for (int i = 0; i < numberOfBitstreams; i++) {
-      System.arraycopy(tmpBuffers[i], 0, availabilityBuffer, bitstreamOffsets[i], bitstreamLengths[i]);
+      System.arraycopy(tmpBuffers[i], 0, availabilityBuffer, bitstreamOffsets[i],
+          bitstreamLengths[i]);
     }
     buffer.setBuffer(availabilityBuffer);
 
@@ -238,11 +256,11 @@ public class TdSubtreeStore {
     json.put("bufferViews", bufferViews);
 
     json.put("tileAvailability", tileAvailability);
-//    if (contentAvailabilityConstant) {
-//      json.put("contentAvailability", contentAvailability);
-//    } else {
-//      json.put("contentAvailability", contentAvailabilityArray);
-//    }
+    // if (contentAvailabilityConstant) {
+    // json.put("contentAvailability", contentAvailability);
+    // } else {
+    // json.put("contentAvailability", contentAvailabilityArray);
+    // }
     if (contentPresent) {
       json.put("contentAvailability", contentAvailabilityArray);
     }
@@ -252,7 +270,7 @@ public class TdSubtreeStore {
   }
 
   private static byte[] createBinaryHeader(int magic, int version,
-                                           String jsonString, byte[] buffer) {
+      String jsonString, byte[] buffer) {
     long JSONByteLength = jsonString.getBytes(StandardCharsets.UTF_8).length;
     int jsonPadding = (8 - (int) JSONByteLength % 8) % 8;
     int bufferPadding = (8 - buffer.length % 8) % 8;
@@ -292,25 +310,32 @@ public class TdSubtreeStore {
       long baseIndex = mortonIndex << (2 * (subtreeLevels - 1));
       for (int i = 0; i < totalLeaves; i++) {
         long[] xy = mortonIndexToXY(baseIndex + i, maxLevel);
-//        if(readBuildingCount(xy[0], xy[1], maxLevel) > 0) {
-//          System.out.println("building at " + xy[0] + ", " + xy[1]);
-//        }
+        // if(readBuildingCount(xy[0], xy[1], maxLevel) > 0) {
+        // System.out.println("building at " + xy[0] + ", " + xy[1]);
+        // }
         buildingPresenceBitSet.set(i, readBuildingCount(xy[0], xy[1], maxLevel) > 0);
       }
     }
 
-    Availability tileAvailability = Availability.generateTileAvailability(buildingPresenceBitSet, totalLeaves);
-    Availability contentAvailability = Availability.generateContentAvailability(buildingPresenceBitSet, totalLeaves, subtreeLevels - (maxLevel - minLevel));
-    Availability childSubtreeAvailability = new Availability(new BitSet(), (int) Math.pow(4, subtreeLevels), true);
+    Availability tileAvailability =
+        Availability.generateTileAvailability(buildingPresenceBitSet, totalLeaves);
+    Availability contentAvailability = Availability.generateContentAvailability(
+        buildingPresenceBitSet, totalLeaves, subtreeLevels - (maxLevel - minLevel));
+    Availability childSubtreeAvailability =
+        new Availability(new BitSet(), (int) Math.pow(4, subtreeLevels), true);
 
-    return new Subtree(tileAvailability, contentAvailability, contentAvailability.getBitSet(false).cardinality(), childSubtreeAvailability, subtreeLevels);
+    return new Subtree(tileAvailability, contentAvailability,
+        contentAvailability.getBitSet(false).cardinality(), childSubtreeAvailability,
+        subtreeLevels);
   }
 
-  private Subtree createSubtree(long mortonIndex, int globalLevel, int originLevel) throws TileStoreException {
+  private Subtree createSubtree(long mortonIndex, int globalLevel, int originLevel)
+      throws TileStoreException {
     // Check if there are any buildings in the tile
     long[] coords = mortonIndexToXY(mortonIndex, globalLevel);
     if (readBuildingCount(coords[0], coords[1], globalLevel) == 0) {
-//      System.out.println("----------- No buildings in tile at " + globalLevel + "__" + coords[0] + "_" + coords[1]);
+      // System.out.println("----------- No buildings in tile at " + globalLevel + "__" + coords[0]
+      // + "_" + coords[1]);
       int levels = subtreeLevels - (globalLevel - originLevel);
       int totalLength = ((int) Math.pow(4, levels) - 1) / 3;
       int totalChildren = (int) Math.pow(4, levels);
@@ -319,8 +344,7 @@ public class TdSubtreeStore {
           new Availability(new BitSet(), totalLength, false),
           0,
           new Availability(new BitSet(), totalChildren, true),
-          levels
-      );
+          levels);
     }
 
     // Recursively create the subtree
@@ -336,16 +360,18 @@ public class TdSubtreeStore {
     // Last level of the Subtree. This is the first level of another Subtree.
 
     // Querry the database
-//    byte[] binary = readSubtree(mortonIndex, globalLevel);
-//    if (binary != null) {
-//      try {
-//        return Subtree.getSimplifiedSubtree(readSubtreeFromBinary(binary));
-//      } catch (ParseException e) {
-//        System.out.println("Error reading subtree binary at level " + (globalLevel) + ", " + mortonIndex + " : " + e);
-//      }
-//    }
+    // byte[] binary = readSubtree(mortonIndex, globalLevel);
+    // if (binary != null) {
+    // try {
+    // return Subtree.getSimplifiedSubtree(readSubtreeFromBinary(binary));
+    // } catch (ParseException e) {
+    // System.out.println("Error reading subtree binary at level " + (globalLevel) + ", " +
+    // mortonIndex + " : " + e);
+    // }
+    // }
 
-//    System.out.println("Creating subtree at level " + level + " with coordinates: " + mortonIndexToXY(mortonIndex, level)[0] + ", " + mortonIndexToXY(mortonIndex, level)[1]);
+    // System.out.println("Creating subtree at level " + level + " with coordinates: " +
+    // mortonIndexToXY(mortonIndex, level)[0] + ", " + mortonIndexToXY(mortonIndex, level)[1]);
 
     Subtree[] subtrees = new Subtree[4];
     long childBaseIndex = mortonIndex << 2;
@@ -353,13 +379,18 @@ public class TdSubtreeStore {
       // Change method depending if max rank
       if (globalLevel >= maxLevel - subtreeLevels) {
         subtrees[i] = Subtree.getSimplifiedSubtree(createMaxRankSubtree(childBaseIndex + i));
-  //      System.out.println("New max rank subtree at " + (globalLevel + 1) + "__" + mortonIndexToXY(mortonIndex, globalLevel)[0] + "_" + mortonIndexToXY(mortonIndex, globalLevel)[1]);
-  //      result.displayChildAvailability();
+        // System.out.println("New max rank subtree at " + (globalLevel + 1) + "__" +
+        // mortonIndexToXY(mortonIndex, globalLevel)[0] + "_" + mortonIndexToXY(mortonIndex,
+        // globalLevel)[1]);
+        // result.displayChildAvailability();
       } else {
-        subtrees[i] = Subtree.getSimplifiedSubtree(createSubtree(childBaseIndex + i, globalLevel + 1, globalLevel + 1));
-  //      System.out.println("New subtree at " + (globalLevel + 1) + "__" + mortonIndexToXY(mortonIndex, globalLevel + 1)[0] + "_" + mortonIndexToXY(mortonIndex, globalLevel + 1)[1]);
-  //      result.displayChildAvailability();
-  //      System.out.println("(not printing max rank subtrees)");
+        subtrees[i] = Subtree.getSimplifiedSubtree(
+            createSubtree(childBaseIndex + i, globalLevel + 1, globalLevel + 1));
+        // System.out.println("New subtree at " + (globalLevel + 1) + "__" +
+        // mortonIndexToXY(mortonIndex, globalLevel + 1)[0] + "_" + mortonIndexToXY(mortonIndex,
+        // globalLevel + 1)[1]);
+        // result.displayChildAvailability();
+        // System.out.println("(not printing max rank subtrees)");
       }
     }
     Subtree newSubtree = Subtree.getSimplifiedSubtree(Subtree.concatenateSubtreeLevel(subtrees));
@@ -367,77 +398,18 @@ public class TdSubtreeStore {
     return newSubtree;
   }
 
-
-  // readSubtreeFromBinary and extractBitSetFromBinary are not finished, they contain errors.
-  // Since they are not used in the code, they will be removed in the next commit.
-//  public Subtree readSubtreeFromBinary(byte[] binary) throws ParseException {
-//    ByteBuffer byteBuffer = ByteBuffer.wrap(binary);
-//    byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
-//
-//    int magic = byteBuffer.getInt();
-//    int version = byteBuffer.getInt();
-//    long JSONByteLength = byteBuffer.getLong();
-//    long binaryByteLength = byteBuffer.getLong();
-//
-//    byte[] jsonStringBytes = new byte[(int) JSONByteLength];
-//    byteBuffer.get(jsonStringBytes);
-//    String jsonString = new String(jsonStringBytes, StandardCharsets.UTF_8);
-//
-//    JSONParser parser = new JSONParser();
-//    JSONObject subtreeJSON = (JSONObject) parser.parse(jsonString);
-//
-//    // Extract and parse availability information from the binary data
-//    BitSet tileAvailabilityBitSet = extractBitSetFromBinary(byteBuffer, subtreeJSON, "tileAvailability");
-//    BitSet contentAvailabilityBitSet = extractBitSetFromBinary(byteBuffer, subtreeJSON, "contentAvailability");
-//    BitSet childSubtreeAvailabilityBitSet = extractBitSetFromBinary(byteBuffer, subtreeJSON, "childSubtreeAvailability");
-//
-//    // Create Availability instances
-//    int totalLength = ((int) Math.pow(4, subtreeLevels) - 1) / 3;
-//    int totalChildren = (int) Math.pow(4, subtreeLevels);
-//    Availability tileAvailability = new Availability(tileAvailabilityBitSet, totalLength, false);
-//    Availability contentAvailability = new Availability(contentAvailabilityBitSet, totalLength, false);
-//    Availability childSubtreeAvailability = new Availability(childSubtreeAvailabilityBitSet, totalChildren, true);
-//
-//    // Calculate available count for content
-//    int availableCount = contentAvailabilityBitSet.cardinality();
-//
-//    // Create and return the Subtree instance
-//    return new Subtree(tileAvailability, contentAvailability, availableCount, childSubtreeAvailability, subtreeLevels);
-//  }
-//
-//  private static BitSet extractBitSetFromBinary(ByteBuffer byteBuffer, JSONObject subtreeJSON, String key) {
-//    JSONObject availabilityObject = (JSONObject) subtreeJSON.get(key);
-//    Long bitstreamIndex = (Long) availabilityObject.get("bitstream");
-//    if (bitstreamIndex != null) {
-//      JSONArray bufferViews = (JSONArray) subtreeJSON.get("bufferViews");
-//      JSONObject bufferView = (JSONObject) bufferViews.get(bitstreamIndex.intValue());
-//      long byteOffset = (Long) bufferView.get("byteOffset");
-//      long byteLength = (Long) bufferView.get("byteLength");
-//      byte[] bitstreamBytes = new byte[(int) byteLength];
-//      byteBuffer.position((int) byteOffset);
-//      byteBuffer.get(bitstreamBytes);
-//      return BitSet.valueOf(bitstreamBytes);
-//    } else {
-//      // Handle constant availability
-//      Long constant = (Long) availabilityObject.get("constant");
-//      BitSet bitSet = new BitSet(1);
-//      bitSet.set(0, constant != null && constant == 1);
-//      return bitSet;
-//    }
-//  }
-
   private byte[] readSubtree(long mortonIndex, int globalLevel) throws TileStoreException {
     try (Connection connection = datasource.getConnection();
-         Statement statement = connection.createStatement()) {
+        Statement statement = connection.createStatement()) {
       String sql = String.format(GET_SUBTREE_QUERY, mortonIndex, globalLevel);
       logger.debug("Executing query: {}", sql);
       try (ResultSet resultSet = statement.executeQuery(sql)) {
         if (resultSet.next()) {
           byte[] binary = resultSet.getBytes("binary_file");
-//          System.out.println("td_subtrees: Subtree " + mortonIndex + " found in db");
+          // System.out.println("td_subtrees: Subtree " + mortonIndex + " found in db");
           return binary;
         } else {
-//          System.out.println("td_subtrees: Subtree " + mortonIndex + " not found in db");
+          // System.out.println("td_subtrees: Subtree " + mortonIndex + " not found in db");
           return null;
         }
       }
@@ -446,15 +418,17 @@ public class TdSubtreeStore {
     }
   }
 
-  private void updateSubtree(long mortonIndex, int globalLevel, byte[] binary) throws TileStoreException {
+  private void updateSubtree(long mortonIndex, int globalLevel, byte[] binary)
+      throws TileStoreException {
     try (Connection connection = datasource.getConnection()) {
       logger.debug("Executing query: {}", UPDATE_SUBTREE_QUERY);
-      try (PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_SUBTREE_QUERY)) {
+      try (
+          PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_SUBTREE_QUERY)) {
         preparedStatement.setLong(1, mortonIndex);
         preparedStatement.setInt(2, globalLevel);
         preparedStatement.setBytes(3, binary);
         preparedStatement.executeUpdate();
-//        System.out.println("td_subtrees: Subtree updated in db: " + mortonIndex);
+        // System.out.println("td_subtrees: Subtree updated in db: " + mortonIndex);
       }
     } catch (SQLException e) {
       throw new TileStoreException(e);
@@ -463,8 +437,8 @@ public class TdSubtreeStore {
 
   private int readBuildingCount(long x, long y, int globalLevel) throws TileStoreException {
     try (Connection connection = datasource.getConnection();
-         Statement statement = connection.createStatement()) {
-//      int trueLevel = globalLevel - Math.floorDiv(globalLevel, subtreeLevels);
+        Statement statement = connection.createStatement()) {
+      // int trueLevel = globalLevel - Math.floorDiv(globalLevel, subtreeLevels);
       float[] coords = xyzToLatLonRadians(x, y, globalLevel);
       String sql = String.format(GET_BUILDINGS_AMOUNT_QUERY,
           coords[2] * 180 / (float) Math.PI,
@@ -472,13 +446,14 @@ public class TdSubtreeStore {
           coords[3] * 180 / (float) Math.PI,
           coords[1] * 180 / (float) Math.PI);
       logger.debug("Executing query: {}", sql);
-//      System.out.println("osm_ways: " + sql);
+      // System.out.println("osm_ways: " + sql);
       try (ResultSet resultSet = statement.executeQuery(sql)) {
         if (resultSet.next()) {
           int result = resultSet.getInt(1);
-//          if (result > 0) {
-//            System.out.println("osm_ways: Buildings found: " + result + " at " + globalLevel + "__" + x + "_" + y);
-//          }
+          // if (result > 0) {
+          // System.out.println("osm_ways: Buildings found: " + result + " at " + globalLevel + "__"
+          // + x + "_" + y);
+          // }
           return result;
         } else {
           return 0;
@@ -489,5 +464,3 @@ public class TdSubtreeStore {
     }
   }
 }
-
-

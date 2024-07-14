@@ -16,15 +16,15 @@
  */
 
 package org.apache.baremaps.tdtiles;
+
 import static org.apache.baremaps.tdtiles.GltfBuilder.createGltfList;
 import static org.apache.baremaps.tdtiles.GltfBuilder.createNode;
 import static org.apache.baremaps.tdtiles.utils.MortonIndexes.*;
 
+import de.javagl.jgltf.model.NodeModel;
 import java.sql.*;
 import java.util.*;
 import javax.sql.DataSource;
-
-import de.javagl.jgltf.model.NodeModel;
 import org.apache.baremaps.tdtiles.building.Building;
 import org.apache.baremaps.tdtiles.tileset.*;
 import org.apache.baremaps.tdtiles.utils.Color;
@@ -75,7 +75,8 @@ public class TdTilesStore {
           "VALUES (?, ?, ?, ?) " +
           "ON CONFLICT (x, y, level) DO UPDATE SET gltf_binary = ?";
 
-  private static final String READ_QUERY = "SELECT gltf_binary FROM td_tile_gltf WHERE x = ? AND y = ? AND level = ?";
+  private static final String READ_QUERY =
+      "SELECT gltf_binary FROM td_tile_gltf WHERE x = ? AND y = ? AND level = ?";
 
   private static final String GET_BUILDINGS_AMOUNT_QUERY =
       "select count(*) " +
@@ -88,7 +89,8 @@ public class TdTilesStore {
   private final int minLevel;
   private final int maxLevel;
 
-  public TdTilesStore(DataSource datasource, int maxCompression, int[] compressionLevels, int minLevel, int maxLevel) {
+  public TdTilesStore(DataSource datasource, int maxCompression, int[] compressionLevels,
+      int minLevel, int maxLevel) {
     this.datasource = datasource;
     this.maxCompression = maxCompression;
     this.compressionLevels = compressionLevels;
@@ -96,48 +98,29 @@ public class TdTilesStore {
     this.maxLevel = maxLevel;
   }
 
-  public Tileset getTileset(int level, long x, long y)
-      throws Exception {
-    float[] coords = xyzToLatLonRadians(x, y, level);
-
-    // Bounding volume of the tile
-    float west = coords[0]; // Minimum longitude
-    float south = coords[2]; // Minimum latitude
-    float east = coords[1]; // Maximum longitude
-    float north = coords[3]; // Maximum latitude
-    BoundingVolume boundingVolume = new BoundingVolume(new Float[]{west, south, east, north, 1f, 2f});
-    BoundingVolume tilesetBoundingVolume = new BoundingVolume(new Float[]{west - 0.1f, south - 0.1f, east + 0.1f, north + 0.1f, 1f, 3f});
-
+  public byte[] getGlb(int level, long x, long y) throws Exception {
     if (level < minLevel) {
-//      Tile example = new Tile(
-//          new BoundingVolume(new Float[]{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f}),
-//          "/content/content_building_id_1.glb",
-//          0
-//      );
-      Tileset tileset = new Tileset(
-          new Asset("1.1"),
-          100f,
-          new Root(
-              boundingVolume,
-              1024f,
-              "ADD",
-              new Tile[0]
-//            new Tile[]{example}
-          ));
-      return tileset;
+      return null;
     }
 
     // Retrieve the gltf in the database if it exists
     byte[] tileExists = read(level, x, y);
-    int levelDelta = maxLevel - minLevel;
-    int compression = (maxLevel - level) * maxCompression / levelDelta;
 
-    if (tileExists == null) {
-//     Find the unprocessed buildings in the tile
+    if (tileExists != null) {
+      return tileExists;
+    } else {
+      // Find the unprocessed buildings in the tile
       System.out.println("Creating tile: " + level + "__" + x + "_" + y);
       int limit = 5000;
       List<Building> buildings;
+      float[] coords = xyzToLatLonRadians(x, y, level);
       buildings = findBuildings(coords[0], coords[1], coords[2], coords[3], limit);
+
+      int compression = 0;
+      while (compression < maxCompression && compressionLevels[compression] >= level) {
+        compression++;
+      }
+
       List<NodeModel> nodes = new LinkedList<>();
       for (Building building : buildings) {
         nodes.add(createNode(building, compression));
@@ -146,44 +129,22 @@ public class TdTilesStore {
       // Update the database with the tile
       byte[] glb = createGltfList(nodes);
       update(level, x, y, glb);
+
+      return glb;
     }
-
-//    float computedGeometricError = 300f / (maxCompression + 1f - compression);
-
-    String content = level == maxLevel ? "/content/content_glb_" + level + "__" + x + "_" + y + ".glb" : "";
-//    String content = "/content/content_glb_" + level + "__" + x + "_" + y + ".glb";
-
-    // Create the tiles
-    Tile tile = new Tile(
-        boundingVolume,
-        0.0f,
-        content
-    );
-
-    // Create the tileset
-    Tileset tileset = new Tileset(
-        new Asset("1.1"),
-        0.0f,
-        new Root(
-            tilesetBoundingVolume,
-            0.0f,
-            "REPLACE",
-            new Tile[]{tile}
-        ));
-
-    return tileset;
   }
 
   public List<Building> findBuildings(float xmin, float xmax, float ymin, float ymax, int limit)
       throws TileStoreException {
     try (Connection connection = datasource.getConnection();
-         Statement statement = connection.createStatement()) {
+        Statement statement = connection.createStatement()) {
 
-      String sql = String.format(FIND_QUERY, ymin * 180 / (float) Math.PI, xmin * 180 / (float) Math.PI,
-          ymax * 180 / (float) Math.PI, xmax * 180 / (float) Math.PI, limit);
+      String sql =
+          String.format(FIND_QUERY, ymin * 180 / (float) Math.PI, xmin * 180 / (float) Math.PI,
+              ymax * 180 / (float) Math.PI, xmax * 180 / (float) Math.PI, limit);
 
       logger.debug("Executing query: {}", sql);
-//       System.out.println("osm_ways: " + sql);
+      // System.out.println("osm_ways: " + sql);
 
       List<Building> buildings = new ArrayList<>();
 
@@ -222,7 +183,7 @@ public class TdTilesStore {
             try {
               finalColor = ColorUtility.parseName(buildingColor);
             } catch (Exception e) {
-//              System.out.println("osm_ways: Error parsing color: " + e); // TODO reput
+              // System.out.println("osm_ways: Error parsing color: " + e); // TODO reput
             }
           }
 
@@ -277,9 +238,9 @@ public class TdTilesStore {
         preparedStatement.setInt(3, level);
         preparedStatement.setBytes(4, data);
         preparedStatement.setBytes(5, data); // for the update part
-//        System.out.println("td_tile_gltf: " + preparedStatement.toString());
+        // System.out.println("td_tile_gltf: " + preparedStatement.toString());
         preparedStatement.executeUpdate();
-//        System.out.println("td_tile_gltf: Updated tile: " + level + "__" + x + "_" + y);
+        // System.out.println("td_tile_gltf: Updated tile: " + level + "__" + x + "_" + y);
       }
     } catch (SQLException e) {
       throw new TileStoreException(e);
@@ -288,17 +249,17 @@ public class TdTilesStore {
 
   public byte[] read(int level, long x, long y) throws TileStoreException {
     try (Connection connection = datasource.getConnection();
-         PreparedStatement statement = connection.prepareStatement(READ_QUERY)) {
+        PreparedStatement statement = connection.prepareStatement(READ_QUERY)) {
       statement.setLong(1, x);
       statement.setLong(2, y);
       statement.setInt(3, level);
       logger.debug("Executing query: {}", READ_QUERY);
       try (ResultSet resultSet = statement.executeQuery()) {
         if (resultSet.next()) {
-//          System.out.println("td_tile_gltf: Tile found: " + level + "__" + x + "_" + y);
+          // System.out.println("td_tile_gltf: Tile found: " + level + "__" + x + "_" + y);
           return resultSet.getBytes("gltf_binary");
         } else {
-//          System.out.println("td_tile_gltf: Tile not found: " + level + "__" + x + "_" + y);
+          // System.out.println("td_tile_gltf: Tile not found: " + level + "__" + x + "_" + y);
           return null;
         }
       }
@@ -309,8 +270,8 @@ public class TdTilesStore {
 
   private int readBuildingCount(long x, long y, int globalLevel) throws TileStoreException {
     try (Connection connection = datasource.getConnection();
-         Statement statement = connection.createStatement()) {
-//      int trueLevel = globalLevel - Math.floorDiv(globalLevel, subtreeLevels);
+        Statement statement = connection.createStatement()) {
+      // int trueLevel = globalLevel - Math.floorDiv(globalLevel, subtreeLevels);
       float[] coords = xyzToLatLonRadians(x, y, globalLevel);
       String sql = String.format(GET_BUILDINGS_AMOUNT_QUERY,
           coords[2] * 180 / (float) Math.PI,
@@ -318,13 +279,14 @@ public class TdTilesStore {
           coords[3] * 180 / (float) Math.PI,
           coords[1] * 180 / (float) Math.PI);
       logger.debug("Executing query: {}", sql);
-//      System.out.println("osm_ways: " + sql);
+      // System.out.println("osm_ways: " + sql);
       try (ResultSet resultSet = statement.executeQuery(sql)) {
         if (resultSet.next()) {
           int result = resultSet.getInt(1);
-//          if (result > 0) {
-//            System.out.println("osm_ways: Buildings found: " + result + " at " + globalLevel + "__" + x + "_" + y);
-//          }
+          // if (result > 0) {
+          // System.out.println("osm_ways: Buildings found: " + result + " at " + globalLevel + "__"
+          // + x + "_" + y);
+          // }
           return result;
         } else {
           return 0;
