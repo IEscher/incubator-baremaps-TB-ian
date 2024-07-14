@@ -29,19 +29,10 @@ import com.linecorp.armeria.server.annotation.Param;
 
 import javax.sql.DataSource;
 
-import de.javagl.jgltf.model.NodeModel;
-import org.apache.baremaps.tdtiles.GltfBuilder;
 import org.apache.baremaps.tdtiles.TdSubtreeStore;
 import org.apache.baremaps.tdtiles.TdTilesStore;
-import org.apache.baremaps.tdtiles.building.Building;
-//import org.apache.baremaps.tdtiles.subtree.Subtree;
-import org.apache.baremaps.tdtiles.tileset.*;
-import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.LinkedList;
-import java.util.List;
 
 public class TdTilesResources {
 
@@ -54,7 +45,7 @@ public class TdTilesResources {
   // todo mettre le calcul correcte dans le rapport (level - Math.floorDiv(level, subtreeLevels))
 
   // Levels to which the compression is increased
-  private static final int[] COMPRESSION_LEVELS = {18, 17, 16};
+  private static final int[] COMPRESSION_LEVELS = {MAX_LEVEL-1, MAX_LEVEL-2, MAX_LEVEL-3};
 
   // Subtree levels
   // See: https://github.com/CesiumGS/3d-tiles/issues/576 for subtree division
@@ -92,8 +83,8 @@ public class TdTilesResources {
   private final TdSubtreeStore tdSubtreeStore;
 
   public TdTilesResources(DataSource dataSource) {
-    this.tdTilesStore = new TdTilesStore(dataSource, MAX_COMPRESSION);
-    this.tdSubtreeStore = new TdSubtreeStore(dataSource, MAX_COMPRESSION, MIN_LEVEL, MAX_LEVEL, COMPRESSION_LEVELS,
+    this.tdTilesStore = new TdTilesStore(dataSource, MAX_COMPRESSION, COMPRESSION_LEVELS, MIN_LEVEL, MAX_LEVEL);
+    this.tdSubtreeStore = new TdSubtreeStore(dataSource, MAX_COMPRESSION, COMPRESSION_LEVELS, MIN_LEVEL, MAX_LEVEL,
         AVAILABLE_LEVELS, SUBTREE_LEVELS, RANK_AMOUNT);
   }
 
@@ -112,76 +103,7 @@ public class TdTilesResources {
   @Get("regex:^/content/content_(?<level>[0-9]+)__(?<x>[0-9]+)_(?<y>[0-9]+).json")
   public HttpResponse getTileset(@Param("level") int level, @Param("x") long x, @Param("y") long y)
       throws Exception {
-    if (level < MIN_LEVEL) {
-//      Tile example = new Tile(
-//          new BoundingVolume(new Float[]{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f}),
-//          "/content/content_building_id_1.glb",
-//          0
-//      );
-      Tileset tileset = new Tileset(
-          new Asset("1.1"),
-          100f,
-          new Root(
-              new BoundingVolume(new Float[]{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f}),
-              0f,
-              "ADD",
-              new Tile[0]
-//            new Tile[]{example}
-          ));
-      return HttpResponse.ofJson(JSON_HEADERS, tileset);
-    }
-
-    // Retrieve the gltf in the database if it exists
-//    byte[] tileExists = tdTilesStore.read(level, x, y);
-//
-//    if (tileExists == null) {
-      // Find the unprocessed buildings in the tile
-      System.out.println("Creating tile: " + level + "__" + x + "_" + y);
-      float[] coords = xyzToLatLonRadians(x, y, level);
-      int limit = 5000;
-      List<Building> buildings;
-      int levelDelta = MAX_LEVEL - MIN_LEVEL;
-      int compression = (MAX_LEVEL - level) * MAX_COMPRESSION / levelDelta;
-      buildings = tdTilesStore.findBuildings(coords[0], coords[1], coords[2], coords[3], limit);
-      List<NodeModel> nodes = new LinkedList<>();
-      for (Building building : buildings) {
-        nodes.add(GltfBuilder.createNode(building, compression));
-      }
-
-      // Update the database with the tile
-      byte[] glb = GltfBuilder.createGltfList(nodes);
-      tdTilesStore.update(level, x, y, glb);
-//    }
-
-    // Create the tiles
-    Tile tile = new Tile(
-          new BoundingVolume(new Float[]{-0.1f, // west
-              -0.1f, // south
-              0.1f, // east
-              0.1f, // north
-              -0.1f, // min height
-              0.1f}), // max height
-          "/content/content_glb_" + level + "__" + x + "_" + y + ".glb"
-      );
-
-    // Create the tileset
-    Tileset tileset = new Tileset(
-        new Asset("1.1"),
-        100f,
-        new Root(
-            new BoundingVolume(new Float[]{-1f, // west
-                -1f, // south
-                1f, // east
-                1f, // north
-                -1f, // min height
-                1f}), // max height
-            100f,
-            "ADD",
-            new Tile[]{tile}
-        ));
-
-    return HttpResponse.ofJson(JSON_HEADERS, tileset);
-
+    return HttpResponse.ofJson(JSON_HEADERS, tdTilesStore.getTileset(level, x, y));
   }
 
   @Get("regex:^/content/content_glb_(?<level>[0-9]+)__(?<x>[0-9]+)_(?<y>[0-9]+).glb")
@@ -194,31 +116,5 @@ public class TdTilesResources {
       System.err.println("Giving empty glb for level: " + level + "__" + x + "_" + y);
       return HttpResponse.of(BINARY_HEADERS, HttpData.empty());
     }
-  }
-
-  /**
-   * Convert XYZ tile coordinates to lat/lon in radians.
-   *
-   * @param x
-   * @param y
-   * @param z
-   * @return
-   */
-  public static float[] xyzToLatLonRadians(long x, long y, int z) {
-    float[] answer = new float[4];
-    int subdivision = 1 << z;
-    float yWidth = (float) Math.PI / subdivision;
-    float xWidth = 2 * (float) Math.PI / subdivision;
-    answer[0] = -(float) Math.PI / 2 + y * yWidth; // Lon
-    answer[1] = answer[0] + yWidth; // Lon max
-    answer[2] = -(float) Math.PI + xWidth * x; // Lat
-    answer[3] = answer[2] + xWidth; // Lat max
-    // Clamp to -PI/2 to PI/2
-    answer[0] = Math.max(-(float) Math.PI / 2, Math.min((float) Math.PI / 2, answer[0]));
-    answer[1] = Math.max(-(float) Math.PI / 2, Math.min((float) Math.PI / 2, answer[1]));
-    // Clamp to -PI to PI
-    answer[2] = Math.max(-(float) Math.PI, Math.min((float) Math.PI, answer[2]));
-    answer[3] = Math.max(-(float) Math.PI, Math.min((float) Math.PI, answer[3]));
-    return answer;
   }
 }

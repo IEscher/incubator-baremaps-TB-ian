@@ -73,6 +73,21 @@ public class Subtree {
     if (subtrees.length != 4) {
       throw new IllegalArgumentException("The subtrees array must have exactly 4 elements.");
     }
+    for (int i = 1; i < subtrees.length; i++) {
+      if (subtrees[i].getLevels() != subtrees[0].getLevels()) {
+        throw new IllegalArgumentException("The subtrees must have the same number of levels.");
+      }
+    }
+    for (int i = 0; i < subtrees.length; i++) {
+      if (subtrees[i].getLevels() < 1) {
+        throw new IllegalArgumentException("The subtrees must have at least one level.");
+      }
+    }
+    for (int i = 1; i < subtrees.length; i++) {
+      if (subtrees[0].levels != subtrees[i].levels) {
+        throw new IllegalArgumentException("The subtrees must have the same number of levels.");
+      }
+    }
 
     Availability[] tileAvailabilities = new Availability[4];
     Availability[] contentAvailabilities = new Availability[4];
@@ -83,13 +98,13 @@ public class Subtree {
       childSubtreeAvailabilities[i] = subtrees[i].getChildSubtreeAvailability();
     }
 
-    Availability parentTileAvailability = Availability.concatenateAvailabilities(tileAvailabilities, false);
-    Availability parentContentAvailability = Availability.concatenateAvailabilities(contentAvailabilities, false);
-    Availability parentChildSubtreeAvailability = Availability.concatenateAvailabilities(childSubtreeAvailabilities, true);
+    Availability parentTileAvailability = Availability.concatenateAvailabilities(tileAvailabilities, false, false);
+    Availability parentContentAvailability = Availability.concatenateAvailabilities(contentAvailabilities, false, true);
+    Availability parentChildSubtreeAvailability = Availability.concatenateAvailabilities(childSubtreeAvailabilities, true, false);
     int contentCount = parentContentAvailability.getBitSet(false).cardinality();
 
     if (parentChildSubtreeAvailability.getBitSet(true).isEmpty()) {
-      System.out.println("Empty child subtree availability: " + parentChildSubtreeAvailability.getBitSet(true).toString());
+      System.err.println("Empty child subtree availability: " + parentChildSubtreeAvailability.getBitSet(true).toString());
     }
 
     return new Subtree(parentTileAvailability, parentContentAvailability, contentCount, parentChildSubtreeAvailability,

@@ -16,13 +16,17 @@
  */
 
 package org.apache.baremaps.tdtiles;
-
+import static org.apache.baremaps.tdtiles.GltfBuilder.createGltfList;
+import static org.apache.baremaps.tdtiles.GltfBuilder.createNode;
+import static org.apache.baremaps.tdtiles.utils.MortonIndexes.*;
 
 import java.sql.*;
 import java.util.*;
 import javax.sql.DataSource;
 
+import de.javagl.jgltf.model.NodeModel;
 import org.apache.baremaps.tdtiles.building.Building;
+import org.apache.baremaps.tdtiles.tileset.*;
 import org.apache.baremaps.tdtiles.utils.Color;
 import org.apache.baremaps.tdtiles.utils.ColorUtility;
 import org.apache.baremaps.tilestore.TileStoreException;
@@ -73,12 +77,101 @@ public class TdTilesStore {
 
   private static final String READ_QUERY = "SELECT gltf_binary FROM td_tile_gltf WHERE x = ? AND y = ? AND level = ?";
 
+  private static final String GET_BUILDINGS_AMOUNT_QUERY =
+      "select count(*) " +
+          "from osm_ways where (tags ? 'building' or tags ? 'building:part') and " +
+          "st_intersects(geom, st_makeenvelope(%1$s, %2$s, %3$s, %4$s, 4326))";
+
   private final DataSource datasource;
   private final int maxCompression;
+  private final int[] compressionLevels;
+  private final int minLevel;
+  private final int maxLevel;
 
-  public TdTilesStore(DataSource datasource, int maxCompression) {
+  public TdTilesStore(DataSource datasource, int maxCompression, int[] compressionLevels, int minLevel, int maxLevel) {
     this.datasource = datasource;
     this.maxCompression = maxCompression;
+    this.compressionLevels = compressionLevels;
+    this.minLevel = minLevel;
+    this.maxLevel = maxLevel;
+  }
+
+  public Tileset getTileset(int level, long x, long y)
+      throws Exception {
+    float[] coords = xyzToLatLonRadians(x, y, level);
+
+    // Bounding volume of the tile
+    float west = coords[0]; // Minimum longitude
+    float south = coords[2]; // Minimum latitude
+    float east = coords[1]; // Maximum longitude
+    float north = coords[3]; // Maximum latitude
+    BoundingVolume boundingVolume = new BoundingVolume(new Float[]{west, south, east, north, 1f, 2f});
+    BoundingVolume tilesetBoundingVolume = new BoundingVolume(new Float[]{west - 0.1f, south - 0.1f, east + 0.1f, north + 0.1f, 1f, 3f});
+
+    if (level < minLevel) {
+//      Tile example = new Tile(
+//          new BoundingVolume(new Float[]{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f}),
+//          "/content/content_building_id_1.glb",
+//          0
+//      );
+      Tileset tileset = new Tileset(
+          new Asset("1.1"),
+          100f,
+          new Root(
+              boundingVolume,
+              1024f,
+              "ADD",
+              new Tile[0]
+//            new Tile[]{example}
+          ));
+      return tileset;
+    }
+
+    // Retrieve the gltf in the database if it exists
+    byte[] tileExists = read(level, x, y);
+    int levelDelta = maxLevel - minLevel;
+    int compression = (maxLevel - level) * maxCompression / levelDelta;
+
+    if (tileExists == null) {
+//     Find the unprocessed buildings in the tile
+      System.out.println("Creating tile: " + level + "__" + x + "_" + y);
+      int limit = 5000;
+      List<Building> buildings;
+      buildings = findBuildings(coords[0], coords[1], coords[2], coords[3], limit);
+      List<NodeModel> nodes = new LinkedList<>();
+      for (Building building : buildings) {
+        nodes.add(createNode(building, compression));
+      }
+
+      // Update the database with the tile
+      byte[] glb = createGltfList(nodes);
+      update(level, x, y, glb);
+    }
+
+//    float computedGeometricError = 300f / (maxCompression + 1f - compression);
+
+    String content = level == maxLevel ? "/content/content_glb_" + level + "__" + x + "_" + y + ".glb" : "";
+//    String content = "/content/content_glb_" + level + "__" + x + "_" + y + ".glb";
+
+    // Create the tiles
+    Tile tile = new Tile(
+        boundingVolume,
+        0.0f,
+        content
+    );
+
+    // Create the tileset
+    Tileset tileset = new Tileset(
+        new Asset("1.1"),
+        0.0f,
+        new Root(
+            tilesetBoundingVolume,
+            0.0f,
+            "REPLACE",
+            new Tile[]{tile}
+        ));
+
+    return tileset;
   }
 
   public List<Building> findBuildings(float xmin, float xmax, float ymin, float ymax, int limit)
@@ -186,7 +279,7 @@ public class TdTilesStore {
         preparedStatement.setBytes(5, data); // for the update part
 //        System.out.println("td_tile_gltf: " + preparedStatement.toString());
         preparedStatement.executeUpdate();
-        System.out.println("td_tile_gltf: Updated tile: " + level + "__" + x + "_" + y);
+//        System.out.println("td_tile_gltf: Updated tile: " + level + "__" + x + "_" + y);
       }
     } catch (SQLException e) {
       throw new TileStoreException(e);
@@ -207,6 +300,34 @@ public class TdTilesStore {
         } else {
 //          System.out.println("td_tile_gltf: Tile not found: " + level + "__" + x + "_" + y);
           return null;
+        }
+      }
+    } catch (SQLException e) {
+      throw new TileStoreException(e);
+    }
+  }
+
+  private int readBuildingCount(long x, long y, int globalLevel) throws TileStoreException {
+    try (Connection connection = datasource.getConnection();
+         Statement statement = connection.createStatement()) {
+//      int trueLevel = globalLevel - Math.floorDiv(globalLevel, subtreeLevels);
+      float[] coords = xyzToLatLonRadians(x, y, globalLevel);
+      String sql = String.format(GET_BUILDINGS_AMOUNT_QUERY,
+          coords[2] * 180 / (float) Math.PI,
+          coords[0] * 180 / (float) Math.PI,
+          coords[3] * 180 / (float) Math.PI,
+          coords[1] * 180 / (float) Math.PI);
+      logger.debug("Executing query: {}", sql);
+//      System.out.println("osm_ways: " + sql);
+      try (ResultSet resultSet = statement.executeQuery(sql)) {
+        if (resultSet.next()) {
+          int result = resultSet.getInt(1);
+//          if (result > 0) {
+//            System.out.println("osm_ways: Buildings found: " + result + " at " + globalLevel + "__" + x + "_" + y);
+//          }
+          return result;
+        } else {
+          return 0;
         }
       }
     } catch (SQLException e) {

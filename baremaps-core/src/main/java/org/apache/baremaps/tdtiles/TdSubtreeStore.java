@@ -1,10 +1,11 @@
 package org.apache.baremaps.tdtiles;
 
+import org.apache.baremaps.tdtiles.Subtree.Subtree;
 import org.apache.baremaps.tdtiles.Subtree.Availability;
 import org.apache.baremaps.tilestore.TileStoreException;
+import static org.apache.baremaps.tdtiles.utils.MortonIndexes.*;
+
 import org.json.simple.JSONArray;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.json.simple.JSONObject;
@@ -15,8 +16,6 @@ import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.util.BitSet;
-
-import org.apache.baremaps.tdtiles.Subtree.Subtree;
 
 public class TdSubtreeStore {
 
@@ -63,7 +62,7 @@ public class TdSubtreeStore {
     }
   }
 
-  public TdSubtreeStore(DataSource datasource, int maxCompression, int minLevel, int maxLevel, int[] compressionLevels, int availableLevels, int subtreeLevels, int rankAmount) {
+  public TdSubtreeStore(DataSource datasource, int maxCompression, int[] compressionLevels, int minLevel, int maxLevel, int availableLevels, int subtreeLevels, int rankAmount) {
     this.datasource = datasource;
     this.maxCompression = maxCompression;
     this.minLevel = minLevel;
@@ -160,15 +159,15 @@ public class TdSubtreeStore {
     }
 
     // Content availability
-    JSONObject contentAvailability = new JSONObject();
     JSONArray contentAvailabilityArray = new JSONArray();
-    boolean contentAvailabilityConstant = true;
+    boolean contentPresent = true;
     if (subtree.getContentBitSet().isEmpty()) {
-      contentAvailability.put("constant", 0);
+      contentPresent = false;
     } else if (subtree.getContentBitSet().cardinality() == length) {
-      contentAvailability.put("constant", 1);
+      JSONObject contentAvailabilityObject = new JSONObject();
+      contentAvailabilityObject.put("constant", 1);
+      contentAvailabilityArray.add(contentAvailabilityObject);
     } else {
-      contentAvailabilityConstant = false;
       JSONObject contentAvailabilityObject = new JSONObject();
       contentAvailabilityObject.put("bitstream", numberOfBitstreams);
       contentAvailabilityObject.put("availableCount", subtree.getAvailableCount());
@@ -239,9 +238,12 @@ public class TdSubtreeStore {
     json.put("bufferViews", bufferViews);
 
     json.put("tileAvailability", tileAvailability);
-    if (contentAvailabilityConstant) {
-      json.put("contentAvailability", contentAvailability);
-    } else {
+//    if (contentAvailabilityConstant) {
+//      json.put("contentAvailability", contentAvailability);
+//    } else {
+//      json.put("contentAvailability", contentAvailabilityArray);
+//    }
+    if (contentPresent) {
       json.put("contentAvailability", contentAvailabilityArray);
     }
     json.put("childSubtreeAvailability", childSubtreeAvailability);
@@ -334,7 +336,7 @@ public class TdSubtreeStore {
     // Last level of the Subtree. This is the first level of another Subtree.
 
     // Querry the database
-//    byte[] binary = readSubtree(mortonIndex, globalLevel); // TODO reput that
+//    byte[] binary = readSubtree(mortonIndex, globalLevel);
 //    if (binary != null) {
 //      try {
 //        return Subtree.getSimplifiedSubtree(readSubtreeFromBinary(binary));
@@ -365,61 +367,64 @@ public class TdSubtreeStore {
     return newSubtree;
   }
 
-  public Subtree readSubtreeFromBinary(byte[] binary) throws ParseException {
-    ByteBuffer byteBuffer = ByteBuffer.wrap(binary);
-    byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
 
-    int magic = byteBuffer.getInt();
-    int version = byteBuffer.getInt();
-    long JSONByteLength = byteBuffer.getLong();
-    long binaryByteLength = byteBuffer.getLong();
-
-    byte[] jsonStringBytes = new byte[(int) JSONByteLength];
-    byteBuffer.get(jsonStringBytes);
-    String jsonString = new String(jsonStringBytes, StandardCharsets.UTF_8);
-
-    JSONParser parser = new JSONParser();
-    JSONObject subtreeJSON = (JSONObject) parser.parse(jsonString);
-
-    // Extract and parse availability information from the binary data
-    BitSet tileAvailabilityBitSet = extractBitSetFromBinary(byteBuffer, subtreeJSON, "tileAvailability");
-    BitSet contentAvailabilityBitSet = extractBitSetFromBinary(byteBuffer, subtreeJSON, "contentAvailability");
-    BitSet childSubtreeAvailabilityBitSet = extractBitSetFromBinary(byteBuffer, subtreeJSON, "childSubtreeAvailability");
-
-    // Create Availability instances
-    int totalLength = ((int) Math.pow(4, subtreeLevels) - 1) / 3;
-    int totalChildren = (int) Math.pow(4, subtreeLevels);
-    Availability tileAvailability = new Availability(tileAvailabilityBitSet, totalLength, false);
-    Availability contentAvailability = new Availability(contentAvailabilityBitSet, totalLength, false);
-    Availability childSubtreeAvailability = new Availability(childSubtreeAvailabilityBitSet, totalChildren, true);
-
-    // Calculate available count for content
-    int availableCount = contentAvailabilityBitSet.cardinality();
-
-    // Create and return the Subtree instance
-    return new Subtree(tileAvailability, contentAvailability, availableCount, childSubtreeAvailability, subtreeLevels);
-  }
-
-  private static BitSet extractBitSetFromBinary(ByteBuffer byteBuffer, JSONObject subtreeJSON, String key) {
-    JSONObject availabilityObject = (JSONObject) subtreeJSON.get(key);
-    Long bitstreamIndex = (Long) availabilityObject.get("bitstream");
-    if (bitstreamIndex != null) {
-      JSONArray bufferViews = (JSONArray) subtreeJSON.get("bufferViews");
-      JSONObject bufferView = (JSONObject) bufferViews.get(bitstreamIndex.intValue());
-      long byteOffset = (Long) bufferView.get("byteOffset");
-      long byteLength = (Long) bufferView.get("byteLength");
-      byte[] bitstreamBytes = new byte[(int) byteLength];
-      byteBuffer.position((int) byteOffset);
-      byteBuffer.get(bitstreamBytes);
-      return BitSet.valueOf(bitstreamBytes);
-    } else {
-      // Handle constant availability
-      Long constant = (Long) availabilityObject.get("constant");
-      BitSet bitSet = new BitSet(1);
-      bitSet.set(0, constant != null && constant == 1);
-      return bitSet;
-    }
-  }
+  // readSubtreeFromBinary and extractBitSetFromBinary are not finished, they contain errors.
+  // Since they are not used in the code, they will be removed in the next commit.
+//  public Subtree readSubtreeFromBinary(byte[] binary) throws ParseException {
+//    ByteBuffer byteBuffer = ByteBuffer.wrap(binary);
+//    byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
+//
+//    int magic = byteBuffer.getInt();
+//    int version = byteBuffer.getInt();
+//    long JSONByteLength = byteBuffer.getLong();
+//    long binaryByteLength = byteBuffer.getLong();
+//
+//    byte[] jsonStringBytes = new byte[(int) JSONByteLength];
+//    byteBuffer.get(jsonStringBytes);
+//    String jsonString = new String(jsonStringBytes, StandardCharsets.UTF_8);
+//
+//    JSONParser parser = new JSONParser();
+//    JSONObject subtreeJSON = (JSONObject) parser.parse(jsonString);
+//
+//    // Extract and parse availability information from the binary data
+//    BitSet tileAvailabilityBitSet = extractBitSetFromBinary(byteBuffer, subtreeJSON, "tileAvailability");
+//    BitSet contentAvailabilityBitSet = extractBitSetFromBinary(byteBuffer, subtreeJSON, "contentAvailability");
+//    BitSet childSubtreeAvailabilityBitSet = extractBitSetFromBinary(byteBuffer, subtreeJSON, "childSubtreeAvailability");
+//
+//    // Create Availability instances
+//    int totalLength = ((int) Math.pow(4, subtreeLevels) - 1) / 3;
+//    int totalChildren = (int) Math.pow(4, subtreeLevels);
+//    Availability tileAvailability = new Availability(tileAvailabilityBitSet, totalLength, false);
+//    Availability contentAvailability = new Availability(contentAvailabilityBitSet, totalLength, false);
+//    Availability childSubtreeAvailability = new Availability(childSubtreeAvailabilityBitSet, totalChildren, true);
+//
+//    // Calculate available count for content
+//    int availableCount = contentAvailabilityBitSet.cardinality();
+//
+//    // Create and return the Subtree instance
+//    return new Subtree(tileAvailability, contentAvailability, availableCount, childSubtreeAvailability, subtreeLevels);
+//  }
+//
+//  private static BitSet extractBitSetFromBinary(ByteBuffer byteBuffer, JSONObject subtreeJSON, String key) {
+//    JSONObject availabilityObject = (JSONObject) subtreeJSON.get(key);
+//    Long bitstreamIndex = (Long) availabilityObject.get("bitstream");
+//    if (bitstreamIndex != null) {
+//      JSONArray bufferViews = (JSONArray) subtreeJSON.get("bufferViews");
+//      JSONObject bufferView = (JSONObject) bufferViews.get(bitstreamIndex.intValue());
+//      long byteOffset = (Long) bufferView.get("byteOffset");
+//      long byteLength = (Long) bufferView.get("byteLength");
+//      byte[] bitstreamBytes = new byte[(int) byteLength];
+//      byteBuffer.position((int) byteOffset);
+//      byteBuffer.get(bitstreamBytes);
+//      return BitSet.valueOf(bitstreamBytes);
+//    } else {
+//      // Handle constant availability
+//      Long constant = (Long) availabilityObject.get("constant");
+//      BitSet bitSet = new BitSet(1);
+//      bitSet.set(0, constant != null && constant == 1);
+//      return bitSet;
+//    }
+//  }
 
   private byte[] readSubtree(long mortonIndex, int globalLevel) throws TileStoreException {
     try (Connection connection = datasource.getConnection();
@@ -483,66 +488,6 @@ public class TdSubtreeStore {
       throw new TileStoreException(e);
     }
   }
-
-  /**
-   * See: https://github.com/CesiumGS/3d-tiles/blob/main/specification/ImplicitTiling/AVAILABILITY.adoc
-   *
-   * @param x
-   * @param y
-   * @param level
-   * @return The morton index of the two coordinates at the given level
-   */
-  private long interleaveBits(long x, long y, int level) {
-//    int trueLevel = level - Math.floorDiv(level, subtreeLevels);
-    long result = 0;
-    int length = (int) Math.pow(2, level);
-    for (int i = 0; i < length; i++) {
-      result |= (x & (1L << i)) << i | (y & (1L << i)) << (i + 1);
-    }
-    return result;
-  }
-
-  private long[] mortonIndexToXY(long mortonIndex, int level) {
-//    int trueLevel = level - Math.floorDiv(level, subtreeLevels);
-    long[] result = new long[2];
-    int length = (int) Math.pow(2, level);
-    long x = 0;
-    long y = 0;
-    for (int i = 0; i < length; i++) {
-      x |= (mortonIndex & (1L << (2 * i))) >> i;
-      y |= (mortonIndex & (1L << (2 * i + 1))) >> (i + 1);
-    }
-    result[0] = x;
-    result[1] = y;
-    return result;
-  }
-
-  /**
-   * Convert XYZ tile coordinates to lat/lon in radians.
-   *
-   * @param x
-   * @param y
-   * @param z
-   * @return
-   */
-  public static float[] xyzToLatLonRadians(long x, long y, int z) {
-    float[] answer = new float[4];
-    int subdivision = 1 << z;
-    float yWidth = (float) Math.PI / subdivision;
-    float xWidth = 2 * (float) Math.PI / subdivision;
-    answer[0] = -(float) Math.PI / 2 + y * yWidth; // Lon
-    answer[1] = answer[0] + yWidth; // Lon max
-    answer[2] = -(float) Math.PI + xWidth * x; // Lat
-    answer[3] = answer[2] + xWidth; // Lat max
-    // Clamp to -PI/2 to PI/2
-    answer[0] = Math.max(-(float) Math.PI / 2, Math.min((float) Math.PI / 2, answer[0]));
-    answer[1] = Math.max(-(float) Math.PI / 2, Math.min((float) Math.PI / 2, answer[1]));
-    // Clamp to -PI to PI
-    answer[2] = Math.max(-(float) Math.PI, Math.min((float) Math.PI, answer[2]));
-    answer[3] = Math.max(-(float) Math.PI, Math.min((float) Math.PI, answer[3]));
-    return answer;
-  }
-
 }
 
 

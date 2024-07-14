@@ -135,17 +135,26 @@ public class Availability {
     availabilities[levels - 1] = availability;
     for (int i = levels - 2; i >= 0; i--) {
       availabilities[i] = new BitSet((int) Math.pow(4, i));
+
       for (int j = 0; j < (int) Math.pow(4, i + 1); j += 4) {
         if (!availabilities[i + 1].get(j, j + 4).isEmpty() && i >= minLevel) {
           availabilities[i].set(j / 4);
         }
       }
+
     }
+
+//    for (int i = 0; i < levels; i++) {
+//      availabilities[i] = new BitSet((int) Math.pow(4, i));
+//    }
+//    if (!availability.isEmpty()) {
+//      availabilities[0].set(0);
+//    }
 
     return new Availability(availabilities, totalLength, false);
   }
 
-  public static Availability concatenateAvailabilities(Availability[] availabilities, boolean isChildren) {
+  public static Availability concatenateAvailabilities(Availability[] availabilities, boolean isChildren, boolean isContent) {
     if (availabilities.length != 4) {
       throw new IllegalArgumentException("The availabilities array must have exactly 4 Availability elements.");
     }
@@ -185,7 +194,9 @@ public class Availability {
     // Set the availability of the root node
     if(!isChildren) {
       concatenatedAvailabilities[0] = new BitSet(1);
-      concatenatedAvailabilities[0].set(0, !concatenatedAvailabilities[1].isEmpty());
+      if (!isContent) {
+        concatenatedAvailabilities[0].set(0, !concatenatedAvailabilities[1].isEmpty());
+      }
     }
 
     int totalLength;

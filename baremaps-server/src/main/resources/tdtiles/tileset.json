@@ -2,13 +2,20 @@
   "asset" : {
     "version" : "1.1"
   },
-  "geometricError" : 1024.0,
+  "geometricError" : 2048.0,
   "root" : {
     "boundingVolume" : {
-      "region" : [ -3.141592653589793238, -1.57079632679, 3.141592653589793238, 1.57079632679, 0, 10000]
+      "region" : [
+        -3.141592653589793238,
+        -1.57079632679,
+        3.141592653589793238,
+        1.57079632679,
+        -100,
+        400
+      ]
     },
-    "geometricError" : 320.0,
-    "refine" : "ADD",
+    "geometricError" : 2048.0,
+    "refine" : "REPLACE",
     "content" : {
       "uri" : "/content/content_{level}__{x}_{y}.json"
     },
