@@ -24,16 +24,15 @@ public class Subtree {
 
   private final Availability tileAvailability;
   private final Availability contentAvailability;
-  private final int availableCount;
   private final Availability childSubtreeAvailability;
   private final int levels;
 
-  public Subtree(Availability tileAvailability, Availability contentAvailability,
-      int availableCount,
-      Availability childSubtreeAvailability, int levels) {
+  public Subtree(Availability tileAvailability,
+                 Availability contentAvailability,
+                 Availability childSubtreeAvailability,
+                 int levels) {
     this.tileAvailability = tileAvailability;
     this.contentAvailability = contentAvailability;
-    this.availableCount = availableCount;
     this.childSubtreeAvailability = childSubtreeAvailability;
     this.levels = levels;
     if (levels != tileAvailability.getAvailabilities().length
@@ -59,10 +58,6 @@ public class Subtree {
 
   public BitSet getContentBitSet() {
     return contentAvailability.getBitSet(false);
-  }
-
-  public int getAvailableCount() {
-    return availableCount;
   }
 
   public Availability getChildSubtreeAvailability() {
@@ -130,7 +125,7 @@ public class Subtree {
           + parentChildSubtreeAvailability.getBitSet(true).toString());
     }
 
-    return new Subtree(parentTileAvailability, parentContentAvailability, contentCount,
+    return new Subtree(parentTileAvailability, parentContentAvailability,
         parentChildSubtreeAvailability,
         subtrees[0].getLevels() + 1);
   }
@@ -146,7 +141,6 @@ public class Subtree {
     return new Subtree(
         new Availability(tileBitSet, 1, false),
         new Availability(contentBitSet, 1, false),
-        subtree.getContentAvailability().isAvailable() ? 1 : 0,
         new Availability(childSubtreeBitSet, 4, true),
         1);
   }

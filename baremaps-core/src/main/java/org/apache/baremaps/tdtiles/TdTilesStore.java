@@ -17,11 +17,12 @@
 
 package org.apache.baremaps.tdtiles;
 
-import static org.apache.baremaps.tdtiles.GltfBuilder.createGltfList;
-import static org.apache.baremaps.tdtiles.GltfBuilder.createNode;
+import static org.apache.baremaps.tdtiles.GltfBuilder.*;
 import static org.apache.baremaps.tdtiles.utils.MortonIndexes.*;
 
 import de.javagl.jgltf.model.NodeModel;
+
+import java.awt.event.TextEvent;
 import java.sql.*;
 import java.util.*;
 import javax.sql.DataSource;
@@ -128,6 +129,7 @@ public class TdTilesStore {
 
       // Update the database with the tile
       byte[] glb = createGltfList(nodes);
+
       update(level, x, y, glb);
 
       return glb;

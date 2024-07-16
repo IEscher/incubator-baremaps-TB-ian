@@ -156,7 +156,7 @@ public class Availability {
       availabilities[i] = new BitSet((int) Math.pow(4, i));
 
       for (int j = 0; j < (int) Math.pow(4, i + 1); j += 4) {
-        if (!availabilities[i + 1].get(j, j + 4).isEmpty() && i >= minLevel) {
+        if (!availabilities[i + 1].get(j, j + 4).isEmpty() && i >= (minLevel - 1)) {
           availabilities[i].set(j / 4);
         }
       }

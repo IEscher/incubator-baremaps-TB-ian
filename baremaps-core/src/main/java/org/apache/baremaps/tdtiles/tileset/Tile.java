@@ -17,5 +17,5 @@
 
 package org.apache.baremaps.tdtiles.tileset;
 
-public record Tile(BoundingVolume boundingVolume, Float geometricError, String uri) {
+public record Tile(BoundingVolume boundingVolume, Float geometricError, Content content) {
 }

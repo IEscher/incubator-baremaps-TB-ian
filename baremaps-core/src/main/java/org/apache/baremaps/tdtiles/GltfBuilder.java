@@ -61,12 +61,19 @@ public class GltfBuilder {
       case 0:
         break;
       case 1:
-        geometry = DouglasPeuckerSimplifier.simplify(building.geometry(), 0.00005);
+        geometry = DouglasPeuckerSimplifier.simplify(building.geometry(), 0.00001);
         break;
       case 2:
-        geometry = DouglasPeuckerSimplifier.simplify(building.geometry(), 0.0001);
+        geometry = DouglasPeuckerSimplifier.simplify(building.geometry(), 0.00005);
         break;
       case 3:
+//        geometry = DouglasPeuckerSimplifier.simplify(building.geometry(), 0.0001);
+//        break;
+
+        if (!building.informationFound()) {
+          return new DefaultNodeModel();
+        }
+      case 4:
         if (!building.informationFound()) {
           return new DefaultNodeModel();
         }
@@ -89,7 +96,7 @@ public class GltfBuilder {
     List<Integer> indices = new ArrayList<>();
     List<Float> normals = new ArrayList<>();
     createRoof(building, translation, triangulation, vertices, indices);
-    if (compression == 0 || compression == 1 || building.informationFound()) {
+    if (!(compression == 3 || compression == 4) || building.informationFound()) {
       HashSet<Edge> edges = getExteriorEdges(triangulation);
       createWalls(building, translation, vertices, indices, edges);
     }
@@ -114,12 +121,15 @@ public class GltfBuilder {
         materialBuilder.setBaseColorFactor(1.0f, 0.0f, 0.0f, 1.0f);
         break;
       case 1:
-        materialBuilder.setBaseColorFactor(0.0f, 1.0f, 0.0f, 1.0f);
+        materialBuilder.setBaseColorFactor(1.0f, 1.0f, 0.0f, 1.0f);
         break;
       case 2:
-        materialBuilder.setBaseColorFactor(0.0f, 0.0f, 1.0f, 1.0f);
+        materialBuilder.setBaseColorFactor(0.0f, 1.0f, 0.0f, 1.0f);
         break;
       case 3:
+        materialBuilder.setBaseColorFactor(0.0f, 0.0f, 1.0f, 1.0f);
+        break;
+      case 4:
         materialBuilder.setBaseColorFactor(1.0f, 1.0f, 1.0f, 1.0f);
         break;
     }

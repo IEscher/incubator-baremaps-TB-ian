@@ -36,23 +36,22 @@ public class TdTilesResources {
 
   // 0 = no compression, 1 = low compression, 2 = high compression + only roof, 3 = only important
   // buildings
-  // If changing this value, changes must also be made in TdTiledStore.java, TdSubtreeStore.java,
-  // and gltf.sql
-  private static final int MAX_COMPRESSION = 3;
+  // If changing this value, changes must also be made in gltf.sql
+  private static final int MAX_COMPRESSION = 2;
 
-  private static final int MIN_LEVEL = 12;
+  private static final int MIN_LEVEL = 15;
   private static final int MAX_LEVEL = 17; // Cannot be over Long.BYTES * 8 / 2 because it uses 2
                                            // bits per level
   // todo mettre le calcul correcte dans le rapport (level - Math.floorDiv(level, subtreeLevels))
 
   // Levels to which the compression is increased
-  private static final int[] COMPRESSION_LEVELS = {MAX_LEVEL - 2, MAX_LEVEL - 3, MAX_LEVEL - 4};
+  private static final int[] COMPRESSION_LEVELS = {MAX_LEVEL - 1, MAX_LEVEL - 2};
 
   // Subtree levels
   // See: https://github.com/CesiumGS/3d-tiles/issues/576 for subtree division
   private static final int AVAILABLE_LEVELS = MAX_LEVEL; // AVAILABLE_LEVELS + 1 should be a
                                                          // multiple of SUBTREE_LEVELS
-  private static final int SUBTREE_LEVELS = 6;
+  private static final int SUBTREE_LEVELS = 3;
 
 
   // private static final int MIN_LEVEL = 0;
@@ -88,8 +87,8 @@ public class TdTilesResources {
   public TdTilesResources(DataSource dataSource) {
     this.tdTilesStore =
         new TdTilesStore(dataSource, MAX_COMPRESSION, COMPRESSION_LEVELS, MIN_LEVEL, MAX_LEVEL);
-    this.tdSubtreeStore = new TdSubtreeStore(dataSource, MAX_COMPRESSION, MIN_LEVEL, MAX_LEVEL,
-        AVAILABLE_LEVELS, SUBTREE_LEVELS, RANK_AMOUNT);
+    this.tdSubtreeStore = new TdSubtreeStore(dataSource, MIN_LEVEL, MAX_LEVEL,
+        SUBTREE_LEVELS, RANK_AMOUNT);
   }
 
   @Get("regex:^/subtrees/(?<level>[0-9]+).(?<x>[0-9]+).(?<y>[0-9]+).subtree")

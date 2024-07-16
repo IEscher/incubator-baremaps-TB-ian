@@ -23,23 +23,30 @@
         const tileset = await Cesium.Cesium3DTileset.fromUrl(
             "http://localhost:9000/tileset.json",
             {
+                // dynamicScreenSpaceError for horizon views
+                // dynamicScreenSpaceError: true,
+
                 // Tree optimization
                 skipLevelOfDetail: true,
-                // preferLeaves: true,
-                // immediatelyLoadDesiredLevelOfDetail: true,
-                // loadSiblings: true,
 
                 // debug
                 debugShowContentBoundingVolume: true,
-                enableCollision: true,
-                enablePick: true,
+                debugShowViewerRequestVolume: true,
+
+                // skipLevelOfDetail: true,
+                // baseScreenSpaceError: 1024,
+                // skipScreenSpaceErrorFactor: 16,
+                // skipLevels: 1,
+                // immediatelyLoadDesiredLevelOfDetail: false,
+                loadSiblings: true,
+                // cullWithChildrenBounds: true
             }
         );
 
         viewer.scene.primitives.add(tileset);
     }
 
-    loadTileset();
+    // viewer.scene.globe.depthTestAgainstTerrain = false;
 
     /*
     * X positive is in direction left
@@ -65,6 +72,9 @@
             console.log(pickedBuilding);;
         }
     }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+
+    loadTileset();
 </script>
 </div>
 </body>

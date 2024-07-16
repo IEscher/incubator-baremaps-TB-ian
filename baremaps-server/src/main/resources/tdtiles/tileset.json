@@ -17,11 +17,11 @@
         3.141592653589793,
         1.5707963267948966,
         0,
-        250000
+        30
       ]
     },
     "refine": "REPLACE",
-    "geometricError": 10000,
+    "geometricError": 500000,
     "children": [
       {
         "boundingVolume": {
@@ -29,12 +29,12 @@
             "3DTILES_bounding_volume_S2": {
               "token": "1",
               "minimumHeight": 0,
-              "maximumHeight": 1000000
+              "maximumHeight": 20
             }
           }
         },
         "refine": "REPLACE",
-        "geometricError": 5000
+        "geometricError": 50000
       },
       {
         "boundingVolume": {
@@ -42,12 +42,12 @@
             "3DTILES_bounding_volume_S2": {
               "token": "3",
               "minimumHeight": 0,
-              "maximumHeight": 1000000
+              "maximumHeight": 20
             }
           }
         },
         "refine": "REPLACE",
-        "geometricError": 5000
+        "geometricError": 50000
       },
       {
         "boundingVolume": {
@@ -55,12 +55,12 @@
             "3DTILES_bounding_volume_S2": {
               "token": "5",
               "minimumHeight": 0,
-              "maximumHeight": 1000000
+              "maximumHeight": 20
             }
           }
         },
         "refine": "REPLACE",
-        "geometricError": 5000
+        "geometricError": 50000
       },
       {
         "boundingVolume": {
@@ -68,12 +68,12 @@
             "3DTILES_bounding_volume_S2": {
               "token": "7",
               "minimumHeight": 0,
-              "maximumHeight": 1000000
+              "maximumHeight": 20
             }
           }
         },
         "refine": "REPLACE",
-        "geometricError": 5000
+        "geometricError": 50000
       },
       {
         "boundingVolume": {
@@ -81,12 +81,12 @@
             "3DTILES_bounding_volume_S2": {
               "token": "9",
               "minimumHeight": 0,
-              "maximumHeight": 1000000
+              "maximumHeight": 20
             }
           }
         },
         "refine": "REPLACE",
-        "geometricError": 5000
+        "geometricError": 50000
       },
       {
         "boundingVolume": {
@@ -94,12 +94,12 @@
             "3DTILES_bounding_volume_S2": {
               "token": "b",
               "minimumHeight": 0,
-              "maximumHeight": 1000000
+              "maximumHeight": 20
             }
           }
         },
         "refine": "REPLACE",
-        "geometricError": 5000
+        "geometricError": 50000
       }
     ],
     "content": {
@@ -107,7 +107,7 @@
     },
     "implicitTiling" : {
       "subdivisionScheme" : "QUADTREE",
-      "subtreeLevels" : 6,
+      "subtreeLevels" : 3,
       "availableLevels" : 17,
       "subtrees" : {
         "uri" : "/subtrees/{level}.{x}.{y}.subtree"

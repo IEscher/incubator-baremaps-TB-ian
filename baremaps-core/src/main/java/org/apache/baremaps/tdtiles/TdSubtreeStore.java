@@ -36,10 +36,8 @@ import org.slf4j.LoggerFactory;
 public class TdSubtreeStore {
 
   private final DataSource datasource;
-  private final int maxCompression;
   private final int minLevel;
   private final int maxLevel;
-  private final int availableLevels;
   private final int subtreeLevels;
   private final int rankAmount;
 
@@ -77,13 +75,11 @@ public class TdSubtreeStore {
     }
   }
 
-  public TdSubtreeStore(DataSource datasource, int maxCompression, int minLevel, int maxLevel,
-      int availableLevels, int subtreeLevels, int rankAmount) {
+  public TdSubtreeStore(DataSource datasource, int minLevel, int maxLevel,
+                        int subtreeLevels, int rankAmount) {
     this.datasource = datasource;
-    this.maxCompression = maxCompression;
     this.minLevel = minLevel;
     this.maxLevel = maxLevel;
-    this.availableLevels = availableLevels;
     this.subtreeLevels = subtreeLevels;
     this.rankAmount = rankAmount;
   }
@@ -160,6 +156,7 @@ public class TdSubtreeStore {
 
     // Tile availability
     JSONObject tileAvailability = new JSONObject();
+    tileAvailability.put("availableCount", subtree.getTileBitSet().cardinality());
     if (subtree.getTileBitSet().isEmpty()) {
       tileAvailability.put("constant", 0);
     } else if (subtree.getTileBitSet().cardinality() == length) {
@@ -183,11 +180,12 @@ public class TdSubtreeStore {
     } else if (subtree.getContentBitSet().cardinality() == length) {
       JSONObject contentAvailabilityObject = new JSONObject();
       contentAvailabilityObject.put("constant", 1);
+      contentAvailabilityObject.put("availableCount", subtree.getContentBitSet().cardinality());
       contentAvailabilityArray.add(contentAvailabilityObject);
     } else {
       JSONObject contentAvailabilityObject = new JSONObject();
       contentAvailabilityObject.put("bitstream", numberOfBitstreams);
-      contentAvailabilityObject.put("availableCount", subtree.getAvailableCount());
+      contentAvailabilityObject.put("availableCount", subtree.getContentBitSet().cardinality());
       contentAvailabilityArray.add(contentAvailabilityObject);
 
       ByteBuffer tmp = ByteBuffer.allocate(bitstreamLength);
@@ -204,6 +202,7 @@ public class TdSubtreeStore {
 
     // Child subtree availability
     JSONObject childSubtreeAvailability = new JSONObject();
+    childSubtreeAvailability.put("availableCount", subtree.getChildSubtreeBitSet().cardinality());
     if (subtree.getChildSubtreeBitSet().isEmpty()) {
       childSubtreeAvailability.put("constant", 0);
     } else if (subtree.getChildSubtreeBitSet().cardinality() == lengthChildren) {
@@ -324,8 +323,7 @@ public class TdSubtreeStore {
     Availability childSubtreeAvailability =
         new Availability(new BitSet(), (int) Math.pow(4, subtreeLevels), true);
 
-    return new Subtree(tileAvailability, contentAvailability,
-        contentAvailability.getBitSet(false).cardinality(), childSubtreeAvailability,
+    return new Subtree(tileAvailability, contentAvailability, childSubtreeAvailability,
         subtreeLevels);
   }
 
@@ -342,7 +340,6 @@ public class TdSubtreeStore {
       return new Subtree(
           new Availability(new BitSet(), totalLength, false),
           new Availability(new BitSet(), totalLength, false),
-          0,
           new Availability(new BitSet(), totalChildren, true),
           levels);
     }
