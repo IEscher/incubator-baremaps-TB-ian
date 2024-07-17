@@ -52,7 +52,7 @@ public class TdTilesStore {
   private static final Logger logger = LoggerFactory.getLogger(TdTilesStore.class);
 
   private static final String FIND_QUERY =
-      "select st_asbinary(geom), " + // 1
+      "SELECT st_asbinary(geom), " + // 1
           "tags -> 'building', " + // 2
           "tags -> 'height', " + // 3
           "tags -> 'building:levels', " + // 4
@@ -67,9 +67,26 @@ public class TdTilesStore {
           "tags -> 'roof:material'," + // 13
           "tags -> 'roof:angle', " + // 14
           "tags -> 'roof:direction' " + // 15
-          "from osm_ways where (tags ? 'building' or tags ? 'building:part') and "
-          +
-          "st_intersects(geom, st_makeenvelope(%1$s, %2$s, %3$s, %4$s, 4326)) LIMIT %5$s";
+          "FROM osm_ways WHERE (tags ? 'building' or tags ? 'building:part') AND " +
+          "st_intersects(geom, st_makeenvelope(%1$s, %2$s, %3$s, %4$s, 4326))" +
+      "UNION " +
+      "SELECT st_asbinary(geom), " + // 1
+          "tags -> 'building', " + // 2
+          "tags -> 'height', " + // 3
+          "tags -> 'building:levels', " + // 4
+          "tags -> 'building:min_level', " + // 5
+          "tags -> 'building:colour', " + // 6
+          "tags -> 'building:material', " + // 7
+          "tags -> 'building:part', " + // 8
+          "tags -> 'roof:shape', " + // 9
+          "tags -> 'roof:levels', " + // 10
+          "tags -> 'roof:height', " + // 11
+          "tags -> 'roof:color', " + // 12
+          "tags -> 'roof:material'," + // 13
+          "tags -> 'roof:angle', " + // 14
+          "tags -> 'roof:direction' " + // 15
+          "FROM osm_relations WHERE (tags ? 'building' or tags ? 'building:part') AND " +
+          "st_intersects(geom, st_makeenvelope(%1$s, %2$s, %3$s, %4$s, 4326))";
 
   private static final String UPSERT_QUERY =
       "INSERT INTO td_tile_gltf (x, y, level, gltf_binary) " +
@@ -89,14 +106,16 @@ public class TdTilesStore {
   private final int[] compressionLevels;
   private final int minLevel;
   private final int maxLevel;
+  private final boolean reloadTiles;
 
   public TdTilesStore(DataSource datasource, int maxCompression, int[] compressionLevels,
-      int minLevel, int maxLevel) {
+      int minLevel, int maxLevel, boolean reloadTiles) {
     this.datasource = datasource;
     this.maxCompression = maxCompression;
     this.compressionLevels = compressionLevels;
     this.minLevel = minLevel;
     this.maxLevel = maxLevel;
+    this.reloadTiles = reloadTiles;
   }
 
   public byte[] getGlb(int level, long x, long y) throws Exception {
@@ -107,15 +126,14 @@ public class TdTilesStore {
     // Retrieve the gltf in the database if it exists
     byte[] tileExists = read(level, x, y);
 
-    if (tileExists != null) {
+    if (tileExists != null && !reloadTiles) {
       return tileExists;
     } else {
       // Find the unprocessed buildings in the tile
       System.out.println("Creating tile: " + level + "__" + x + "_" + y);
-      int limit = 5000;
       List<Building> buildings;
       float[] coords = xyzToLatLonRadians(x, y, level);
-      buildings = findBuildings(coords[0], coords[1], coords[2], coords[3], limit);
+      buildings = findBuildings(coords[0], coords[1], coords[2], coords[3]);
 
       int compression = 0;
       while (compression < maxCompression && compressionLevels[compression] >= level) {
@@ -124,7 +142,12 @@ public class TdTilesStore {
 
       List<NodeModel> nodes = new LinkedList<>();
       for (Building building : buildings) {
-        nodes.add(createNode(building, compression));
+        Optional<NodeModel> node = createNode(building, compression);
+        node.ifPresent(nodes::add);
+      }
+
+      if (nodes.isEmpty()) {
+        return null;
       }
 
       // Update the database with the tile
@@ -136,14 +159,14 @@ public class TdTilesStore {
     }
   }
 
-  public List<Building> findBuildings(float xmin, float xmax, float ymin, float ymax, int limit)
+  public List<Building> findBuildings(float xmin, float xmax, float ymin, float ymax)
       throws TileStoreException {
     try (Connection connection = datasource.getConnection();
         Statement statement = connection.createStatement()) {
 
       String sql =
           String.format(FIND_QUERY, ymin * 180 / (float) Math.PI, xmin * 180 / (float) Math.PI,
-              ymax * 180 / (float) Math.PI, xmax * 180 / (float) Math.PI, limit);
+              ymax * 180 / (float) Math.PI, xmax * 180 / (float) Math.PI);
 
       logger.debug("Executing query: {}", sql);
       // System.out.println("osm_ways: " + sql);
@@ -172,12 +195,12 @@ public class TdTilesStore {
 
           Color finalColor = new Color(1f, 1f, 1f);
           boolean informationFound = true;
-          // if no attribute is found, make the building red
+
           if (height == null && buildingLevels == null && buildingMinLevels == null
               && buildingColor == null && buildingMaterial == null && roofShape == null
               && roofLevels == null && roofHeight == null && roofColor == null
               && roofMaterial == null && roofAngle == null && roofDirection == null) {
-            finalColor = new Color(1f, 0f, 0f);
+//            finalColor = new Color(1f, 0f, 0f);
             informationFound = false;
           }
 
@@ -205,9 +228,9 @@ public class TdTilesStore {
             }
           }
           // TODO rise the building in the air instead of making it taller
-          if (buildingMinLevels != null) {
-            finalHeight += Float.parseFloat(buildingMinLevels.replaceAll("[^0-9.]", "")) * 3;
-          }
+//          if (buildingMinLevels != null) {
+//            finalHeight += Float.parseFloat(buildingMinLevels.replaceAll("[^0-9.]", "")) * 3;
+//          }
 
           // Debug code
           if (finalHeight < 0) {
@@ -219,7 +242,7 @@ public class TdTilesStore {
               geometry,
               informationFound,
               finalHeight,
-              0,
+              buildingMinLevels != null ? Float.parseFloat(buildingMinLevels.replaceAll("[^0-9.]", "")) : 0,
               finalColor,
               null));
         }

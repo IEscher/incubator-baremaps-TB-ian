@@ -2,7 +2,7 @@
   "asset" : {
     "version" : "1.1"
   },
-  "geometricError": 10000,
+  "geometricError": 1200000,
   "extensionsUsed": [
     "3DTILES_bounding_volume_S2"
   ],
@@ -17,11 +17,11 @@
         3.141592653589793,
         1.5707963267948966,
         0,
-        30
+        60
       ]
     },
     "refine": "REPLACE",
-    "geometricError": 500000,
+    "geometricError": 1200000,
     "children": [
       {
         "boundingVolume": {
@@ -34,7 +34,7 @@
           }
         },
         "refine": "REPLACE",
-        "geometricError": 50000
+        "geometricError": 120000
       },
       {
         "boundingVolume": {
@@ -47,7 +47,7 @@
           }
         },
         "refine": "REPLACE",
-        "geometricError": 50000
+        "geometricError": 120000
       },
       {
         "boundingVolume": {
@@ -60,7 +60,7 @@
           }
         },
         "refine": "REPLACE",
-        "geometricError": 50000
+        "geometricError": 120000
       },
       {
         "boundingVolume": {
@@ -73,7 +73,7 @@
           }
         },
         "refine": "REPLACE",
-        "geometricError": 50000
+        "geometricError": 120000
       },
       {
         "boundingVolume": {
@@ -86,7 +86,7 @@
           }
         },
         "refine": "REPLACE",
-        "geometricError": 50000
+        "geometricError": 120000
       },
       {
         "boundingVolume": {
@@ -99,7 +99,7 @@
           }
         },
         "refine": "REPLACE",
-        "geometricError": 50000
+        "geometricError": 120000
       }
     ],
     "content": {
@@ -107,8 +107,8 @@
     },
     "implicitTiling" : {
       "subdivisionScheme" : "QUADTREE",
-      "subtreeLevels" : 3,
-      "availableLevels" : 17,
+      "subtreeLevels" : 4,
+      "availableLevels" : 19,
       "subtrees" : {
         "uri" : "/subtrees/{level}.{x}.{y}.subtree"
       }

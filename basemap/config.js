@@ -17,8 +17,10 @@
 export default {
     "host": "http://localhost:9000",
     "database": "jdbc:postgresql://localhost:5432/baremaps?&user=baremaps&password=baremaps",
+    "osmPbfUrl": "https://download.geofabrik.de/north-america/us/new-york-latest.osm.pbf",
+    // "osmPbfUrl": "https://download.geofabrik.de/asia/japan/kanto-latest.osm.pbf",
     // "osmPbfUrl": "https://download.geofabrik.de/europe/united-kingdom/england/greater-london-latest.osm.pbf",
-    "osmPbfUrl": "https://download.geofabrik.de/europe/liechtenstein-latest.osm.pbf",
+    // "osmPbfUrl": "https://download.geofabrik.de/europe/liechtenstein-latest.osm.pbf",
     // "center": [9.513162, 47.149542],
     // "bounds": [6.02260949059, 45.7769477403, 10.4427014502, 47.8308275417],
     // "zoom": 14,

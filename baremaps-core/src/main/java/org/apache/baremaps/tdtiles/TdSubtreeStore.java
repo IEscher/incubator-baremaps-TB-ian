@@ -40,6 +40,7 @@ public class TdSubtreeStore {
   private final int maxLevel;
   private final int subtreeLevels;
   private final int rankAmount;
+  private final boolean reloadSubtrees;
 
   private static final Logger logger = LoggerFactory.getLogger(TdTilesStore.class);
 
@@ -55,8 +56,12 @@ public class TdSubtreeStore {
           "binary_file = EXCLUDED.binary_file";
 
   private static final String GET_BUILDINGS_AMOUNT_QUERY =
-      "select count(*) " +
-          "from osm_ways where (tags ? 'building' or tags ? 'building:part') and " +
+      "SELECT COUNT(*) " +
+          "FROM osm_ways WHERE (tags ? 'building' or tags ? 'building:part') AND " +
+          "st_intersects(geom, st_makeenvelope(%1$s, %2$s, %3$s, %4$s, 4326))" +
+      "UNION " +
+      "SELECT COUNT(*) " +
+          "FROM osm_relations WHERE (tags ? 'building' or tags ? 'building:part') AND " +
           "st_intersects(geom, st_makeenvelope(%1$s, %2$s, %3$s, %4$s, 4326))";
 
   private static class ByteWrapper {
@@ -76,12 +81,13 @@ public class TdSubtreeStore {
   }
 
   public TdSubtreeStore(DataSource datasource, int minLevel, int maxLevel,
-                        int subtreeLevels, int rankAmount) {
+                        int subtreeLevels, int rankAmount, boolean reloadSubtrees) {
     this.datasource = datasource;
     this.minLevel = minLevel;
     this.maxLevel = maxLevel;
     this.subtreeLevels = subtreeLevels;
     this.rankAmount = rankAmount;
+    this.reloadSubtrees = reloadSubtrees;
   }
 
   public byte[] getSubtree(int level, long x, long y) throws TileStoreException {
@@ -93,13 +99,16 @@ public class TdSubtreeStore {
 
     // Search in db
     long mortonIndex = interleaveBits(x, y, level);
-    byte[] subtree = readSubtree(mortonIndex, level); // TODO reput that
-    if (subtree != null) {
-      // System.out.println("td_subtrees: Subtree found in db: " + level + "__" + x + "_" + y);
-      return subtree;
+    if (!reloadSubtrees) {
+      byte[] subtree = readSubtree(mortonIndex, level);
+      if (subtree != null) {
+         System.out.println("td_subtrees: Subtree found in db: " + level + "__" + x + "_" + y);
+        return subtree;
+      }
     }
 
     // Subtree isn't found
+    System.out.println("Creating subtree: " + level + "__" + x + "_" + y);
 
     // Create subtree
     Subtree newSubtree;
