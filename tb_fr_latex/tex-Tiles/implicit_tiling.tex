@@ -1,0 +1,26 @@
+\subsection{Nouveautés de la version 1.1 de 3D Tiles}
+
+Avec la nouvelle version 1.1 de la spécification 3D Tiles, il a été introduit une nouvelle fonctionnalitée appelée \textit{Implicit Tiling}. Elle permet de diviser implicitement un dataset en tuiles de mêmes tailles sans avoir à les définir explicitement.
+
+Pour cela, l'implicit tiling divise la carte en tuiles de manière récursive. Tant que le \texttt{level} de division n'a pas atteint la valeur maximum \texttt{availableLevels}, on divise la tuile dans laquelle nous nous trouvons en tuiles de même taille.
+
+Deux méthodes de division sont actuellement disponibles : \texttt{QUADTREE} et \texttt{OCTREE}. La première reste sur un concept de tuiles en deux dimensions, tandis que les octrees permettent de diviser les tuiles en rajoutant une notion de hauteur, donc en 3 dimensions. Dans mon cas, j'utilise une division en quadtree puisque tout les bâtiments que je dois traiter se trouvent sur un plan 2D.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{assets/figures/implicit-tiling-small.png}
+    \caption{Division en quadtree par implicit tiling \cite{3d-tiles-specification}}
+    \label{fig:implicit-tiling}
+\end{figure}
+
+Le niveau 0 englobe l'entièreté du Tileset, dans notre cas la planète entière, puis, à chaque division, chaque tuile correspond non pas à une profondeur supplémentaire, mais à une portion de plus en plus petite du Tileset. Ainsi, une tuile de \texttt{level} 0 est la tuile de base, une tuile de \texttt{level} 1 est une tuile résultant de la division de la tuile de \texttt{level} 0, etc. Plus d'informations quand à l'indexation des tuiles sont disponibles dans la section \ref{sec:morton}.
+
+Pour définir un implicit tiling, il faut en premier lieux créer un Tileset hôte qui définira entre autre son \texttt{bounding volume}. L'implicit tiling va ensuite définir les tuiles de ce Tileset hôte en fonction de son \texttt{subdivisionScheme}, de son \texttt{subtreeLevels} et de ses \texttt{availableLevels}, tout en prenant comme taille initiale le \texttt{bounding volume} du Tileset. Enfin, il est possible de définir les adresses auxquelles le clien doit envoyer des requêtes pour obtenir les tuiles.
+
+En plus de l'implicit tiling, la version 1.1 de 3D Tiles apporte le support des fichiers GLTF ainsi que deux nouvelles extensions : \href{https://github.com/CesiumGS/glTF/tree/3d-tiles-next/extensions/2.0/Vendor/EXT_mesh_features}{EXT_mesh_features}\footnote{https://github.com/CesiumGS/glTF/tree/3d-tiles-next/extensions/2.0/Vendor/EXT_mesh_features} et \href{https://github.com/CesiumGS/glTF/tree/3d-tiles-next/extensions/2.0/Vendor/EXT_structural_metadata}{EXT_structural_metadata}\footnote{https://github.com/CesiumGS/glTF/tree/3d-tiles-next/extensions/2.0/Vendor/EXT_structural_metadata}. Cela introduit beaucoup de nouvelles possibilités par rapport à l'ancien système, notamment à des \textit{metadata} très précises par objet GLTF. 
+
+Bien que la génération de fichiers GLTF sera discuté dans la section \ref{sec:gltf}, je ne parlerai pas des extensions dans ce rapport puisqu'elles n'ont pas été utilisées dans mon projet.
+
+\subsection{Avantages et inconvénients de l'implicit tiling}
+
+Comme son nom l'indique, cette technique de division de tuiles est implicite, ce qui signifie que l'on ne peut pas définir nous même les caractéristiques des tuiles. Cela peut être un avantage pour des datasets très grands, comme une planète entière, où il serait difficile de définir explicitement les tuiles, mais cela peut poser problème lorsque le \texttt{bounding volume} d'une tuile contenant une petite maison de campagne sera le même que celui de la tuile qui contiendra l'Empire State Building. LODSSSS ????

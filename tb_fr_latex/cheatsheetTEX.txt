@@ -22,3 +22,11 @@ mots \index{mots}
         \end{tabular}
     \end{center}
 \end{table}
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{assets/figures/Tilesets.png}
+    \caption{Exemple de Tileset contenant 3 Tiles}
+    \label{fig:Tilesets}
+\end{figure}

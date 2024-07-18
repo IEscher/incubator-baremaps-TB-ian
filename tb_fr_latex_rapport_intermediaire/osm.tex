@@ -1,0 +1,120 @@
+Comme décrit en page \pageref{sec:basemap} \autoref{sec:basemap}, le module Basemap se charge d'importer le fichier OpenStreetMap et de le transformer en une base de données PostgreSQL/PostGIS. Une fois la base de donnée générée, il faut maintenant pouvoir récupérer et traiter les données correctement.
+
+\newpage
+
+\section{Extraction des données et définition d'un bâtiment}
+\label{sec:extraction}
+
+La partie nous intéressant dans la base de données OpenStreetMap est la table \texttt{osm\_nodes}. Cette table contient les données de tout les bâtiments. Ceux-ci ne contiennent généralement qu'une \Gls{géométrie}, une structure de donnée contenant plusieurs points et formant un polygone. Parfois seulement, des \Gls{tags} peuvent être ajoutés. Ces tags peuvent contenir des informations sur la hauteur du bâtiment, sa couleur, son matériau, etc.
+
+La \href{https://wiki.openstreetmap.org/wiki/Simple_3D_Buildings}{documentation OpenStreetMap}\footnote{https://wiki.openstreetmap.org/wiki/Simple\_3D\_Buildings} nous permet d'avoir la liste complète des tags existants et nous intéressant concernant les bâtiments.
+
+Pour pouvoir récupérer toutes ces informations, j'utilise la requête SQL suivante :
+
+\begin{verbatim}
+SELECT st_asbinary(geom),
+    tags -> building,
+    tags -> height,
+    tags -> building:levels,
+    tags -> building:min_level,
+    tags -> building:colour,
+    tags -> building:material,
+    tags -> building:part,
+    tags -> roof:shape,
+    tags -> roof:levels,
+    tags -> roof:height,
+    tags -> roof:color,
+    tags -> roof:material,
+    tags -> roof:angle,
+    tags -> roof:direction,
+    tags -> amenity
+FROM osm_ways
+WHERE (tags ? building or tags ? building:part) and
+    st_intersects(geom, st_makeenvelope(%1$s, %2$s, %3$s, %4$s, 4326))
+LIMIT %5$s;
+\end{verbatim}
+
+\texttt{\%1\$s, \%2\$s, \%3\$s, \%4\$s, et \%5\$s} sont des espaces réservés qui seront remplacés par les coordonnées de la zone à charger lors de l'exécution de la requête.
+
+\newpage
+
+\section{Couleurs des bâtiments}
+
+Concernant la couleur des bâtiments, il est possible de récupérer la couleur de base du bâtiment en utilisant le tag \texttt{building:colour}. Cependant, ce tag ne donne que le mot en anglais de la couleur et non pas son code RGB, HEX ou HSL.
+
+Pour remédier à cela, j'ai créé la classe \texttt{ColorUtils}\footnote{baremaps-core/src/main/java/org/apache/baremaps/tdtiles/utils/ColorUtility.java} qui contient une map statique de toutes les couleurs selon le standard définit par \href{https://www.w3schools.com/cssref/css_colors.php}{W3Schools}\footnote{https://www.w3schools.com/cssref/css\_colors.php}. Cette classe permet de convertir le nom de la couleur en code HEX :
+
+\begin{lstlisting}[style=java]
+public class ColorUtility {
+  private static final Map<String, String> colorMap;
+
+  static {
+    colorMap = new HashMap<>();
+    colorMap.put("aliceblue", "f0f8ff");
+    // ...
+    colorMap.put("yellowgreen", "9acd32");
+  }
+
+  public static Color parseName(String color) {
+    // Calcul des valeurs RGB en fonction du code HEX.
+    return new Color(r, g, b);
+  }
+}
+\end{lstlisting}
+
+\texttt{Color}\footnote{baremaps-core/src/main/java/org/apache/baremaps/tdtiles/utils/Color.java} étant un record, il est possible de créer une nouvelle couleur en passant les valeurs RGB en paramètre.
+
+Une fois la couleur RGB récupérée, il est possible de l'utiliser dans la classe \texttt{GltfBuilder}\footnote{baremaps-core/src/main/java/org/apache/baremaps/tdtiles/GltfBuilder.java} pour donner la couleur au bâtiment lors de sa modélisation.
+
+\newpage
+
+\section{Hauteur des bâtiments}
+
+Le calcul de la hauteur des bâtiments doit se faire en fonction de la \href{https://wiki.openstreetmap.org/wiki/Simple_3D_Buildings}{définition}\footnote{https://wiki.openstreetmap.org/wiki/Simple\_3D\_Buildings} des bâtiments par OSM. Si aucun tags ne donne la hauteur du bâtiment, il aura par défaut une hauteur de 10 mètres.
+
+Sinon, la hauteur du bâtiment est calculée en fonction des tags \texttt{height}, \texttt{building:levels}, \texttt{building:min\_level}, \texttt{roof:height} et \texttt{roof:levels} :
+
+\begin{itemize}
+    \item On commence avec une hauteur de bâtiment de 0 mètres.
+    \item Si aucun tag n'est présent,
+          \begin{itemize}
+              \item La hauteur du bâtiment est de 10 mètres.
+          \end{itemize}
+    \item Sinon, si le tag \texttt{height} est présent,
+          \begin{itemize}
+              \item La hauteur du bâtiment est égale à la valeur du tag \texttt{height}.
+              \item Si le tag \texttt{roof:height} est présent,
+                    \begin{itemize}
+                        \item La hauteur du toit \texttt{roof:height} doit être soustraite de la hauteur du bâtiment
+                    \end{itemize}
+          \end{itemize}
+    \item Sinon,
+          \begin{itemize}
+              \item Si le tag \texttt{building:levels} est présent,
+                    \begin{itemize}
+                        \item La hauteur du bâtiment est égale à la valeur du tag \texttt{building:levels} multipliée par 3 mètres.
+                    \end{itemize}
+              \item Si le tag \texttt{roof:levels} est présent,
+                    \begin{itemize}
+                        \item La hauteur du toit \texttt{roof:levels} multipliée par 3 mètres doit être additionnée à la hauteur du bâtiment.
+                    \end{itemize}
+              \item Si le tag \texttt{building:min\_level} est présent,
+                    \begin{itemize}
+                        \item La hauteur du vide en dessous du bâtiment est égale à la valeur du tag \texttt{building:min\_level} multipliée par 3 mètres.
+                    \end{itemize}
+          \end{itemize}
+\end{itemize}
+
+La hauteur connue, on peut la transmettre à la classe \texttt{GltfBuilder}\footnote{baremaps-core/src/main/java/org/apache/baremaps/tdtiles/GltfBuilder.java} pour donner la hauteur au bâtiment lors de sa modélisation.
+
+\newpage
+
+\section{Géométries des bâtiments}
+
+La classe \texttt{GltfBuilder} a donc accès à la couleur et à la hauteur du bâtiment. Ces informations ainsi que les autres tags lui sont transmis à travers le record \texttt{Building}\footnote{baremaps-core/src/main/java/org/apache/baremaps/tdtiles/building/Building.java} et \texttt{Roof}\footnote{baremaps-core/src/main/java/org/apache/baremaps/tdtiles/building/Roof.java}.
+
+Outre ces informations, \texttt{Building} comporte aussi une \texttt{Geometry}\footnote{org.locationtech.jts.geom.Geometry} qui nous sert à déterminer le polygone au sol du bâtiment. Grâce à ce polygone, nous pouvons extruder le bâtiment en 3D. Cependant une \texttt{Geometry} ne contient qu'une liste de points et il faut une liste de triangles pour pouvoir modéliser le bâtiment en 3D. Pour cela, la méthode \texttt{DelaunayTriangulationBuilder}\footnote{org.locationtech.jts.triangulate.DelaunayTriangulationBuilder} était utilisée. Le problème était que la \href{https://en.wikipedia.org/wiki/Delaunay_triangulation}{\textit{Delaunay triangulation}}\footnote{https://en.wikipedia.org/wiki/Delaunay\_triangulation} ne fonctionne pas avec des polygones concaves. Une version complémentaire de cette méthode est la \href{https://en.wikipedia.org/wiki/Constrained_Delaunay_triangulation}{\textit{Constrained Delaunay triangulation}}\footnote{https://en.wikipedia.org/wiki/Constrained\_Delaunay\_triangulation} qui fonctionne avec des polygones concaves en définissant des segments comme bords du polygone. Cette version de l'algorithme est aussi disponible dans la librairie \href{https://locationtech.github.io/jts/}{JTS}\footnote{https://locationtech.github.io/jts/} mais elle propose aussi la classe \href{https://locationtech.github.io/jts/javadoc/org/locationtech/jts/triangulate/polygon/PolygonTriangulator.html}{\texttt{PolygonTriangulator}}\footnote{https://locationtech.github.io/jts/javadoc/org/locationtech/jts/triangulate/polygon/PolygonTriangulator.html} qui permet aussi de faire une triangulation de polygones concaves de manière moins optimisée mais plus rapide que la \textit{Constrained Delaunay triangulation}. C'est donc cette classe que j'ai utilisée pour trianguler les bâtiments.
+
+Grâce à cette nouvelle triangulation, il est possible de modéliser les bâtiments en 3D correctement, même ceux comprenant des cours intérieures ou des trous dans leur structure.
+
+La classe \texttt{DelaunayTriangulationBuilder} comportait cependant un paramètre \texttt{tolerance} qui permettait de définir la distance minimale entre deux points afin d'optimiser le coût de la triangulation. Cette possibilité n'est pas disponible dans la classe \texttt{PolygonTriangulator}, néanmoins j'implémente une alternative dans le chapitre suivant.

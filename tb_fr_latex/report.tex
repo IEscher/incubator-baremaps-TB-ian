@@ -56,21 +56,61 @@
 
 %% Contenu
 \mainmatter
+
+
 \chapter{Introduction}
 \input{introduction.tex}
-% \input{examples.tex}
 
-\chapter{Présentation du framework Baremaps}
-\input{baremaps.tex}
+\chapter{3D Tiles}
 
-\chapter{Utilisation de la base de donnée OpenStreetMap}
-\input{osm.tex}
+\section{Spécification 3D Tiles Next}
+\label{sec:3d-tiles-next}
+\input{tex-Tiles/tiles-intro.tex}
 
-\chapter{Optimisation de l'affichage des bâtiments}
-\label{chap:optimisation}
-\input{optimisation.tex}
+\section{Implicit Tiling}
+\label{sec:implicit-tiling}
+\input{tex-Tiles/implicit_tiling.tex}
+
+\section{Level of Detail}
+\label{sec:lod}
+\input{tex-Tiles/LODs.tex}
+
+\section{3DTILES\_bounding\_volume\_S2 extension}
+\label{sec:3DTILES_bv_S2}
+\input{tex-Tiles/3DTILES_bv_S2_extension.tex}
+
+\section{Création des fichiers GLTF}
+\label{sec:gltf}
+\input{tex-Tiles/gltf.tex}
+
+\section{Database}
+\label{sec:database}
+\input{tex-Tiles/database.tex}
+
+\chapter{Subtrees}
+
+\section{Introduction}
+\label{sec:subtrees-intro}
+\input{tex-Subtrees/subtrees-intro.tex}
+
+\section{Subtree Class}
+\label{sec:subtree-class}
+\input{tex-Subtrees/subtrees.tex}
+
+\section{Morton Index}
+\label{sec:morton}
+\input{tex-Subtrees/morton.tex}
+
+\section{Availabilities}
+\label{sec:availability-class}
+\input{tex-Subtrees/availabilities.tex}
+
+\section{Transmission}
+\label{sec:transmission}
+\input{tex-Subtrees/binary-file.tex}
 
 \chapter{Conclusion}
+\label{sec:conclusion}
 \input{conclusion.tex}
 
 \clearpage
@@ -108,6 +148,6 @@
 \printindex
 
 % Le colophon est le dernier élément d'un document qui contient des notes de l'auteur concernant la mise en page et l'édition du document : il est parfaitement optionnel.
-\input{colophon.tex}
+% \input{colophon.tex}
 
 \end{document}

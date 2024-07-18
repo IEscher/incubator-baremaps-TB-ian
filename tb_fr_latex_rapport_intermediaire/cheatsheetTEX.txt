@@ -1,0 +1,24 @@
+\href{https://www.overleaf.com/learn/latex/Glossaries}{Overleaf/Glossaires}
+\footnote{La note en bas de page (ou note de bas de page)}
+\maraja{Je suis une marginale, et je suis utile pour résumé un paragraphe en quelques mots.}
+\Gls{hes-so}
+\pageref{glossaire}
+mots \index{mots}
+
+\ref{cantons}
+
+\begin{table}[h]
+    \begin{center}
+        \caption{Liste des cantons \label{cantons}}
+        \begin{tabular}{c|l|r}
+            Abréviation & Nom du canton & Depuis                  \\ \hline
+            ZH          & Zürich        & \ordinalnum{1} mai 1351 \\
+            BE          & Berne         & 6 mars 1353             \\
+            FR          & Fribourg      & 22 décembre 1481        \\
+            VD          & Vaud          & 19 février 1815         \\
+            VS          & Valais        & 4 août 1815             \\
+            NE          & Neuchâtel     & 19 mai 1815             \\
+            GE          & Genève        & 19 mai 1815
+        \end{tabular}
+    \end{center}
+\end{table}
