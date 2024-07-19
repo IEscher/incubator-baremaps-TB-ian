@@ -8,16 +8,43 @@ Deux méthodes de division sont actuellement disponibles : \texttt{QUADTREE} et 
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.6\textwidth]{assets/figures/implicit-tiling-small.png}
+    \includegraphics[width=0.4\textwidth]{assets/figures/implicit-tiling-small.png}
     \caption{Division en quadtree par implicit tiling \cite{3d-tiles-specification}}
     \label{fig:implicit-tiling}
 \end{figure}
 
 Le niveau 0 englobe l'entièreté du Tileset, dans notre cas la planète entière, puis, à chaque division, chaque tuile correspond non pas à une profondeur supplémentaire, mais à une portion de plus en plus petite du Tileset. Ainsi, une tuile de \texttt{level} 0 est la tuile de base, une tuile de \texttt{level} 1 est une tuile résultant de la division de la tuile de \texttt{level} 0, etc. Plus d'informations quand à l'indexation des tuiles sont disponibles dans la section \ref{sec:morton}.
 
-Pour définir un implicit tiling, il faut en premier lieux créer un Tileset hôte qui définira entre autre son \texttt{bounding volume}. L'implicit tiling va ensuite définir les tuiles de ce Tileset hôte en fonction de son \texttt{subdivisionScheme}, de son \texttt{subtreeLevels} et de ses \texttt{availableLevels}, tout en prenant comme taille initiale le \texttt{bounding volume} du Tileset. Enfin, il est possible de définir les adresses auxquelles le clien doit envoyer des requêtes pour obtenir les tuiles. Selon la spécification, le client Cesium s'attend à recevoir des fichiers glb (glTF binary) pour les tuiles.
+Pour définir un implicit tiling, il faut en premier lieux créer un Tileset hôte qui définira entre autre son \texttt{bounding volume}. L'implicit tiling va ensuite définir les tuiles de ce Tileset hôte en fonction de son \texttt{subdivisionScheme}, de son \texttt{subtreeLevels} et de ses \texttt{availableLevels}, tout en prenant comme taille initiale le \texttt{bounding volume} du Tileset. Enfin, il est possible de définir les adresses auxquelles le clien doit envoyer des requêtes pour obtenir les tuiles ainsi que les \textit{Subtrees}. Ces derniers seront discutés dans leur chapitre dédié \autoref{sec:subtrees-intro}. Selon la spécification, le client Cesium s'attend à recevoir des fichiers glb (glTF binary) pour les tuiles. Ci-dessous un exemple de fichier JSON définissant un Tileset avec un implicit tiling :
 
-En plus de l'implicit tiling, la version 1.1 de 3D Tiles apporte le support des fichiers glTF ainsi que deux nouvelles extensions : \href{https://github.com/CesiumGS/glTF/tree/3d-tiles-next/extensions/2.0/Vendor/EXT_mesh_features}{EXT\_mes\_features}\footnote{https://github.com/CesiumGS/glTF/tree/3d-tiles-next/extensions/2.0/Vendor/EXT_mesh_features} et \href{https://github.com/CesiumGS/glTF/tree/3d-tiles-next/extensions/2.0/Vendor/EXT_structural_metadata}{EXT\_structural\_metadata}\footnote{https://github.com/CesiumGS/glTF/tree/3d-tiles-next/extensions/2.0/Vendor/EXT_structural_metadata}. Cela introduit beaucoup de nouvelles possibilités par rapport à l'ancien système, notamment à des \textit{metadata} très précises par objet glTF.
+\begin{verbatim}
+{
+    "asset" : {
+        "version" : "1.1"
+    },
+    "geometricError": 1200000,
+    "root" : {
+        "boundingVolume": {
+            "region": [-3.14, -1.57, 3.14, 1.57, 0, 60]
+        },
+        "refine": "REPLACE",
+        "geometricError": 1200000,
+        "content": {
+        "uri" : "/content/content_glb_{level}__{x}_{y}.glb"
+        },
+        "implicitTiling" : {
+            "subdivisionScheme" : "QUADTREE",
+            "subtreeLevels" : 4,
+            "availableLevels" : 19,
+            "subtrees" : {
+                "uri" : "/subtrees/{level}.{x}.{y}.subtree"
+            }
+        }
+    }
+}
+\end{verbatim}
+
+En plus de l'implicit tiling, la version 1.1 de 3D Tiles apporte le support des fichiers glTF ainsi que deux nouvelles extensions : \href{https://github.com/CesiumGS/glTF/tree/3d-tiles-next/extensions/2.0/Vendor/EXT_mesh_features}{EXT\_mes\_features}\footnote{https://github.com/CesiumGS/glTF/tree/3d-tiles-next/extensions/2.0/Vendor/EXT\_mesh\_features} et \href{https://github.com/CesiumGS/glTF/tree/3d-tiles-next/extensions/2.0/Vendor/EXT_structural_metadata}{EXT\_structural\_metadata}\footnote{https://github.com/CesiumGS/glTF/tree/3d-tiles-next/extensions/2.0/Vendor/EXT\_structural\_metadata}. Cela introduit beaucoup de nouvelles possibilités par rapport à l'ancien système, notamment à des \textit{metadata} très précises par objet glTF.
 
 Bien que la génération de fichiers glTF sera discuté dans la section \ref{sec:gltf}, je ne parlerai pas des extensions dans ce rapport puisqu'elles n'ont pas été utilisées dans mon projet.
 

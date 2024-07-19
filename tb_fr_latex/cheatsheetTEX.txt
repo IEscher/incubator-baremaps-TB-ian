@@ -30,3 +30,14 @@ mots \index{mots}
     \caption{Exemple de Tileset contenant 3 Tiles}
     \label{fig:Tilesets}
 \end{figure}
+
+\begin{verbatim}
+"implicitTiling" : {
+    "subdivisionScheme" : "QUADTREE",
+    "subtreeLevels" : 6,
+    "availableLevels" : 18,
+    "subtrees" : {
+        "uri" : "/subtrees/{level}.{x}.{y}.json"
+    }
+}
+\end{verbatim}

@@ -44,28 +44,3 @@ Grâce à ces résultats, nous pouvons observer que c'est l'écriture en fichier
 On remarque aussi que la méthode \texttt{createNode}\footnote{baremaps-core/src/main/java/org/apache/baremaps/tdtiles/GltfBuilder.java} prend aussi beaucoup de temps. Ici il est possible de \textit{multithreader} cette méthode pour gagner du temps. J'ai donc écrit la méthode \texttt{createNodes}\footnote{baremaps-server/src/main/java/org/apache/baremaps/server/TdTilesResources.java} qui permet de le faire en prenant en compte le nombre de CPUs disponibles.
 
 \newpage
-\section{Système de compression des géométries des bâtiments}
-
-Comme vu à la section précédente, l'écriture des bâtiments en fichiers binaires \texttt{glTF} est une des étapes les plus longues. Une manière de réduire le temps passé dans cette étape est de simplement réduire la quantité de donnée que la fonction prend en paramètre. Pour cela, j'utilise un système de \textit{Level of details} (LOD) pour les géométries des bâtiments.
-
-Ce système se base sur les \texttt{levels} des tuiles discutés au chapitre \ref{sec:implicit-tiling}. Plus le \texttt{level} est élevé, plus les bâtiments sont proches de la caméra et donc plus les bâtiments doivent être détaillés. En fonction du \texttt{level} de leur tuile, les bâtiments subissent jusqu'à 3 niveau de compression :
-
-\begin{itemize}
-    \item \texttt{level} 0 : Les bâtiments sont affichés en 3D avec toutes les géométries.
-    \item \texttt{level} 1 : Les bâtiments sont affichés en 3D avec une géométrie simplifiée.
-    \item \texttt{level} 2 : Les bâtiments sont affichés en 2D.
-    \item \texttt{level} 3 : Les bâtiments sont affichés en 3D avec toutes les géométries uniquement si ils ont des caractéristiques spécifiques enregistrées dans la base de données OpenStreetMap.
-\end{itemize}
-
-Pour visualiser les différences entre les niveaux de compression, je vous invite à regarder la figure \ref{levelsofdetails.pdf} où chaque niveau de détail est simbolisé par une couleur :
-
-\begin{itemize}
-    \item \texttt{level} 0 : rouge
-    \item \texttt{level} 1 : vert
-    \item \texttt{level} 2 : bleu
-    \item \texttt{level} 3 : blanc
-\end{itemize}
-
-\fig[H, width=1\textwidth]{Niveaux de détails des bâtiments}{levelsofdetails.pdf}
-
-Faire ainsi permet de réduire drastiquement le temps passé à générer ces bâtiments tout en gardant une qualité d'affichage correcte.

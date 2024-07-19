@@ -77,6 +77,33 @@
       \endverb
       \keyw{specification,3d-tiles}
     \endentry
+    \entry{3DTILES_bounding_volume_S2-website}{online}{}
+      \name{author}{1}{}{%
+        {{hash=1cb71813949fcb3aebef1f6eadcd72df}{%
+           family={S2Geometry},
+           familyi={S\bibinitperiod}}}%
+      }
+      \strng{namehash}{1cb71813949fcb3aebef1f6eadcd72df}
+      \strng{fullhash}{1cb71813949fcb3aebef1f6eadcd72df}
+      \strng{bibnamehash}{1cb71813949fcb3aebef1f6eadcd72df}
+      \strng{authorbibnamehash}{1cb71813949fcb3aebef1f6eadcd72df}
+      \strng{authornamehash}{1cb71813949fcb3aebef1f6eadcd72df}
+      \strng{authorfullhash}{1cb71813949fcb3aebef1f6eadcd72df}
+      \field{labelalpha}{S2G}
+      \field{sortinit}{9}
+      \field{sortinithash}{0a5ebc79d83c96b6579069544c73c7d4}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{addendum}{(accessed: 19.07.2024)}
+      \field{title}{Bounding Volume S2 extension website}
+      \verb{urlraw}
+      \verb http://s2geometry.io/devguide/s2cell_hierarchy#s2cellid-numbering
+      \endverb
+      \verb{url}
+      \verb http://s2geometry.io/devguide/s2cell_hierarchy#s2cellid-numbering
+      \endverb
+      \keyw{extension,3d-tiles,bounding-volume,S2}
+    \endentry
   \enddatalist
 \endrefsection
 \endinput

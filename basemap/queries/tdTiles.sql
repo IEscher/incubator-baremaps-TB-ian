@@ -5,7 +5,6 @@
 --     ADD gltf_binary_c3 bytea;
 
 DROP TABLE IF EXISTS td_subtrees;
-DROP TABLE IF EXISTS td_max_rank_subtrees;
 CREATE TABLE td_subtrees
 (
     morton_index bigint,
