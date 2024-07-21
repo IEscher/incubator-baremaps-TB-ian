@@ -2355,9 +2355,11 @@
     <bcf:citekey order="14">3DTILES_bounding_volume_S2-website</bcf:citekey>
     <bcf:citekey order="15">3d-tiles-specification</bcf:citekey>
     <bcf:citekey order="16">3d-tiles-specification</bcf:citekey>
-    <bcf:citekey order="17">3d-tiles-reference-card-v1</bcf:citekey>
-    <bcf:citekey order="18">3d-tiles-specification</bcf:citekey>
-    <bcf:citekey order="19">3DTILES_bounding_volume_S2-website</bcf:citekey>
+    <bcf:citekey order="17">3d-tiles-reference-card-v1_1</bcf:citekey>
+    <bcf:citekey order="18">3d-tiles-reference-card-v1</bcf:citekey>
+    <bcf:citekey order="19">3d-tiles-specification</bcf:citekey>
+    <bcf:citekey order="20">3DTILES_bounding_volume_S2-website</bcf:citekey>
+    <bcf:citekey order="21">3d-tiles-reference-card-v1_1</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->
   <bcf:sortingtemplate name="ynt">

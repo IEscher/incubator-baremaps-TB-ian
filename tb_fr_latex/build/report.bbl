@@ -48,7 +48,7 @@
       \endverb
       \keyw{reference-card,3d-tiles,v1.0}
     \endentry
-    \entry{3d-tiles-specification}{online}{}
+    \entry{3d-tiles-reference-card-v1_1}{online}{}
       \name{author}{1}{}{%
         {{hash=2dd1f047cd9a0b3a708b07fc198862ec}{%
            family={CesiumGS},
@@ -65,6 +65,35 @@
       \field{sortinit}{9}
       \field{sortinithash}{0a5ebc79d83c96b6579069544c73c7d4}
       \field{extraalpha}{2}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{addendum}{(accessed: 21.07.2024)}
+      \field{title}{3D Tiles reference cards V1.1}
+      \verb{urlraw}
+      \verb https://github.com/CesiumGS/3d-tiles/blob/main/3d-tiles-reference-card-1.1.pdf
+      \endverb
+      \verb{url}
+      \verb https://github.com/CesiumGS/3d-tiles/blob/main/3d-tiles-reference-card-1.1.pdf
+      \endverb
+      \keyw{reference-card,3d-tiles,v1.1}
+    \endentry
+    \entry{3d-tiles-specification}{online}{}
+      \name{author}{1}{}{%
+        {{hash=2dd1f047cd9a0b3a708b07fc198862ec}{%
+           family={CesiumGS},
+           familyi={C\bibinitperiod}}}%
+      }
+      \strng{namehash}{2dd1f047cd9a0b3a708b07fc198862ec}
+      \strng{fullhash}{2dd1f047cd9a0b3a708b07fc198862ec}
+      \strng{bibnamehash}{2dd1f047cd9a0b3a708b07fc198862ec}
+      \strng{authorbibnamehash}{2dd1f047cd9a0b3a708b07fc198862ec}
+      \strng{authornamehash}{2dd1f047cd9a0b3a708b07fc198862ec}
+      \strng{authorfullhash}{2dd1f047cd9a0b3a708b07fc198862ec}
+      \field{extraname}{3}
+      \field{labelalpha}{Ces}
+      \field{sortinit}{9}
+      \field{sortinithash}{0a5ebc79d83c96b6579069544c73c7d4}
+      \field{extraalpha}{3}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{addendum}{(accessed: 18.07.2024)}

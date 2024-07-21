@@ -2256,6 +2256,9 @@ INPUT ./tex-Subtrees/subtrees-intro.tex
 INPUT tex-Subtrees/subtrees-intro.tex
 INPUT ./tex-Subtrees/subtrees-intro.tex
 INPUT tex-Subtrees/subtrees-intro.tex
+INPUT build/assets/figures/Subtree_hierarchy.drawio.pdf
+INPUT build/assets/figures/Subtree_hierarchy.drawio.pdf
+INPUT build/assets/figures/Subtree_hierarchy.drawio.pdf
 INPUT ./tex-Subtrees/subtrees.tex
 INPUT tex-Subtrees/subtrees.tex
 INPUT ./tex-Subtrees/subtrees.tex

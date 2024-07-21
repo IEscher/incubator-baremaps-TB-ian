@@ -77,3 +77,13 @@ Le calcul de la hauteur des bâtiments doit se faire en fonction de la \href{htt
 \end{itemize}
 
 La hauteur connue, on peut la transmettre à la classe \texttt{GltfBuilder} pour donner la hauteur au bâtiment lors de sa modélisation.
+
+\subsection{glTF par bâtiment ou par tuile}
+
+Quand on pense aux manière de générer les fichiers 3D, il est facile de concevoir que deux méthodes sont possibles : générer un fichier glTF par bâtiment ou générer un fichier glTF par tuile. La première méthode nous permettrait de générer des features par bâtiment glTF, ce qui rendrait l'utilisation de metadata très intéressante.
+
+Plus intéressant encore, générer ces fichiers 3D par bâtiment nous pousserai fortement à tenir une liste de bâtiments se trouvant dans chaque tuile. En faisant ainsi, il serait possible de prévenir le placement d'un même bâtiment dans plusieurs tuiles. Souvent, un bâtiment se trouve à cheval sur plusieurs tuiles et il est donc nécessaire de le placer dans plusieurs fichiers glTF quand on génère un fichier par tuile.
+
+Pour pouvoir générer un fichier glTF par bâtiment, il faut utiliser le concept de \textit{Multiple Content} introduit dans la version 1.1 de la spécification 3D Tiles \cite{3d-tiles-reference-card-v1_1}. Pour utiliser cela, il faut remplacer le champ \texttt{content} de chaque tuile par un champ \texttt{contents} qui sera une liste de plusieurs \texttt{content}. Chaque \texttt{content} contiendra un \texttt{uri} qui pointera vers le fichier glTF du bâtiment.
+
+Cependant, un problème survient si l'on utilise en même temps l'implicit tiling lors de la génération des \textit{Subtrees}. Ces Subtrees, définits plus en profondeur dans leur chapitre dédié, nécessitent une liste de disponibilité (\autoref{sec:availability-class}) \textbf{par content}. En d'autres termes, si une tuile contient $X$ bâtiments, il faudra $X$ listes de disponibilité sur la tuile. Sur chacune de ces listes, une seule valeur sera à \texttt{true}, la valeur correspondant à l'index de la tuile sur laquelle le bâtiment se trouve. Cela rend donc la génération des Subtrees beaucoup plus complexe et énormément plus volumineuse. Pour plus de précisions sur le pourquoi de cette complexité, je vous invite à lire le chapitre dédié aux Subtrees.
