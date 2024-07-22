@@ -12,4 +12,7 @@
 \contentsline {figure}{\numberline {3.2}{\ignorespaces Classes utilisées pour la création d'une hiérarchie de Subtrees\relax }}{19}{figure.caption.13}%
 \contentsline {figure}{\numberline {3.3}{\ignorespaces Classes utilisées pour la création d'une hiérarchie de Subtrees\relax }}{20}{figure.caption.17}%
 \contentsline {figure}{\numberline {3.4}{\ignorespaces Indexes X Y vers index de Morton \blx@tocontentsinit {0}\cite {availability-gh}\relax }}{22}{figure.caption.19}%
+\contentsline {figure}{\numberline {3.5}{\ignorespaces Flowchart de la fonction \texttt {getSubtree}\relax }}{24}{figure.caption.23}%
+\contentsline {figure}{\numberline {3.6}{\ignorespaces Flowchart de la fonction \texttt {createMaxRankSubtree}\relax }}{24}{figure.caption.25}%
+\contentsline {figure}{\numberline {3.7}{\ignorespaces Flowchart de la fonction \texttt {createSubtree}\relax }}{25}{figure.caption.27}%
 \addvspace {10\p@ }

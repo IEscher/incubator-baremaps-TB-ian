@@ -1,20 +1,20 @@
 # Fdb version 3
-["biber build/report"] 1721664989 "build/report.bcf" "build/report.bbl" "build/report" 1721668516
+["biber build/report"] 1721664989 "build/report.bcf" "build/report.bbl" "build/report" 1721680302
   "bibliography.bib" 1721664984 2017 e5571ac3476a85112fa0e7ebefdaa89f ""
-  "build/report.bcf" 1721668166 108167 97d82f06f26648306da222997fec851e "pdflatex"
+  "build/report.bcf" 1721680187 108167 97d82f06f26648306da222997fec851e "pdflatex"
   (generated)
   "build/report.bbl"
   "build/report.blg"
-["cusdep nlo nls build/report"] 0 "build/report.nlo" "build/report.nls" "build/report" 1721668516
-  "build/report.nlo" 1721668166 1287 1730361b9607f8f71dad035a51256517 "pdflatex"
+["cusdep nlo nls build/report"] 0 "build/report.nlo" "build/report.nls" "build/report" 1721680302
+  "build/report.nlo" 1721680187 1287 1730361b9607f8f71dad035a51256517 "pdflatex"
   (generated)
   "build/report.nls"
-["makeindex build/report.idx"] 1716413840 "build/report.idx" "build/report.ind" "build/report" 1721668516
-  "build/report.idx" 1721668163 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
+["makeindex build/report.idx"] 1716413840 "build/report.idx" "build/report.ind" "build/report" 1721680302
+  "build/report.idx" 1721680184 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
   (generated)
   "build/report.ilg"
   "build/report.ind"
-["pdflatex"] 1721668516 "report.tex" "build/report.pdf" "report" 1721668516
+["pdflatex"] 1721680302 "report.tex" "build/report.pdf" "report" 1721680302
   "/dev/null" 1721653276 0 d41d8cd98f00b204e9800998ecf8427e ""
   "/etc/texmf/web2c/texmf.cnf" 1662021339 475 c0e671620eb5563b2130f56340a5fde8 ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
@@ -304,6 +304,7 @@
   "/usr/share/texmf/fonts/tfm/public/lm/ec-lmss12.tfm" 1254938640 11232 955a7245396175d9219648eadc654ac9 ""
   "/usr/share/texmf/fonts/tfm/public/lm/ec-lmssbx10.tfm" 1254938640 11168 06d87f5698fd1b642d96449b7c8d90b0 ""
   "/usr/share/texmf/fonts/tfm/public/lm/ec-lmtt10.tfm" 1254938640 1372 2ef2c2b492b3c4cd7879fe083abbb061 ""
+  "/usr/share/texmf/fonts/tfm/public/lm/ec-lmtti10.tfm" 1254938640 1372 0dcee1a56926aed3dd9ded91b7563563 ""
   "/usr/share/texmf/fonts/tfm/public/lm/lmex10.tfm" 1254938640 992 ce925c9346c7613270a79afbee98c070 ""
   "/usr/share/texmf/fonts/tfm/public/lm/lmmi10.tfm" 1254938640 1528 6d36b2385e0ca062a654de6ac59cb34f ""
   "/usr/share/texmf/fonts/tfm/public/lm/lmmi12.tfm" 1254938640 1524 753b192b18f2991794f9d41a8228510b ""
@@ -339,17 +340,20 @@
   "assets/logos/heig-vd-baseline.pdf" 1677456776 5612 3d6f8d4caeb754e1071c7f82873e8b77 ""
   "assets/logos/hes-so.pdf" 1677456776 10811 0fbdb0a4883084fc5756450be8dd9ede ""
   "build/assets/figures/Subtree_hierarchy.drawio.pdf" 1721582209 64361 bdc0293414d605c30b3927ec0a6171a0 ""
+  "build/assets/figures/createSubtree-flowchart.drawio.pdf" 1721680301 25272 c2eac42c8508e978d96fb2dcb15c6243 ""
+  "build/assets/figures/getSubtree-flowchart.drawio.pdf" 1721680147 14987 7a67263a505547c5798c51602a11a92e ""
   "build/assets/figures/iescher.svg.pdf" 1716392772 8001 8effd687ecb887747963e31582de11f0 ""
-  "build/assets/figures/simple-flowchart.drawio.pdf" 1721643295 14049 fdc57258e06e77c5e1b5dcbc5e8e338f ""
+  "build/assets/figures/maxRank-flowchart.drawio.pdf" 1721680302 14561 78c49573867df3967fd083012cf4ef5f ""
+  "build/assets/figures/simple-flowchart.drawio.pdf" 1721680149 13647 527309f46ee0b3001d5507583637155a ""
   "build/assets/figures/subtree-classes.drawio.pdf" 1721643147 25198 c004bcd02a9a358a054ac0492b5eb466 ""
-  "build/report.aux" 1721668166 11423 566df21f2ad77db58419c541038bfb8b "pdflatex"
+  "build/report.aux" 1721680187 12592 d90725f0c92a5706b197b25e422774ac "pdflatex"
   "build/report.bbl" 1721664990 6632 54f68b1b32b896fb2004c3adb9b69b90 "biber build/report"
   "build/report.ind" 1716413840 0 d41d8cd98f00b204e9800998ecf8427e "makeindex build/report.idx"
-  "build/report.lof" 1721668166 1608 94e33fb7db4d0e4494adbcbbccaab5bb "pdflatex"
+  "build/report.lof" 1721680187 2023 62231972f65eb53863dd2ac7c46edc31 "pdflatex"
   "build/report.nls" 1716381802 0 d41d8cd98f00b204e9800998ecf8427e "cusdep nlo nls build/report"
-  "build/report.out" 1721668166 4416 d9936c9f01b723e76e8cf04d57061ea4 "pdflatex"
-  "build/report.run.xml" 1721668166 2392 cd945acf90f44d141877f25c838915cf "pdflatex"
-  "build/report.toc" 1721668166 2263 81c850bbcaf2ae384eca9a4194e8b480 "pdflatex"
+  "build/report.out" 1721680187 4663 25b5b3ca04fe0b522b2ae224173d300e "pdflatex"
+  "build/report.run.xml" 1721680187 2392 cd945acf90f44d141877f25c838915cf "pdflatex"
+  "build/report.toc" 1721680187 2430 e1b43c573b158400838a36875f20d4b2 "pdflatex"
   "conclusion.tex" 1716553316 1243 c13f196b27122a6acd209d5afb2d721c ""
   "glossary.tex" 1716543283 1059 1e10879d3f9c4b4200f1ef428a011f70 ""
   "heig-tb.cls" 1677456776 12571 d09b5c2f3defadc8c56779af07b82d62 ""
@@ -360,8 +364,8 @@
   "report.tex" 1721583974 3553 07702156754c5a596996cba1ab3d22aa ""
   "tex-Subtrees/binary-file.tex" 1721287585 0 d41d8cd98f00b204e9800998ecf8427e ""
   "tex-Subtrees/classes.tex" 1721657954 3805 5d5ef5347fe50d5deeebf9d8538a7f5a ""
-  "tex-Subtrees/morton.tex" 1721668509 5154 ee27d208c956ce73a5c2476e40add252 ""
-  "tex-Subtrees/subtree-creation.tex" 1721582423 0 d41d8cd98f00b204e9800998ecf8427e ""
+  "tex-Subtrees/morton.tex" 1721679997 5154 ee27d208c956ce73a5c2476e40add252 ""
+  "tex-Subtrees/subtree-creation.tex" 1721680175 850 5b680a8ddd0f8ca3115866ed62037fd1 ""
   "tex-Subtrees/subtrees-intro.tex" 1721585417 3613 53ee0a7bf958e2ca52d4e699355c8d85 ""
   "tex-Tiles/3DTILES_bv_S2_extension.tex" 1721389113 4249 d946ddff6fa4cd78a9de956793467bdf ""
   "tex-Tiles/LODs.tex" 1721379336 2278 94c94a673e4fcfa22fa64d9aa076ea3b ""
