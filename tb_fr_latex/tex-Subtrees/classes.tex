@@ -1,12 +1,12 @@
-\subsection*{Classe Subtree}
-\label{sec:subtree-class}
-
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\textwidth]{assets/figures/subtree-classes.drawio.pdf}
     \caption{Classes utilisées pour la création d'une hiérarchie de Subtrees}
     \label{fig:subtree-classes}
 \end{figure}
+
+\subsection*{Classe Subtree}
+\label{sec:subtree-class}
 
 La première classe écrite dans le but de gérer les Subtrees est la classe \texttt{Subtree}. Un objet de cette classe comporte tout les éléments nécessaires pour la gestion d'un Subtree. Il contient un objet \texttt{Availability} pour chaque type de disponibilité (tuile, contenu, enfants) ainsi que le nombre de levels contenu. La classe offre aussi tous les getters utiles pour accéder aux informations importantes. Elle fournit aussi une fonction statique de concaténation de 4 Subtrees en un d'ordre supérieur. Cette fonction sera utilisée pour la création de l'arbre de Subtrees. Finalement, elle offre deux fonction de debug pour afficher les \textit{Tile Availability} et le \textit{Child Availability} dans la console.
 
@@ -27,3 +27,4 @@ Cette classe est celle qui orchestrera la création et la distribution des Subtr
     \label{fig:ssimple-flowchart}
 \end{figure}
 
+Vous observerez que la classe utilise un système récursif pour la création d'un Subtree. Puisqu'un Subtree parent doit être au courant des disponibilités des Subtrees enfants, il faudrait en théorie que ces derniers soient connus. Cependant, cela peut être optimisé en ne faisant que regarder si des bâtiments se trouvent dans la tuile enfant. Pour cela, une requête SQL simple permet de le déterminer.
