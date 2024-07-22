@@ -55,7 +55,7 @@ public class MortonIndexes {
   public static long interleaveBits(long x, long y, int level) {
     // int trueLevel = level - Math.floorDiv(level, subtreeLevels);
     long result = 0;
-    int length = (int) Math.pow(2, level);
+    int length = 2 * level;
     for (int i = 0; i < length; i++) {
       result |= (x & (1L << i)) << i | (y & (1L << i)) << (i + 1);
     }
@@ -65,7 +65,7 @@ public class MortonIndexes {
   public static long[] mortonIndexToXY(long mortonIndex, int level) {
     // int trueLevel = level - Math.floorDiv(level, subtreeLevels);
     long[] result = new long[2];
-    int length = (int) Math.pow(2, level);
+    int length = 2 * level;
     long x = 0;
     long y = 0;
     for (int i = 0; i < length; i++) {
