@@ -8,14 +8,14 @@ Une fois ces Subtrees générés, il faudra les envoyer au client. Cela se fera 
     \centering
     \includegraphics[width=1\textwidth]{assets/figures/Subtree_hierarchy.drawio.pdf}
     \caption{Exemple de hiérarchie de Subtrees}
-    \label{fig:Tilesets}
+    \label{fig:subtree-hierarchy}
 \end{figure}
 
 Le tileset est partitionné en Subtrees de taille \texttt{subtreeLevels} fixe. Leur schéma de subdivision suit la même logique que les tuiles d'un implicit tiling. Chaque \textit{level} ou niveau représente une subdivision de la tuile de niveau supérieur. Un Subtree est généralement de plusieurs niveau de profondeur. Chaque niveau est composé d'une liste de noeuds représentant la disponibilité d'une tuile. En fonction du shema de subdivision, quadtree ou octree, chaque noeud peut avoir 4 ou 8 enfants respectivement. On peut retrouver ces noeuds dans les listes citées plus haut à une exception près: les listes de disponibilités des tuiles et des disponibilités des contenus représentent à l'identique chacun de ces noeuds mais la liste de disponibilité des enfants est une liste représentant la disponibilité de chaque Subtree enfant du Subtree courant. Les \textit{Availabilities} seront traités plus en détails dans la section \ref{sec:availability-class}.
 
-Plusieurs Subtrees peuvent être liés entre eux pour former un arbre de Subtrees. Leur liaison se fait entre le noeud \textit{root} d'un subtree et un noeud au niveau maximum d'un autre Subtree.
+Plusieurs Subtrees peuvent être liés entre eux pour former un arbre de Subtrees. Leur liaison se fait entre le noeud \textit{root} d'un subtree et un noeud au niveau maximum d'un autre Subtree. Par soucis de compréhension, j'appellerai le \textit{rang}, ou \textit{rank} en Anglais, d'un Subtree le niveau de profondeur de ce Subtree par rapport à la racine du tileset. Le Subtree de rang 0 est le Subtree de la racine du tileset. Les Subtree de rang maximum sont les Subtrees qui contiendront les contenus à afficher.
 
-Quelques rêgles doivent être respectées lors d'une construction d'une hiérarchie de Subtrees:
+Finalement, quelques rêgles doivent être respectées lors d'une construction d'une hiérarchie de Subtrees:
 
 \begin{itemize}
     \item Les Subtrees doivent être de même taille.

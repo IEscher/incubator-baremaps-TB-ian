@@ -1,0 +1,76 @@
+<mxfile host="app.diagrams.net" modified="2024-07-22T08:30:30.875Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36" version="24.7.1" etag="g9I1hFfDk2XIOvYbBmUb" type="device">
+  <diagram id="K-ZgOm30yjv1ut8U8r9q" name="Page-1">
+    <mxGraphModel dx="2128" dy="1315" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="827" pageHeight="1169" background="none" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="node2" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;Availability&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt;- length: int&lt;br/&gt;- isChildren: boolean&lt;br/&gt;- availabilities: BitSet[]&lt;br/&gt;- levels: int&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt;+ getAvailability(int): BitSet&lt;br/&gt;+ getLevels(): int&lt;br/&gt;+ isChildren(): boolean&lt;br/&gt;+ generateContentAvailability(BitSet, int, int): Availability&lt;br/&gt;+ getLength(): int&lt;br/&gt;+ isAvailable(): boolean&lt;br/&gt;+ concatenateAvailabilities(Availability[], boolean, boolean): Availability&lt;br/&gt;+ getAvailabilities(): BitSet[]&lt;br/&gt;+ getBitSet(boolean): BitSet&lt;br/&gt;+ generateTileAvailability(BitSet, int): Availability&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=14;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;" parent="1" vertex="1">
+          <mxGeometry x="656" y="-97" width="438" height="427" as="geometry" />
+        </mxCell>
+        <mxCell id="node3" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;MortonIndexes&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt;+ mortonIndexToXY(long, int): long[]&lt;br/&gt;+ xyzToLatLonRadians(long, long, int): float[]&lt;br/&gt;+ interleaveBits(long, long, int): long&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=14;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;" parent="1" vertex="1">
+          <mxGeometry x="264" y="330" width="291" height="127" as="geometry" />
+        </mxCell>
+        <mxCell id="node1" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;Subtree&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt;- tileAvailability: Availability&lt;br/&gt;- contentAvailability: Availability&lt;br/&gt;- childSubtreeAvailability: Availability&lt;br/&gt;- levels: int&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt;+ getLevels(): int&lt;br/&gt;+ getChildSubtreeAvailability(): Availability&lt;br/&gt;+ concatenateSubtreeLevel(Subtree[]): Subtree&lt;br/&gt;+ displayTileAvailability(): void&lt;br/&gt;+ getTileBitSet(): BitSet&lt;br/&gt;+ getTileAvailability(): Availability&lt;br/&gt;+ getEquivalentChildSubtreeBitSet(): BitSet&lt;br/&gt;+ getSimplifiedSubtree(Subtree): Subtree&lt;br/&gt;+ getContentAvailability(): Availability&lt;br/&gt;+ getContentBitSet(): BitSet&lt;br/&gt;+ getChildSubtreeBitSet(): BitSet&lt;br/&gt;+ displayChildAvailability(): void&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=14;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;" parent="1" vertex="1">
+          <mxGeometry x="264" y="-181" width="303" height="483" as="geometry" />
+        </mxCell>
+        <mxCell id="node0" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;TdSubtreeStore&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;&gt;&amp;nbsp;- GET_BUILDINGS_AMOUNT_QUERY: String&lt;br&gt;&amp;nbsp;- UPDATE_SUBTREE_QUERY: String&lt;br&gt;&amp;nbsp;- GET_SUBTREE_QUERY: String&lt;br&gt;&amp;nbsp;- datasource: DataSource&lt;br&gt;&amp;nbsp;- logger: Logger&lt;br&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt;- reloadSubtrees: boolean&lt;br&gt;- minLevel: int&lt;br&gt;- maxLevel: int&lt;br&gt;- subtreeLevels: int&lt;br&gt;- rankAmount: int&lt;/p&gt;&lt;hr size=&quot;1&quot;&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt;+ getSubtree(int, long, long): byte[]&lt;br&gt;- subtreeToJSON(Subtree, ByteWrapper): JSONObject&lt;br&gt;- subtreeToJSONBinary(Subtree): byte[]&lt;br&gt;- readSubtree(long, int): byte[]?&lt;br&gt;- isRoot(int): boolean&lt;br&gt;- createBinaryHeader(int, int, String, byte[]): byte[]&lt;br&gt;- createSubtree(long, int, int): Subtree&lt;br&gt;- updateSubtree(long, int, byte[]): void&lt;br&gt;- createMaxRankSubtree(long): Subtree&lt;br&gt;- readBuildingCount(long, long, int): int&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=14;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;" parent="1" vertex="1">
+          <mxGeometry x="-181" y="-181" width="352" height="595" as="geometry" />
+        </mxCell>
+        <mxCell id="edge1" value="" style="html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=1;startArrow=none;endArrow=openThin;endSize=12;strokeColor=#595959;" parent="1" target="node2" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="595" y="140" />
+              <mxPoint x="595" y="240" />
+            </Array>
+            <mxPoint x="567" y="140" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label8" value="«create»" style="edgeLabel;resizable=0;html=1;align=left;verticalAlign=top;strokeColor=default;" parent="edge1" vertex="1" connectable="0">
+          <mxGeometry x="569" y="196" as="geometry" />
+        </mxCell>
+        <mxCell id="edge3" value="" style="html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=0;startArrow=diamondThin;endArrow=openThin;endSize=12;strokeColor=#000000;exitX=1.000;exitY=0.250;exitDx=0;exitDy=0;entryX=0.000;entryY=0.250;entryDx=0;entryDy=0;startFill=1;startSize=11;" parent="1" source="node1" target="node2" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="595" y="-65" />
+              <mxPoint x="595" y="9" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label18" value="1" style="edgeLabel;resizable=0;html=1;align=left;verticalAlign=top;strokeColor=default;" parent="edge3" vertex="1" connectable="0">
+          <mxGeometry x="583" y="-93" as="geometry" />
+        </mxCell>
+        <mxCell id="label22" value="1" style="edgeLabel;resizable=0;html=1;align=left;verticalAlign=top;strokeColor=default;" parent="edge3" vertex="1" connectable="0">
+          <mxGeometry x="635" y="-11" as="geometry" />
+        </mxCell>
+        <mxCell id="label23" value="tileAvailability" style="edgeLabel;resizable=0;html=1;align=left;verticalAlign=top;strokeColor=default;" parent="edge3" vertex="1" connectable="0">
+          <mxGeometry x="575" y="9" as="geometry" />
+        </mxCell>
+        <mxCell id="edge0" value="" style="html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=1;startArrow=none;endArrow=openThin;endSize=12;strokeColor=#595959;exitX=1.000;exitY=0.500;exitDx=0;exitDy=0;" parent="1" source="node0" target="node2" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="235" y="117" />
+              <mxPoint x="235" y="316" />
+              <mxPoint x="595" y="316" />
+              <mxPoint x="595" y="240" />
+            </Array>
+            <mxPoint x="656" y="216" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label2" value="«create»" style="edgeLabel;resizable=0;html=1;align=left;verticalAlign=top;strokeColor=default;" parent="edge0" vertex="1" connectable="0">
+          <mxGeometry x="569" y="296" as="geometry" />
+        </mxCell>
+        <mxCell id="edge2" value="" style="html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=1;startArrow=none;endArrow=openThin;endSize=12;strokeColor=#595959;exitX=1.000;exitY=0.500;exitDx=0;exitDy=0;entryX=0.000;entryY=0.500;entryDx=0;entryDy=0;" parent="1" source="node0" target="node1" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="235" y="116" />
+              <mxPoint x="235" y="56" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label14" value="«create»" style="edgeLabel;resizable=0;html=1;align=left;verticalAlign=top;strokeColor=default;" parent="edge2" vertex="1" connectable="0">
+          <mxGeometry x="183" y="76" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

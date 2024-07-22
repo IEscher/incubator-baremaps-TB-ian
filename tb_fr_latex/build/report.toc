@@ -21,9 +21,9 @@
 \contentsline {subsection}{\numberline {2.6.4}glTF par bâtiment ou par tuile}{14}{subsection.2.6.4}%
 \contentsline {chapter}{\numberline {3}Subtrees}{17}{chapter.3}%
 \contentsline {section}{\numberline {3.1}Introduction}{17}{section.3.1}%
-\contentsline {section}{\numberline {3.2}Subtree Class}{19}{section.3.2}%
-\contentsline {section}{\numberline {3.3}Morton Index}{19}{section.3.3}%
-\contentsline {section}{\numberline {3.4}Availabilities}{19}{section.3.4}%
-\contentsline {section}{\numberline {3.5}Transmission}{19}{section.3.5}%
+\contentsline {section}{\numberline {3.2}Classes importantes}{19}{section.3.2}%
+\contentsline {section}{\numberline {3.3}Morton Index}{20}{section.3.3}%
+\contentsline {section}{\numberline {3.4}Création de l'arbre de Subtrees}{20}{section.3.4}%
+\contentsline {section}{\numberline {3.5}Transmission au client Cesium}{20}{section.3.5}%
 \contentsline {chapter}{\numberline {4}Conclusion}{21}{chapter.4}%
-\contentsline {chapter}{Appendices}{27}{section*.14}%
+\contentsline {chapter}{Appendices}{27}{section*.19}%
