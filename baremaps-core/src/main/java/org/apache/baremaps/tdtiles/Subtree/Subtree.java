@@ -120,6 +120,7 @@ public class Subtree {
         Availability.concatenateAvailabilities(childSubtreeAvailabilities, true, false);
     int contentCount = parentContentAvailability.getBitSet(false).cardinality();
 
+    // TODO fix that
 //    if (parentChildSubtreeAvailability.getBitSet(true).isEmpty()) {
 //      System.err.println("Empty child subtree availability: "
 //          + parentChildSubtreeAvailability.getBitSet(true).toString());

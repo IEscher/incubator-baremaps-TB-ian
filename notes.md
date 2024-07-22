@@ -117,3 +117,8 @@ Validation result:
 }
 ```
 
+
+39 sec - 4 sec de load buildings
+
+vs 
+

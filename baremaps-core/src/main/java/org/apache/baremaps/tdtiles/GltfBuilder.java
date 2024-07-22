@@ -85,6 +85,7 @@ public class GltfBuilder {
     try { // can crash if the geometry is not a polygon, this can happen after simplifying the geometry too much
       triangulation = PolygonTriangulator.triangulate(geometry);
     } catch (Exception e) {
+      System.out.println("Error triangulating building.");
       return Optional.empty();
     }
     if (triangulation.getNumGeometries() == 0) {

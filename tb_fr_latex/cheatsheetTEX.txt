@@ -41,3 +41,24 @@ mots \index{mots}
     }
 }
 \end{verbatim}
+
+\begin{table}[h]
+    \begin{center}
+        \caption{Liste des cantons (vilain)}
+        \begin{tabular}{|l|l|l|} \hline
+            \textbf{Abréviation} & \textbf{Nom du canton} & \textbf{Depuis}         \\
+            \Xhline{4\arrayrulewidth}
+            ZH                   & Zürich                 & \ordinalnum{1} mai 1351 \\ \hline
+            BE                   & Berne                  & 6 mars 1353             \\ \hline
+            FR                   & Fribourg               & 22 décembre 1481        \\ \hline
+            VD                   & Vaud                   & 19 février 1815         \\ \hline
+            VS                   & Valais                 & 4 août 1815             \\ \hline
+            NE                   & Neuchâtel              & 19 mai 1815             \\ \hline
+            GE                   & Genève                 & 19 mai 1815             \\ \hline
+        \end{tabular}
+    \end{center}
+\end{table}
+
+\begin{listing}[h]
+
+\end{listing}

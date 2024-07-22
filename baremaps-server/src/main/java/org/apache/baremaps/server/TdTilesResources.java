@@ -55,6 +55,7 @@ public class TdTilesResources {
 
   private static final boolean RELOAD_SUBTREES = false;
   private static final boolean RELOAD_TILES = false;
+  private static final boolean GENERATE_ALL_SUBTREES = false;
 
 
   // private static final int MIN_LEVEL = 0;
@@ -91,7 +92,7 @@ public class TdTilesResources {
     this.tdTilesStore =
         new TdTilesStore(dataSource, MAX_COMPRESSION, COMPRESSION_LEVELS, MIN_LEVEL, MAX_LEVEL, RELOAD_TILES);
     this.tdSubtreeStore = new TdSubtreeStore(dataSource, MIN_LEVEL, MAX_LEVEL,
-        SUBTREE_LEVELS, RANK_AMOUNT, RELOAD_SUBTREES);
+        SUBTREE_LEVELS, RANK_AMOUNT, RELOAD_SUBTREES, GENERATE_ALL_SUBTREES);
   }
 
   @Get("regex:^/subtrees/(?<level>[0-9]+).(?<x>[0-9]+).(?<y>[0-9]+).subtree")

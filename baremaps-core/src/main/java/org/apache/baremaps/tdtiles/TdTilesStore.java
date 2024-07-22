@@ -96,11 +96,6 @@ public class TdTilesStore {
   private static final String READ_QUERY =
       "SELECT gltf_binary FROM td_tile_gltf WHERE x = ? AND y = ? AND level = ?";
 
-  private static final String GET_BUILDINGS_AMOUNT_QUERY =
-      "select count(*) " +
-          "from osm_ways where (tags ? 'building' or tags ? 'building:part') and " +
-          "st_intersects(geom, st_makeenvelope(%1$s, %2$s, %3$s, %4$s, 4326))";
-
   private final DataSource datasource;
   private final int maxCompression;
   private final int[] compressionLevels;
@@ -286,35 +281,6 @@ public class TdTilesStore {
         } else {
           // System.out.println("td_tile_gltf: Tile not found: " + level + "__" + x + "_" + y);
           return null;
-        }
-      }
-    } catch (SQLException e) {
-      throw new TileStoreException(e);
-    }
-  }
-
-  private int readBuildingCount(long x, long y, int globalLevel) throws TileStoreException {
-    try (Connection connection = datasource.getConnection();
-        Statement statement = connection.createStatement()) {
-      // int trueLevel = globalLevel - Math.floorDiv(globalLevel, subtreeLevels);
-      float[] coords = xyzToLatLonRadians(x, y, globalLevel);
-      String sql = String.format(GET_BUILDINGS_AMOUNT_QUERY,
-          coords[2] * 180 / (float) Math.PI,
-          coords[0] * 180 / (float) Math.PI,
-          coords[3] * 180 / (float) Math.PI,
-          coords[1] * 180 / (float) Math.PI);
-      logger.debug("Executing query: {}", sql);
-      // System.out.println("osm_ways: " + sql);
-      try (ResultSet resultSet = statement.executeQuery(sql)) {
-        if (resultSet.next()) {
-          int result = resultSet.getInt(1);
-          // if (result > 0) {
-          // System.out.println("osm_ways: Buildings found: " + result + " at " + globalLevel + "__"
-          // + x + "_" + y);
-          // }
-          return result;
-        } else {
-          return 0;
         }
       }
     } catch (SQLException e) {

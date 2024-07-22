@@ -17,7 +17,32 @@
 
 package org.apache.baremaps.tdtiles.utils;
 
+import org.apache.baremaps.tilestore.TileStoreException;
+import org.apache.baremaps.vectortile.tileset.Database;
+import org.slf4j.Logger;
+
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
 public class MortonIndexes {
+
+  private static final String GET_BUILDINGS_AMOUNT_QUERY =
+      "SELECT EXISTS (" +
+          "SELECT 1 " +
+          "FROM osm_ways " +
+          "WHERE (tags ? 'building' OR tags ? 'building:part') " +
+          "AND st_intersects(geom, st_makeenvelope(%1$s, %2$s, %3$s, %4$s, 4326))" +
+      ") OR EXISTS (" +
+          "SELECT 1 " +
+          "FROM osm_relations " +
+          "WHERE (tags ? 'building' OR tags ? 'building:part') " +
+          "AND st_intersects(geom, st_makeenvelope(%1$s, %2$s, %3$s, %4$s, 4326))" +
+      ") AS has_buildings";
+
+
   /**
    * See:
    * https://github.com/CesiumGS/3d-tiles/blob/main/specification/ImplicitTiling/AVAILABILITY.adoc
@@ -50,6 +75,42 @@ public class MortonIndexes {
     result[0] = x;
     result[1] = y;
     return result;
+  }
+
+  public static boolean readBuildingCount(long x, long y, int globalLevel, DataSource datasource, Logger logger) throws TileStoreException {
+    try (Connection connection = datasource.getConnection();
+         Statement statement = connection.createStatement()) {
+      float[] coords = xyzToLatLonRadians(x, y, globalLevel);
+      String sql = "SELECT EXISTS (" +
+          "SELECT 1 " +
+          "FROM osm_ways WHERE (tags ? 'building' OR tags ? 'building:part') AND " +
+          "st_intersects(geom, st_makeenvelope(" +
+          coords[2] * 180 / (float) Math.PI + ", " +
+          coords[0] * 180 / (float) Math.PI + ", " +
+          coords[3] * 180 / (float) Math.PI + ", " +
+          coords[1] * 180 / (float) Math.PI +
+          ", 4326)) LIMIT 1" +
+          ") OR EXISTS (" +
+          "SELECT 1 " +
+          "FROM osm_relations WHERE (tags ? 'building' OR tags ? 'building:part') AND " +
+          "st_intersects(geom, st_makeenvelope(" +
+          coords[2] * 180 / (float) Math.PI + ", " +
+          coords[0] * 180 / (float) Math.PI + ", " +
+          coords[3] * 180 / (float) Math.PI + ", " +
+          coords[1] * 180 / (float) Math.PI +
+          ", 4326)) LIMIT 1" +
+          ")";
+      logger.debug("Executing query: {}", sql);
+      try (ResultSet resultSet = statement.executeQuery(sql)) {
+        if (resultSet.next()) {
+          return resultSet.getBoolean(1);
+        } else {
+          return false;
+        }
+      }
+    } catch (SQLException e) {
+      throw new TileStoreException(e);
+    }
   }
 
   /**
