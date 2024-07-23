@@ -64,7 +64,7 @@ Ainsi, l'index de Morton pour \( x = 5 \) et \( y = 3 \) est \( 27 \).
 
 \subsection*{Conversion d'un index de Morton en coordonnées}
 
-Le processus inverse du "interleaving bits" consiste à séparer les bits d'un index de Morton \( Z \) pour récupérer les deux entiers \( X \) et \( X \).
+Le processus inverse du \textit{interleaving bits} consiste à séparer les bits d'un index de Morton \( Z \) pour récupérer les deux entiers \( X \) et \( X \).
 
 1. \textbf{Représentation binaire} :
 
@@ -122,3 +122,12 @@ Par exemple, pour obtenir l'index de Morton de l'enfant 2 de l'index de Morton 2
 \]
 
 Ainsi, l'index de Morton de l'enfant 2 de l'index de Morton 27 est 110.
+
+Une distinction qui se trouve parfois pratique est la distinction d'un index local versus un index global. Un index global est un index de Morton qui représente une tuile sur l'entièreté du Tileset, en comptant donc depuis l'index 0 du level 0. Tandis qu'un index local est un index de Morton qui représente une tuile avec pour référence l'index 0 du subtree.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/figures/global-to-local-morton.png}
+    \caption{Index local et index global \cite{availability-gh}}
+    \label{fig:xy-morton}
+\end{figure}

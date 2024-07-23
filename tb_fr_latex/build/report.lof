@@ -10,9 +10,14 @@
 \addvspace {10\p@ }
 \contentsline {figure}{\numberline {3.1}{\ignorespaces Exemple de hiérarchie de Subtrees\relax }}{18}{figure.caption.12}%
 \contentsline {figure}{\numberline {3.2}{\ignorespaces Classes utilisées pour la création d'une hiérarchie de Subtrees\relax }}{19}{figure.caption.13}%
-\contentsline {figure}{\numberline {3.3}{\ignorespaces Classes utilisées pour la création d'une hiérarchie de Subtrees\relax }}{20}{figure.caption.17}%
-\contentsline {figure}{\numberline {3.4}{\ignorespaces Indexes X Y vers index de Morton \blx@tocontentsinit {0}\cite {availability-gh}\relax }}{22}{figure.caption.19}%
-\contentsline {figure}{\numberline {3.5}{\ignorespaces Flowchart de la fonction \texttt {getSubtree}\relax }}{24}{figure.caption.23}%
-\contentsline {figure}{\numberline {3.6}{\ignorespaces Flowchart de la fonction \texttt {createMaxRankSubtree}\relax }}{24}{figure.caption.25}%
-\contentsline {figure}{\numberline {3.7}{\ignorespaces Flowchart de la fonction \texttt {createSubtree}\relax }}{25}{figure.caption.27}%
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Représentation des niveaux de tuiles dans un BitSet\relax }}{20}{figure.caption.16}%
+\contentsline {figure}{\numberline {3.4}{\ignorespaces Classes utilisées pour la création d'une hiérarchie de Subtrees\relax }}{21}{figure.caption.18}%
+\contentsline {figure}{\numberline {3.5}{\ignorespaces Indexes X Y vers index de Morton \blx@tocontentsinit {0}\cite {availability-gh}\relax }}{23}{figure.caption.20}%
+\contentsline {figure}{\numberline {3.6}{\ignorespaces Index local et index global \blx@tocontentsinit {0}\cite {availability-gh}\relax }}{25}{figure.caption.23}%
+\contentsline {figure}{\numberline {3.7}{\ignorespaces Flowchart de la fonction \texttt {getSubtree}\relax }}{26}{figure.caption.25}%
+\contentsline {figure}{\numberline {3.8}{\ignorespaces Flowchart de la fonction \texttt {createMaxRankSubtree}\relax }}{27}{figure.caption.27}%
+\contentsline {figure}{\numberline {3.9}{\ignorespaces Flowchart de la fonction \texttt {createSubtree}\relax }}{29}{figure.caption.29}%
+\contentsline {figure}{\numberline {3.10}{\ignorespaces Génération de Availability : État initial\relax }}{30}{figure.caption.30}%
+\contentsline {figure}{\numberline {3.11}{\ignorespaces Génération de Availability : Procédure\relax }}{30}{figure.caption.31}%
+\contentsline {figure}{\numberline {3.12}{\ignorespaces Concaténation de 4 Availability\relax }}{31}{figure.caption.32}%
 \addvspace {10\p@ }
