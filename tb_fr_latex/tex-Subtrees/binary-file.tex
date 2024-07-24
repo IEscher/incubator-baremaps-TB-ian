@@ -49,7 +49,7 @@ Les objets \texttt{bufferViews} doivent contenir les informations suivantes :
     \item \textbf{byteLength} : longueur de la vue.
 \end{itemize}
 
-Les objets \texttt{tileAvailability}, \texttt{contentAvailability} et \texttt{childAvailability} peuvent soit contenir un objet \texttt{constant} ayant une valeur de \texttt{0} ou \texttt{1} qui signifie que toutes les tuiles ont la même disponibilité. Soit contenir un objet \texttt{bufferView} qui fait référence à un bufferView contenant les listes de disponibilités avec un objet \texttt{availableCount} qui indique le nombre de tuiles disponibles.
+Les objets \texttt{tileAvailability}, \texttt{contentAvailability} et \texttt{childAvailability} peuvent soit contenir un objet \texttt{constant} ayant une valeur de \texttt{0} ou \texttt{1} qui signifie que toutes les tuiles ont la même disponibilité. Soit contenir un objet \texttt{bufferView} qui fait référence à un bufferView contenant les listes de disponibilités avec un objet \texttt{availableCount} qui indique le nombre de tuiles disponibles. Notez que si le Subtree ne contient pas de liste de contenu, \texttt{contentAvailability} doit être omis.
 
 \begin{itemize}
     \item \textbf{constant} : objet contenant une valeur de \texttt{0} ou \texttt{1}.
@@ -62,5 +62,38 @@ D'autres informations peuvent notamment être ajoutées au JSON tel que des meta
 Voici un exemple de JSON d'un des Subtrees créés par mon implémentation :
 
 \begin{verbatim}
-    TODO
+    {
+        "buffers": [
+          {
+            "name": "Internal Buffer",
+            "byteLength": 24
+          }
+        ],
+        "contentAvailability": [
+          {
+            "availableCount": 54,
+            "bitstream": 1
+          }
+        ],
+        "childSubtreeAvailability": {
+          "availableCount": 0,
+          "constant": 0
+        },
+        "bufferViews": [
+          {
+            "byteOffset": 0,
+            "byteLength": 11,
+            "buffer": 0
+          },
+          {
+            "byteOffset": 11,
+            "byteLength": 11,
+            "buffer": 0
+          }
+        ],
+        "tileAvailability": {
+          "availableCount": 54,
+          "bitstream": 0
+        }
+      }
 \end{verbatim}

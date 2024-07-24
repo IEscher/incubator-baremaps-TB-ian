@@ -22,47 +22,43 @@ Pour visualiser les différences entre les niveaux de compression, je vous invit
     \item \texttt{level} 3 : blanc
 \end{itemize}
 
+
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\textwidth]{assets/figures/lods-horizon.png}
-    \caption{Calcul du SSE \cite{3d-tiles-specification}}
-    \label{fig:lods-colors}
+    \caption{Vue à l'horizon}
+    \label{fig:lods-horizon}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\textwidth]{assets/figures/lods0.png}
-    \caption{Calcul du SSE \cite{3d-tiles-specification}}
-    \label{fig:lods-colors}
+    \begin{minipage}{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{assets/figures/lods0.png}
+        \caption{Level 0}
+        \label{fig:lods0}
+    \end{minipage}\hfill
+    \begin{minipage}{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{assets/figures/lods1.png}
+        \caption{Level 1}
+        \label{fig:lods1}
+    \end{minipage}
+    \vspace{1cm}
+    \begin{minipage}{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{assets/figures/lods2.png}
+        \caption{Level 2}
+        \label{fig:lods2}
+    \end{minipage}\hfill
+    \begin{minipage}{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{assets/figures/lods3.png}
+        \caption{Level 3}
+        \label{fig:lods3}
+    \end{minipage}
 \end{figure}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1\textwidth]{assets/figures/lods1.png}
-    \caption{Calcul du SSE \cite{3d-tiles-specification}}
-    \label{fig:lods-colors}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1\textwidth]{assets/figures/lods2.png}
-    \caption{Calcul du SSE \cite{3d-tiles-specification}}
-    \label{fig:lods-colors}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1\textwidth]{assets/figures/lods3.png}
-    \caption{Calcul du SSE \cite{3d-tiles-specification}}
-    \label{fig:lods-colors}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1\textwidth]{assets/figures/lods4.png}
-    \caption{Calcul du SSE \cite{3d-tiles-specification}}
-    \label{fig:lods-colors}
-\end{figure}
 
 Faire ainsi permet de réduire drastiquement le temps passé à générer ces bâtiments ainsi que de garantir un affichage plus fluide chez le client tout en gardant une qualité d'affichage correcte.
 
@@ -70,17 +66,17 @@ Outre la compression des géométries, une autre autre qui pourrait être dével
 
 \subsection{Géométries des bâtiments}
 
-Avec le niveau de compression ainsi que la \texttt{Geometry}\footnote{org.locationtech.jts.geom.Geometry}, qui nous sert à déterminer le polygone au sol du bâtiment, nous pouvons extruder le bâtiment en 3D. Cependant une \texttt{Geometry} ne contient qu'une liste de points et il faut une liste de triangles pour pouvoir modéliser le bâtiment en 3D. Pour cela, la méthode \texttt{DelaunayTriangulationBuilder}\footnote{org.locationtech.jts.triangulate.DelaunayTriangulationBuilder} était utilisée. Le problème était que la \href{https://en.wikipedia.org/wiki/Delaunay_triangulation}{\textit{Delaunay triangulation}}\footnote{https://en.wikipedia.org/wiki/Delaunay\_triangulation} ne fonctionne pas avec des polygones concaves. Une version complémentaire de cette méthode est la \href{https://en.wikipedia.org/wiki/Constrained_Delaunay_triangulation}{\textit{Constrained Delaunay triangulation}}\footnote{https://en.wikipedia.org/wiki/Constrained\_Delaunay\_triangulation} qui fonctionne avec des polygones concaves en définissant des segments comme bords du polygone. Cette version de l'algorithme est aussi disponible dans la librairie \texttt{JTS} mais elle propose aussi la classe \href{https://locationtech.github.io/jts/javadoc/org/locationtech/jts/triangulate/polygon/PolygonTriangulator.html}{\texttt{PolygonTriangulator}}\footnote{https://locationtech.github.io/jts/javadoc/org/locationtech/jts/triangulate/polygon/PolygonTriangulator.html} qui permet aussi de faire une triangulation de polygones concaves de manière moins optimisée mais plus rapide que la \textit{Constrained Delaunay triangulation}. C'est donc cette classe que j'ai utilisée pour trianguler les bâtiments.
+Avec le niveau de compression ainsi que la \texttt{Geometry}\footnote{org.locationtech.jts.geom.Geometry}, qui nous sert à déterminer le polygone au sol du bâtiment, nous pouvons extruder le bâtiment en 3D. Cependant une \texttt{Geometry} ne contient qu'une liste de points et il faut une liste de triangles pour pouvoir modéliser le bâtiment en 3D. Pour cela, il faut une méthode qui fonctionne avec des polygones concaves et qui déforme le moins possible les géométrie des bâtiments. Une méthode faisant explicitement cela est la méthode \texttt{simplify} de la classe \href{https://locationtech.github.io/jts/javadoc/org/locationtech/jts/simplify/TopologyPreservingSimplifier.html}{\textit{TopologyPreservingSimplifier}}\footnote{https://locationtech.github.io/jts/javadoc/org/locationtech/jts/simplify/TopologyPreservingSimplifier.html} de la librairie \texttt{org.locationtech.jts} qui fonctionne avec des polygones concaves et qui, comme son nom l'indique, préserve la topologie initiale de la géométrie. Cette librairie \texttt{org.locationtech.jts} propose aussi la classe \href{https://locationtech.github.io/jts/javadoc/org/locationtech/jts/triangulate/polygon/PolygonTriangulator.html}{\texttt{PolygonTriangulator}}\footnote{https://locationtech.github.io/jts/javadoc/org/locationtech/jts/triangulate/polygon/PolygonTriangulator.html} qui permet aussi de faire une triangulation de polygones concaves de manière moins optimisée mais plus rapide que la classe \textit{TopologyPreservingSimplifier}. C'est donc cette classe que j'ai utilisée pour trianguler les bâtiments.
 
-Grâce à cette nouvelle triangulation, il est possible de modéliser les bâtiments en 3D correctement, même ceux comprenant des cours intérieures ou des trous dans leur structure.
+Grâce à cette triangulation, il est possible de modéliser les bâtiments en 3D correctement, même ceux comprenant des cours intérieures ou des trous dans leur structure.
 
-La classe \texttt{DelaunayTriangulationBuilder} comportait cependant un paramètre \texttt{tolerance} qui permettait de définir la distance minimale entre deux points afin d'optimiser le coût de la triangulation. Cette possibilité n'est pas disponible dans la classe \texttt{PolygonTriangulator}, néanmoins j'implémente une alternative dans le chapitre suivant.
+La classe \texttt{TopologyPreservingSimplifier} comporte un paramètre \texttt{tolerance} qui permet de définir la distance minimale entre deux points afin d'optimiser le coût de la triangulation.
 
-https://ths.rwth-aachen.de/wp-content/uploads/sites/4/schulz20203d.pdf
+Si nous voulons pousser la génération des bâtiments plus loin, beaucoup de données sont disponibles concernant le toit des bâtiments. Ils peuvent être de différentes formes et comportent des défis très intéressants à relever. Un travail de Bachelor a été écrit par M. Philipp Shultz à propos de la visualisation de données OpenStreetMap en WebGL (disponible à l'adresse \href{https://ths.rwth-aachen.de/wp-content/uploads/sites/4/schulz20203d.pdf}{https://ths.rwth-aachen.de/wp-content/uploads/sites/4/schulz20203d.pdf}). Au chapitre 3.2, il parle de la génération de toits de bâtiments en fonction de leur tag OSM. Il serait intéressant de reprendre ces idées pour améliorer la génération des bâtiments en 3D.
 
 \subsection{Hauteur des bâtiments}
 
-Le calcul de la hauteur des bâtiments doit se faire en fonction de la \href{https://wiki.openstreetmap.org/wiki/Simple_3D_Buildings}{définition}\footnote{https://wiki.openstreetmap.org/wiki/Simple\_3D\_Buildings} des bâtiments par OSM. Si aucun tags ne donne la hauteur du bâtiment, il aura par défaut une hauteur de 10 mètres. Sinon, la hauteur du bâtiment est calculée en fonction des tags \texttt{height}, \texttt{building:levels}, \texttt{building:min\_level}, \texttt{roof:height} et \texttt{roof:levels} :
+Le calcul de la hauteur des bâtiments doit se faire en fonction de la \href{https://wiki.openstreetmap.org/wiki/Simple_3D_Buildings}{définition}\footnote{https://wiki.openstreetmap.org/wiki/Simple\_3D\_Buildings} des bâtiments par OSM. Si aucun tags ne donne la hauteur du bâtiment, il aura par défaut une hauteur de 10 mètres. Sinon, la hauteur du bâtiment est calculée en fonction des tags \texttt{height}, \texttt{building:levels}, \texttt{roof:height} et \texttt{roof:levels} :
 
 \begin{itemize}
     \item On commence avec une hauteur de bâtiment de 0 mètres.
@@ -112,6 +108,30 @@ Le calcul de la hauteur des bâtiments doit se faire en fonction de la \href{htt
                     \end{itemize}
           \end{itemize}
 \end{itemize}
+
+Il se peut que des géométries ne soient pas en contact avec le sol et flottent dans les airs. Ces informations sont fournies par les tags \texttt{building:min\_level}, \texttt{building:min\_height} et \texttt{min\_height}. Pour calculer la hauteur entre la géométrie et le sol, on peut la calculer de la même manière que la hauteur du bâtiment :
+
+\begin{itemize}
+    \item Si le tag \texttt{building:min\_level} est présent,
+        \begin{itemize}
+            \item La hauteur du vide en dessous du bâtiment est égale à la valeur du tag \texttt{building:min\_level} multipliée par 3 mètres.
+        \end{itemize}
+    \item Si le tag \texttt{building:min\_height} est présent,
+        \begin{itemize}
+            \item La hauteur du vide en dessous du bâtiment est égale à la valeur du tag \texttt{building:min\_height}.
+        \end{itemize}
+    \item Si le tag \texttt{min\_height} est présent,
+        \begin{itemize}
+            \item La hauteur du vide en dessous du bâtiment est égale à la valeur du tag \texttt{min\_height}.
+        \end{itemize}
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.55\textwidth]{assets/figures/Minlevel.svg}
+    \caption{Hauteur minimum d'un bâtiment \cite{MinLevel-image}}
+    \label{fig:building-Minlevel}
+\end{figure}
 
 La hauteur connue, on peut la transmettre à la classe \texttt{GltfBuilder} pour donner la hauteur au bâtiment lors de sa modélisation.
 

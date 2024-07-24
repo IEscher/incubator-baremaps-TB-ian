@@ -13,9 +13,9 @@
 \contentsline {section}{\numberline {2.4}3DTILES\_bounding\_volume\_S2 extension}{9}{section.2.4}%
 \contentsline {section}{\numberline {2.5}Création des fichiers glTF}{12}{section.2.5}%
 \contentsline {subsection}{\numberline {2.5.1}Système de compression des géométries des bâtiments}{12}{subsection.2.5.1}%
-\contentsline {subsection}{\numberline {2.5.2}Géométries des bâtiments}{13}{subsection.2.5.2}%
+\contentsline {subsection}{\numberline {2.5.2}Géométries des bâtiments}{14}{subsection.2.5.2}%
 \contentsline {subsection}{\numberline {2.5.3}Hauteur des bâtiments}{14}{subsection.2.5.3}%
-\contentsline {subsection}{\numberline {2.5.4}glTF par bâtiment ou par tuile}{14}{subsection.2.5.4}%
+\contentsline {subsection}{\numberline {2.5.4}glTF par bâtiment ou par tuile}{15}{subsection.2.5.4}%
 \contentsline {chapter}{\numberline {3}Architecture}{17}{chapter.3}%
 \contentsline {section}{\numberline {3.1}Fonctionnement général}{17}{section.3.1}%
 \contentsline {section}{\numberline {3.2}Database}{19}{section.3.2}%
@@ -31,5 +31,5 @@
 \contentsline {subsection}{\numberline {4.4.3}Concaténations}{36}{subsection.4.4.3}%
 \contentsline {section}{\numberline {4.5}Transmission au client Cesium}{37}{section.4.5}%
 \contentsline {subsection}{\numberline {4.5.1}Écriture de JSON}{38}{subsection.4.5.1}%
-\contentsline {chapter}{\numberline {5}Conclusion}{39}{chapter.5}%
-\contentsline {chapter}{Appendices}{45}{section*.36}%
+\contentsline {chapter}{\numberline {5}Conclusion}{41}{chapter.5}%
+\contentsline {chapter}{Appendices}{47}{section*.39}%

@@ -1,8 +1,17 @@
 % L'introduction est une section requise dans un rapport technique. Introduisez votre travail, l'idée de départ et les objectifs attendus. Un lecteur qui découvrirait votre projet au travers de cette introduction devrait ainsi être capable d'en comprendre le cadre, l'idée générale et les aboutissants du projet.
 
-Le but de cette première partie de travail de Bachelor était de prendre en main le framework Baremaps, de comprendre son fonctionnement et de commencer à l'adapter pour qu'il puisse être utilisé avec Cesium JS.
+Durant ce travail, j'ai écrit un programme sur la base du \href{https://github.com/baremaps/baremaps}{framework Baremaps}\footnote{https://github.com/baremaps/baremaps} permettant à un client \href{https://cesium.com/}{Cesium}\footnote{https://cesium.com/} d'obtenir les ressources nécessaires pour à afficher les bâtiments de le dataset d'\href{https://www.openstreetmap.org/}{OpenStreetMap}\footnote{https://www.openstreetmap.org/} en 3D.
 
-Dans ce rapport intermédiaire, je vais commencer par vous présenter rapidement la structure du framework Baremaps. Une fois cela fait, cela posera les bases pour que je puisse vous expliquer les différentes tâches que j'ai effectué jusqu'à présent ainsi que les tâches futures.
+Ces ressources utilisent la spécification \href{https://cesium.com/blog/2021/11/10/introducing-3d-tiles-next/}{3D Tiles Next}\footnote{https://cesium.com/blog/2021/11/10/introducing-3d-tiles-next/} de Cesium tout en respectant la version 1.1 de leur \href{https://docs.ogc.org/cs/22-025r4/22-025r4.html}{standard de tuiles vectorielles}\footnote{https://docs.ogc.org/cs/22-025r4/22-025r4.html}. Cette nouvelle version de leur spécification introduit entre autre la fonctionnalité de \textit{implicit tiling} \cite{implicit-tiling-gh} qui permet une utilisation facilitée de datasets volumineux. Les ressources qui seront fournies au client Cesium utiliseront donc cette fonctionnalité.
+
+Le programme se divise en deux parties : la première est celle qui s'occupe de la génération des tuiles vectorielles contenant les bâtiments d'OpenStreetMap en 3D et la seconde est celle qui va construire les \textit{Subtrees}, des objects indispensables au client Cesium pour optimiser l'affichage des tuiles. Ces deux parties ne sont pas équivalentes en termes de complexité. La première est plus simple et a été réalisée en premier. La seconde a nécessité d'avantages d'études ainsi que le développement de plusieurs algorithmes pour être implémentée.
+
+\newpage
+\section*{Fondements écrits par Antoine Drabble}
+
+Afin d'évaluer si le projet s'apprêtais à être utilisé dans le cadre d'un travail de Bachelor, M. Antoine Drabble a effectué un travail de recherche et a produit un prototype de visualisation de bâtiments 3D à l'intérieur du client Cesium JS sur lequel je vais m'appuyer. Ce prototype, bien qu'incomplet, pose les fondements de l'utilisation de Cesium JS, la spécification 3D Tiles et le framework Baremaps les uns avec les autres. Ce prototype est donc un bon point de départ pour mon travail.
+
+Il n'est pas pertinent de détailler ici le travail effectué par M. Antoine Drabble fichier par fichier mais j'expliquerai au fur et à mesure de ce rapport ce qui a été fait et ce que je dois modifier ou ajouter pour remplir mes objectifs.
 
 % \section{Contexte}
 % Cette section \underline{n'est pas obligatoire}, mais elle est souvent présente dans un rapport technique pour compléter l'introduction et définir le contexte du travail \cad le cadre formel dans lequel le travail est mené.
