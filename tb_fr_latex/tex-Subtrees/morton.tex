@@ -36,6 +36,7 @@ Pour convertir des coordonnées (X, Y, Level) en un index de Morton, nous devons
    z_{2i} = x_i \quad \text{et} \quad z_{2i+1} = y_i \quad \text{pour} \quad i = 0, 1, \ldots, n \quad \text{avec} \quad n = 2 \times {level}
    \]
 
+   \newpage
 3. \textbf{Exemple}
 
    Prenons un exemple simple avec \( x = 5 \) et \( y = 3 \). En binaire, nous avons :
@@ -73,6 +74,7 @@ Le processus inverse du \textit{interleaving bits} consiste à séparer les bits
    Z = z_{2n+1} z_{2n} z_{2n-1} \ldots z_1 z_0
    \]
 
+   \newpage
 2. \textbf{Séparation des bits} :
 
    Nous séparons les bits de \( Z \) pour reconstruire \( X \) et \( Y \). Les bits pairs de \( Z \) formeront \( X \), et les bits impairs de \( Z \) formeront \( Y \).
@@ -123,6 +125,7 @@ Par exemple, pour obtenir l'index de Morton de l'enfant 2 de l'index de Morton 2
 
 Ainsi, l'index de Morton de l'enfant 2 de l'index de Morton 27 est 110.
 
+\newpage
 Une distinction qui se trouve parfois pratique est la distinction d'un index local versus un index global. Un index global est un index de Morton qui représente une tuile sur l'entièreté du Tileset, en comptant donc depuis l'index 0 du level 0. Tandis qu'un index local est un index de Morton qui représente une tuile avec pour référence l'index 0 du subtree.
 
 \begin{figure}[H]

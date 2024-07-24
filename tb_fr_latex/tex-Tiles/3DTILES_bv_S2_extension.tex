@@ -4,7 +4,7 @@ Sans trop rentrer dans les détails, l'extension utilise une \href{https://en.wi
 
 Pour utiliser cette extension, il suffit de rajouter les champs \texttt{extensionsUsed} et \texttt{extensionsRequired} dans le fichier JSON du Tileset. Puis, il faut rajouter une tuile dans le champ \texttt{children} du fichier JSON du Tileset. Cette tuile doit contenir un champ \texttt{boundingVolume} avec un champ \texttt{extensions} contenant les informations nécessaires pour l'extension.
 
-Remarquez le champ \texttt{token} dans l'exemple ci-dessous. Il s'agit d'un identifiant unique correspondant à la \textit{root cell} (la cellule de plus haut niveau) de la courbe de Hilbert. Selon l'extension, le globe terrestre à été divisé en 6 \textit{root cells} comme si l'on avait projeté les 6 faces d'un cube sur la terre. Par exemple, l'Antarctique se trouve dans la cellule "5".
+Remarquez le champ \texttt{token} dans l'exemple ci-dessous. Il s'agit d'un identifiant unique correspondant à la \textit{root cell} (la cellule de plus haut niveau) de la courbe de Hilbert. Selon l'extension, le globe terrestre à été divisé en 6 \textit{root cells} comme si l'on avait projeté les 6 faces d'un cube sur la terre. Par exemple, l'Antarctique se trouve dans la cellule "5" (cf. \autoref{fig:s2-ext}).
 
 \newpage
 
@@ -60,13 +60,14 @@ Voici un exemple de fichier JSON utilisant l'extension 3DTILES\_bounding\_volume
 }
 \end{verbatim}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1\textwidth]{assets/figures/s2cell_global.jpg}
-    \caption{Tokens des 6 \textit{root cells} \cite{3DTILES_bounding_volume_S2-website}}
-    \label{fig:s2-ext}
-\end{figure}
-
+\newpage
 Notez aussi que dans l'exemple JSON ci-dessus, qu'une seule \textit{root cell} est définie. Dans mon cas, comme j'aimerai pouvoir utiliser l'entièreté de la terre, j'ai défini les 6 \textit{root cells} en tant que 6 \texttt{children} différents avec chacun leur propre \texttt{token}.
 
 Cette manière de partager l'espace de la terre ne correspond cependant pas à la méthode qu'utilise l'implicit tiling. Les calculs nécessairs pour convertir les indexes de l'implicit tiling vers ceux des courbes de Hilbert ne sont néanmoins pas à effectuer par nos soins, l'extension ce charge de cela.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{assets/figures/s2cell_global.jpg}
+    \caption{Partition du monde en 6 \textit{root cells} \cite{3DTILES_bounding_volume_S2-website}}
+    \label{fig:s2-ext}
+\end{figure}

@@ -74,6 +74,7 @@ La classe \texttt{TopologyPreservingSimplifier} comporte un paramètre \texttt{t
 
 Si nous voulons pousser la génération des bâtiments plus loin, beaucoup de données sont disponibles concernant le toit des bâtiments. Ils peuvent être de différentes formes et comportent des défis très intéressants à relever. Un travail de Bachelor a été écrit par M. Philipp Shultz à propos de la visualisation de données OpenStreetMap en WebGL (disponible à l'adresse \href{https://ths.rwth-aachen.de/wp-content/uploads/sites/4/schulz20203d.pdf}{https://ths.rwth-aachen.de/wp-content/uploads/sites/4/schulz20203d.pdf}). Au chapitre 3.2, il parle de la génération de toits de bâtiments en fonction de leur tag OSM. Il serait intéressant de reprendre ces idées pour améliorer la génération des bâtiments en 3D.
 
+\newpage
 \subsection{Hauteur des bâtiments}
 
 Le calcul de la hauteur des bâtiments doit se faire en fonction de la \href{https://wiki.openstreetmap.org/wiki/Simple_3D_Buildings}{définition}\footnote{https://wiki.openstreetmap.org/wiki/Simple\_3D\_Buildings} des bâtiments par OSM. Si aucun tags ne donne la hauteur du bâtiment, il aura par défaut une hauteur de 10 mètres. Sinon, la hauteur du bâtiment est calculée en fonction des tags \texttt{height}, \texttt{building:levels}, \texttt{roof:height} et \texttt{roof:levels} :

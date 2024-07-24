@@ -31,10 +31,7 @@ Pour comprendre comment les différents niveaux de tuiles sont représentées da
 Vous remarquerez que les listes de disponibilités n'ont pas toutes la même longueur. La longueur des listes de disponibilités des tuiles et des contenus suit la formule suivante :
 
 \[
-length = \frac{(4^{subtreeLevels} - 1)}{3}
-\]
-\[
-\text{avec} \quad subtreeLevels \quad \text{le nombre de niveaux contenu dans un Subtree}
+length = \frac{(4^{subtreeLevels} - 1)}{3} \text{avec} \quad subtreeLevels \quad \text{le nombre de niveaux d'un Subtree}
 \]
 
 La longueur des listes de disponibilités des enfants suit la formule suivante :
@@ -42,12 +39,10 @@ La longueur des listes de disponibilités des enfants suit la formule suivante :
 \[
 length = 4^{subtreeLevels}
 \]
-\[
-\text{avec} \quad subtreeLevels \quad \text{le nombre de niveaux contenu dans un Subtree}
-\]
 
 Dans l'exemple de la \autoref{fig:availability-levels}, les Subtrees sont composés de 3 niveaux (\texttt{subtreeLevels}). Les listes de disponibilités des tuiles et des contenus auront donc une longueur de 21 et la liste de disponibilités des enfants aura une longueur de 64.
 
+\newpage
 \subsection*{Classe TdSubtreeStore\footnote{org/apache/baremaps/tdtiles/TdSubtreeStore.java}}
 \label{sec:tdsubtreestore-class}
 
