@@ -66,7 +66,9 @@ public class TdTilesStore {
           "tags -> 'roof:color', " + // 12
           "tags -> 'roof:material'," + // 13
           "tags -> 'roof:angle', " + // 14
-          "tags -> 'roof:direction' " + // 15
+          "tags -> 'roof:direction', " + // 15
+          "tags -> 'min_height', " + // 16
+          "tags -> 'building:min_height' " + // 17
           "FROM osm_ways WHERE (tags ? 'building' or tags ? 'building:part') AND " +
           "st_intersects(geom, st_makeenvelope(%1$s, %2$s, %3$s, %4$s, 4326))" +
       "UNION " +
@@ -84,7 +86,9 @@ public class TdTilesStore {
           "tags -> 'roof:color', " + // 12
           "tags -> 'roof:material'," + // 13
           "tags -> 'roof:angle', " + // 14
-          "tags -> 'roof:direction' " + // 15
+          "tags -> 'roof:direction', " + // 15
+          "tags -> 'min_height', " + // 16
+          "tags -> 'building:min_height' " + // 17
           "FROM osm_relations WHERE (tags ? 'building' or tags ? 'building:part') AND " +
           "st_intersects(geom, st_makeenvelope(%1$s, %2$s, %3$s, %4$s, 4326))";
 
@@ -187,6 +191,8 @@ public class TdTilesStore {
           String roofMaterial = resultSet.getString(13);
           String roofAngle = resultSet.getString(14);
           String roofDirection = resultSet.getString(15);
+          String minHeight = resultSet.getString(16);
+          String buildingMinHeight = resultSet.getString(17);
 
           Color finalColor = new Color(1f, 1f, 1f);
           boolean informationFound = true;
@@ -208,6 +214,7 @@ public class TdTilesStore {
           }
 
           float finalHeight = 10;
+          float finalMinHeight = 0;
           if (height != null) {
             finalHeight = Float.parseFloat(height.replaceAll("[^0-9.]", ""));
             if (roofHeight != null) {
@@ -222,10 +229,23 @@ public class TdTilesStore {
               finalHeight += Float.parseFloat(roofLevels.replaceAll("[^0-9.]", "")) * 3;
             }
           }
-          // TODO rise the building in the air instead of making it taller
-//          if (buildingMinLevels != null) {
-//            finalHeight += Float.parseFloat(buildingMinLevels.replaceAll("[^0-9.]", "")) * 3;
-//          }
+          // The different minimum heights must also be added to the total height even if it is representing
+          // empty space underneath the building
+          if (buildingMinLevels != null) {
+            float value = Float.parseFloat(buildingMinLevels.replaceAll("[^0-9.]", "")) * 3;
+//            finalHeight += value;
+            finalMinHeight += value;
+          }
+          if (buildingMinHeight != null) {
+            float value = Float.parseFloat(buildingMinHeight.replaceAll("[^0-9.]", ""));
+//            finalHeight += value;
+            finalMinHeight += value;
+          }
+          if (minHeight != null) {
+            float value = Float.parseFloat(minHeight.replaceAll("[^0-9.]", ""));
+//            finalHeight += value;
+            finalMinHeight += value;
+          }
 
           // Debug code
           if (finalHeight < 0) {
@@ -237,7 +257,7 @@ public class TdTilesStore {
               geometry,
               informationFound,
               finalHeight,
-              buildingMinLevels != null ? Float.parseFloat(buildingMinLevels.replaceAll("[^0-9.]", "")) : 0,
+              finalMinHeight,
               finalColor,
               null));
         }

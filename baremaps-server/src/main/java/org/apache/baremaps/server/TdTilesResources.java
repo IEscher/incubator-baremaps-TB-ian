@@ -54,7 +54,7 @@ public class TdTilesResources {
   private static final int SUBTREE_LEVELS = 4;
 
   private static final boolean RELOAD_SUBTREES = false;
-  private static final boolean RELOAD_TILES = false;
+  private static final boolean RELOAD_TILES = true;
   private static final boolean GENERATE_ALL_SUBTREES = false;
 
 

@@ -38,6 +38,7 @@ import org.locationtech.jts.geom.*;
 import org.locationtech.jts.geomgraph.Edge;
 import org.locationtech.jts.math.Vector3D;
 import org.locationtech.jts.simplify.DouglasPeuckerSimplifier;
+import org.locationtech.jts.simplify.TopologyPreservingSimplifier;
 import org.locationtech.jts.triangulate.polygon.PolygonTriangulator;
 
 public class GltfBuilder {
@@ -61,22 +62,26 @@ public class GltfBuilder {
       case 0:
         break;
       case 1:
-        geometry = DouglasPeuckerSimplifier.simplify(building.geometry(), 0.00001);
+//        geometry = DouglasPeuckerSimplifier.simplify(building.geometry(), 0.00001);
+        geometry = TopologyPreservingSimplifier.simplify(building.geometry(), 0.00001);
         break;
       case 2:
-        geometry = DouglasPeuckerSimplifier.simplify(building.geometry(), 0.00005);
+//        geometry = DouglasPeuckerSimplifier.simplify(building.geometry(), 0.00005);
+        geometry = TopologyPreservingSimplifier.simplify(building.geometry(), 0.00005);
         break;
       case 3:
         if (!building.informationFound()) {
           return Optional.empty();
         }
-        geometry = DouglasPeuckerSimplifier.simplify(building.geometry(), 0.0001);
+//        geometry = DouglasPeuckerSimplifier.simplify(building.geometry(), 0.0001);
+        geometry = TopologyPreservingSimplifier.simplify(building.geometry(), 0.0001);
         break;
       case 4:
         if (!building.informationFound()) {
           return Optional.empty();
         }
-        geometry = DouglasPeuckerSimplifier.simplify(building.geometry(), 0.0001);
+//        geometry = DouglasPeuckerSimplifier.simplify(building.geometry(), 0.0001);
+        geometry = TopologyPreservingSimplifier.simplify(building.geometry(), 0.0001);
         break;
     }
 
@@ -211,7 +216,7 @@ public class GltfBuilder {
    */
   private static void createWalls(Building building, float[] translation, List<Float> vertices,
       List<Integer> indices, HashSet<Edge> edges) {
-    float elevation = building.minLevel() * 3;
+    float elevation = building.minheight();
 //    float elevation = 50;
     for (Edge edge : edges) {
       Coordinate[] v = edge.getCoordinates();
@@ -225,12 +230,12 @@ public class GltfBuilder {
       pos1[1] -= translation[1];
       pos1[2] -= translation[2];
       float[] pos2 =
-          cartesian3FromDegrees((float) v[0].getY(), (float) v[0].getX(), building.height() + elevation);
+          cartesian3FromDegrees((float) v[0].getY(), (float) v[0].getX(), building.height());
       pos2[0] -= translation[0];
       pos2[1] -= translation[1];
       pos2[2] -= translation[2];
       float[] pos3 =
-          cartesian3FromDegrees((float) v[1].getY(), (float) v[1].getX(), building.height() + elevation);
+          cartesian3FromDegrees((float) v[1].getY(), (float) v[1].getX(), building.height());
       pos3[0] -= translation[0];
       pos3[1] -= translation[1];
       pos3[2] -= translation[2];
@@ -313,22 +318,21 @@ public class GltfBuilder {
    */
   private static void createRoof(Building building, float[] translation, Geometry triangulation,
       List<Float> vertices, List<Integer> indices) {
-    float elevation = building.minLevel() * 3;
     for (int i = 0; i < triangulation.getNumGeometries(); i++) {
       Geometry triangle = triangulation.getGeometryN(i);
       Coordinate corner1 = triangle.getCoordinates()[0];
       Coordinate corner2 = triangle.getCoordinates()[2];
       Coordinate corner3 = triangle.getCoordinates()[1];
 
-      float[] pos0 = cartesian3FromDegrees((float) corner1.y, (float) corner1.x, building.height() + elevation);
+      float[] pos0 = cartesian3FromDegrees((float) corner1.y, (float) corner1.x, building.height());
       pos0[0] -= translation[0];
       pos0[1] -= translation[1];
       pos0[2] -= translation[2];
-      float[] pos1 = cartesian3FromDegrees((float) corner2.y, (float) corner2.x, building.height() + elevation);
+      float[] pos1 = cartesian3FromDegrees((float) corner2.y, (float) corner2.x, building.height());
       pos1[0] -= translation[0];
       pos1[1] -= translation[1];
       pos1[2] -= translation[2];
-      float[] pos2 = cartesian3FromDegrees((float) corner3.y, (float) corner3.x, building.height() + elevation);
+      float[] pos2 = cartesian3FromDegrees((float) corner3.y, (float) corner3.x, building.height());
       pos2[0] -= translation[0];
       pos2[1] -= translation[1];
       pos2[2] -= translation[2];

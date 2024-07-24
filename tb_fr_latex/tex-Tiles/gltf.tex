@@ -13,7 +13,7 @@ En fonction du \texttt{level} de leur tuile, les bâtiments subissent jusqu'à 3
     \item \texttt{level} 3 : Les bâtiments sont affichés avec une géométrie très simplifiée uniquement si ils ont des caractéristiques spécifiques enregistrées dans la base de données OSM.
 \end{itemize}
 
-Pour visualiser les différences entre les niveaux de compression, je vous invite à regarder la figure \ref{fig:lods-colors} où chaque niveau de détail est symbolisé par une couleur :
+Pour visualiser les différences entre les niveaux de compression, je vous invite à regarder les figures ci-dessous où chaque niveau de détail est symbolisé par une couleur :
 
 \begin{itemize}
     \item \texttt{level} 0 : rouge
@@ -22,11 +22,44 @@ Pour visualiser les différences entre les niveaux de compression, je vous invit
     \item \texttt{level} 3 : blanc
 \end{itemize}
 
-% TODO: outdated image
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{assets/figures/lods-horizon.png}
+    \caption{Calcul du SSE \cite{3d-tiles-specification}}
+    \label{fig:lods-colors}
+\end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\textwidth]{assets/figures/s2-Cells_and_implicit_auto_LODs.png}
+    \includegraphics[width=1\textwidth]{assets/figures/lods0.png}
+    \caption{Calcul du SSE \cite{3d-tiles-specification}}
+    \label{fig:lods-colors}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{assets/figures/lods1.png}
+    \caption{Calcul du SSE \cite{3d-tiles-specification}}
+    \label{fig:lods-colors}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{assets/figures/lods2.png}
+    \caption{Calcul du SSE \cite{3d-tiles-specification}}
+    \label{fig:lods-colors}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{assets/figures/lods3.png}
+    \caption{Calcul du SSE \cite{3d-tiles-specification}}
+    \label{fig:lods-colors}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{assets/figures/lods4.png}
     \caption{Calcul du SSE \cite{3d-tiles-specification}}
     \label{fig:lods-colors}
 \end{figure}
@@ -42,6 +75,8 @@ Avec le niveau de compression ainsi que la \texttt{Geometry}\footnote{org.locati
 Grâce à cette nouvelle triangulation, il est possible de modéliser les bâtiments en 3D correctement, même ceux comprenant des cours intérieures ou des trous dans leur structure.
 
 La classe \texttt{DelaunayTriangulationBuilder} comportait cependant un paramètre \texttt{tolerance} qui permettait de définir la distance minimale entre deux points afin d'optimiser le coût de la triangulation. Cette possibilité n'est pas disponible dans la classe \texttt{PolygonTriangulator}, néanmoins j'implémente une alternative dans le chapitre suivant.
+
+https://ths.rwth-aachen.de/wp-content/uploads/sites/4/schulz20203d.pdf
 
 \subsection{Hauteur des bâtiments}
 
