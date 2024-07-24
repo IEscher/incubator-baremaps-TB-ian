@@ -99,10 +99,10 @@
       \field{addendum}{(accessed: 18.07.2024)}
       \field{title}{3D Tiles specification}
       \verb{urlraw}
-      \verb https://github.com/CesiumGS/3d-tiles/tree/main/specification#core-implicit-tiling
+      \verb https://github.com/CesiumGS/3d-tiles/tree/main/specification
       \endverb
       \verb{url}
-      \verb https://github.com/CesiumGS/3d-tiles/tree/main/specification#core-implicit-tiling
+      \verb https://github.com/CesiumGS/3d-tiles/tree/main/specification
       \endverb
       \keyw{specification,3d-tiles}
     \endentry
@@ -134,6 +134,35 @@
       \verb https://github.com/CesiumGS/3d-tiles/blob/main/specification/ImplicitTiling/AVAILABILITY.adoc
       \endverb
       \keyw{implicit,tiling,3d-tiles,Availability,Indexing,Morton}
+    \endentry
+    \entry{implicit-tiling-gh}{online}{}
+      \name{author}{1}{}{%
+        {{hash=2dd1f047cd9a0b3a708b07fc198862ec}{%
+           family={CesiumGS},
+           familyi={C\bibinitperiod}}}%
+      }
+      \strng{namehash}{2dd1f047cd9a0b3a708b07fc198862ec}
+      \strng{fullhash}{2dd1f047cd9a0b3a708b07fc198862ec}
+      \strng{bibnamehash}{2dd1f047cd9a0b3a708b07fc198862ec}
+      \strng{authorbibnamehash}{2dd1f047cd9a0b3a708b07fc198862ec}
+      \strng{authornamehash}{2dd1f047cd9a0b3a708b07fc198862ec}
+      \strng{authorfullhash}{2dd1f047cd9a0b3a708b07fc198862ec}
+      \field{extraname}{5}
+      \field{labelalpha}{Ces}
+      \field{sortinit}{9}
+      \field{sortinithash}{0a5ebc79d83c96b6579069544c73c7d4}
+      \field{extraalpha}{5}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{addendum}{(accessed: 19.07.2024)}
+      \field{title}{Implicit Tiling}
+      \verb{urlraw}
+      \verb https://github.com/CesiumGS/3d-tiles/tree/main/specification/ImplicitTiling
+      \endverb
+      \verb{url}
+      \verb https://github.com/CesiumGS/3d-tiles/tree/main/specification/ImplicitTiling
+      \endverb
+      \keyw{implicit,tiling,3d-tiles}
     \endentry
     \entry{3DTILES_bounding_volume_S2-website}{online}{}
       \name{author}{1}{}{%

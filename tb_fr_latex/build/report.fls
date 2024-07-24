@@ -2216,6 +2216,7 @@ INPUT /usr/share/texmf/fonts/tfm/public/lm/ec-lmcsc10.tfm
 INPUT /usr/share/texmf/fonts/tfm/public/lm/ec-lmr10.tfm
 INPUT /usr/share/texmf/fonts/tfm/public/lm/ec-lmbx10.tfm
 INPUT /usr/share/texmf/fonts/tfm/public/lm/ec-lmri10.tfm
+INPUT /usr/share/texmf/fonts/tfm/public/lm/ec-lmro10.tfm
 INPUT ./tex-Tiles/implicit_tiling.tex
 INPUT tex-Tiles/implicit_tiling.tex
 INPUT ./tex-Tiles/implicit_tiling.tex
@@ -2226,7 +2227,6 @@ INPUT /usr/share/texmf/fonts/tfm/public/lm/ec-lmbxi10.tfm
 INPUT ./assets/figures/implicit-tiling-small.png
 INPUT ./assets/figures/implicit-tiling-small.png
 INPUT assets/figures/implicit-tiling-small.png
-INPUT /usr/share/texmf/fonts/tfm/public/lm/ec-lmro10.tfm
 INPUT ./tex-Tiles/LODs.tex
 INPUT tex-Tiles/LODs.tex
 INPUT ./tex-Tiles/LODs.tex
@@ -2315,6 +2315,9 @@ INPUT ./tex-Subtrees/binary-file.tex
 INPUT tex-Subtrees/binary-file.tex
 INPUT ./tex-Subtrees/binary-file.tex
 INPUT tex-Subtrees/binary-file.tex
+INPUT ./assets/figures/binary-subtree.png
+INPUT ./assets/figures/binary-subtree.png
+INPUT assets/figures/binary-subtree.png
 INPUT ./conclusion.tex
 INPUT conclusion.tex
 INPUT ./conclusion.tex

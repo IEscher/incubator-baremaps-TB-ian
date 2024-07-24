@@ -3,21 +3,22 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \contentsline {figure}{\numberline {2.1}{\ignorespaces Exemple de Tileset contenant un arbre de Tiles \blx@tocontentsinit {0}\cite {3d-tiles-reference-card-v1}\relax }}{3}{figure.caption.6}%
-\contentsline {figure}{\numberline {2.2}{\ignorespaces Division en quadtree par implicit tiling \blx@tocontentsinit {0}\cite {3d-tiles-specification}\relax }}{4}{figure.caption.7}%
-\contentsline {figure}{\numberline {2.3}{\ignorespaces Calcul du SSE \blx@tocontentsinit {0}\cite {3d-tiles-specification}\relax }}{7}{figure.caption.8}%
-\contentsline {figure}{\numberline {2.4}{\ignorespaces Tokens des 6 \textit {root cells} \blx@tocontentsinit {0}\cite {3DTILES_bounding_volume_S2-website}\relax }}{10}{figure.caption.9}%
-\contentsline {figure}{\numberline {2.5}{\ignorespaces Calcul du SSE \blx@tocontentsinit {0}\cite {3d-tiles-specification}\relax }}{13}{figure.caption.10}%
+\contentsline {figure}{\numberline {2.2}{\ignorespaces Division en quadtree par implicit tiling \blx@tocontentsinit {0}\cite {3d-tiles-specification}\relax }}{5}{figure.caption.7}%
+\contentsline {figure}{\numberline {2.3}{\ignorespaces Calcul du SSE \blx@tocontentsinit {0}\cite {3d-tiles-specification}\relax }}{8}{figure.caption.8}%
+\contentsline {figure}{\numberline {2.4}{\ignorespaces Tokens des 6 \textit {root cells} \blx@tocontentsinit {0}\cite {3DTILES_bounding_volume_S2-website}\relax }}{11}{figure.caption.9}%
+\contentsline {figure}{\numberline {2.5}{\ignorespaces Calcul du SSE \blx@tocontentsinit {0}\cite {3d-tiles-specification}\relax }}{15}{figure.caption.10}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {3.1}{\ignorespaces Exemple de hiérarchie de Subtrees\relax }}{18}{figure.caption.12}%
-\contentsline {figure}{\numberline {3.2}{\ignorespaces Classes utilisées pour la création d'une hiérarchie de Subtrees\relax }}{19}{figure.caption.13}%
-\contentsline {figure}{\numberline {3.3}{\ignorespaces Représentation des niveaux de tuiles dans un BitSet\relax }}{20}{figure.caption.16}%
-\contentsline {figure}{\numberline {3.4}{\ignorespaces Classes utilisées pour la création d'une hiérarchie de Subtrees\relax }}{21}{figure.caption.18}%
-\contentsline {figure}{\numberline {3.5}{\ignorespaces Indexes X Y vers index de Morton \blx@tocontentsinit {0}\cite {availability-gh}\relax }}{23}{figure.caption.20}%
-\contentsline {figure}{\numberline {3.6}{\ignorespaces Index local et index global \blx@tocontentsinit {0}\cite {availability-gh}\relax }}{25}{figure.caption.23}%
-\contentsline {figure}{\numberline {3.7}{\ignorespaces Flowchart de la fonction \texttt {getSubtree}\relax }}{26}{figure.caption.25}%
-\contentsline {figure}{\numberline {3.8}{\ignorespaces Flowchart de la fonction \texttt {createMaxRankSubtree}\relax }}{27}{figure.caption.27}%
-\contentsline {figure}{\numberline {3.9}{\ignorespaces Flowchart de la fonction \texttt {createSubtree}\relax }}{29}{figure.caption.29}%
-\contentsline {figure}{\numberline {3.10}{\ignorespaces Génération de Availability : État initial\relax }}{30}{figure.caption.30}%
-\contentsline {figure}{\numberline {3.11}{\ignorespaces Génération de Availability : Procédure\relax }}{30}{figure.caption.31}%
-\contentsline {figure}{\numberline {3.12}{\ignorespaces Concaténation de 4 Availability\relax }}{31}{figure.caption.32}%
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Exemple de hiérarchie de Subtrees\relax }}{20}{figure.caption.12}%
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Classes utilisées pour la création d'une hiérarchie de Subtrees\relax }}{21}{figure.caption.13}%
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Représentation des niveaux de tuiles dans un BitSet\relax }}{22}{figure.caption.16}%
+\contentsline {figure}{\numberline {3.4}{\ignorespaces Classes utilisées pour la création d'une hiérarchie de Subtrees\relax }}{23}{figure.caption.18}%
+\contentsline {figure}{\numberline {3.5}{\ignorespaces Indexes X Y vers index de Morton \blx@tocontentsinit {0}\cite {availability-gh}\relax }}{26}{figure.caption.20}%
+\contentsline {figure}{\numberline {3.6}{\ignorespaces Index local et index global \blx@tocontentsinit {0}\cite {availability-gh}\relax }}{28}{figure.caption.23}%
+\contentsline {figure}{\numberline {3.7}{\ignorespaces Flowchart de la fonction \texttt {getSubtree}\relax }}{29}{figure.caption.25}%
+\contentsline {figure}{\numberline {3.8}{\ignorespaces Flowchart de la fonction \texttt {createMaxRankSubtree}\relax }}{30}{figure.caption.27}%
+\contentsline {figure}{\numberline {3.9}{\ignorespaces Flowchart de la fonction \texttt {createSubtree}\relax }}{32}{figure.caption.29}%
+\contentsline {figure}{\numberline {3.10}{\ignorespaces Génération de Availability : État initial\relax }}{33}{figure.caption.30}%
+\contentsline {figure}{\numberline {3.11}{\ignorespaces Génération de Availability : Procédure\relax }}{33}{figure.caption.31}%
+\contentsline {figure}{\numberline {3.12}{\ignorespaces Concaténation de 4 Availability\relax }}{34}{figure.caption.32}%
+\contentsline {figure}{\numberline {3.13}{\ignorespaces Header d'un fichier au \textit {Subtree Binary Format} \blx@tocontentsinit {0}\cite {implicit-tiling-gh}\relax }}{35}{figure.caption.33}%
 \addvspace {10\p@ }
