@@ -4,30 +4,32 @@
 \contentsline {chapter}{Authentification}{iii}{chapter*.2}%
 \contentsline {chapter}{Résumé}{v}{chapter*.3}%
 \contentsline {chapter}{\numberline {1}Introduction}{1}{chapter.1}%
-\contentsline {chapter}{\numberline {2}3D Tiles}{3}{chapter.2}%
+\contentsline {chapter}{\numberline {2}3D Tiles et Architecture}{3}{chapter.2}%
 \contentsline {section}{\numberline {2.1}Spécification 3D Tiles Next}{3}{section.2.1}%
 \contentsline {section}{\numberline {2.2}Implicit Tiling}{5}{section.2.2}%
 \contentsline {subsection}{\numberline {2.2.1}Nouveautés de la version 1.1 de 3D Tiles}{5}{subsection.2.2.1}%
 \contentsline {subsection}{\numberline {2.2.2}Avantages et inconvénients de l'implicit tiling}{6}{subsection.2.2.2}%
 \contentsline {section}{\numberline {2.3}Level of Detail}{8}{section.2.3}%
 \contentsline {section}{\numberline {2.4}3DTILES\_bounding\_volume\_S2 extension}{9}{section.2.4}%
-\contentsline {section}{\numberline {2.5}Database}{12}{section.2.5}%
-\contentsline {subsection}{\numberline {2.5.1}Données OSM}{12}{subsection.2.5.1}%
-\contentsline {subsection}{\numberline {2.5.2}Données générées}{13}{subsection.2.5.2}%
-\contentsline {section}{\numberline {2.6}Création des fichiers glTF}{14}{section.2.6}%
-\contentsline {subsection}{\numberline {2.6.1}Système de compression des géométries des bâtiments}{14}{subsection.2.6.1}%
-\contentsline {subsection}{\numberline {2.6.2}Géométries des bâtiments}{15}{subsection.2.6.2}%
-\contentsline {subsection}{\numberline {2.6.3}Hauteur des bâtiments}{16}{subsection.2.6.3}%
-\contentsline {subsection}{\numberline {2.6.4}glTF par bâtiment ou par tuile}{16}{subsection.2.6.4}%
-\contentsline {chapter}{\numberline {3}Subtrees}{19}{chapter.3}%
-\contentsline {section}{\numberline {3.1}Introduction}{19}{section.3.1}%
-\contentsline {section}{\numberline {3.2}Classes importantes}{21}{section.3.2}%
-\contentsline {section}{\numberline {3.3}Morton Index}{25}{section.3.3}%
-\contentsline {section}{\numberline {3.4}Création de l'arbre de Subtrees}{29}{section.3.4}%
-\contentsline {subsection}{\numberline {3.4.1}Flowcharts}{29}{subsection.3.4.1}%
-\contentsline {subsection}{\numberline {3.4.2}Génération de Availability}{33}{subsection.3.4.2}%
-\contentsline {subsection}{\numberline {3.4.3}Concaténations}{34}{subsection.3.4.3}%
-\contentsline {section}{\numberline {3.5}Transmission au client Cesium}{35}{section.3.5}%
-\contentsline {subsection}{\numberline {3.5.1}Écriture de JSON}{36}{subsection.3.5.1}%
-\contentsline {chapter}{\numberline {4}Conclusion}{37}{chapter.4}%
-\contentsline {chapter}{Appendices}{43}{section*.35}%
+\contentsline {section}{\numberline {2.5}Création des fichiers glTF}{12}{section.2.5}%
+\contentsline {subsection}{\numberline {2.5.1}Système de compression des géométries des bâtiments}{12}{subsection.2.5.1}%
+\contentsline {subsection}{\numberline {2.5.2}Géométries des bâtiments}{13}{subsection.2.5.2}%
+\contentsline {subsection}{\numberline {2.5.3}Hauteur des bâtiments}{14}{subsection.2.5.3}%
+\contentsline {subsection}{\numberline {2.5.4}glTF par bâtiment ou par tuile}{14}{subsection.2.5.4}%
+\contentsline {chapter}{\numberline {3}Architecture}{17}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Fonctionnement général}{17}{section.3.1}%
+\contentsline {section}{\numberline {3.2}Database}{19}{section.3.2}%
+\contentsline {subsection}{\numberline {3.2.1}Données OSM}{19}{subsection.3.2.1}%
+\contentsline {subsection}{\numberline {3.2.2}Données générées}{20}{subsection.3.2.2}%
+\contentsline {chapter}{\numberline {4}Subtrees}{21}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Introduction}{21}{section.4.1}%
+\contentsline {section}{\numberline {4.2}Classes importantes}{23}{section.4.2}%
+\contentsline {section}{\numberline {4.3}Morton Index}{27}{section.4.3}%
+\contentsline {section}{\numberline {4.4}Création de l'arbre de Subtrees}{31}{section.4.4}%
+\contentsline {subsection}{\numberline {4.4.1}Flowcharts}{31}{subsection.4.4.1}%
+\contentsline {subsection}{\numberline {4.4.2}Génération de Availability}{35}{subsection.4.4.2}%
+\contentsline {subsection}{\numberline {4.4.3}Concaténations}{36}{subsection.4.4.3}%
+\contentsline {section}{\numberline {4.5}Transmission au client Cesium}{37}{section.4.5}%
+\contentsline {subsection}{\numberline {4.5.1}Écriture de JSON}{38}{subsection.4.5.1}%
+\contentsline {chapter}{\numberline {5}Conclusion}{39}{chapter.5}%
+\contentsline {chapter}{Appendices}{45}{section*.36}%

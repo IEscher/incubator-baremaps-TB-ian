@@ -71,6 +71,7 @@ public class TdTilesResources {
   // private static final int SUBTREE_LEVELS = 4;
 
 
+
   private static final int RANK_AMOUNT = (AVAILABLE_LEVELS + 1) / SUBTREE_LEVELS;
 
   private static final Logger logger = LoggerFactory.getLogger(TdTilesStore.class);

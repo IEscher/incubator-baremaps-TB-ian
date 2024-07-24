@@ -1,4 +1,4 @@
-Grâce à l'introduction du support des fichiers glTF ou plus précisément des fichiers glb dans la spécification 3D Tiles 1.1, il est devenu beaucoup plus facile de générer des fichiers 3D comparé à l'ancien système. Ici, j'utilise la librairie \href{https://github.com/javagl/JglTF}{jglTF}\footnote{https://github.com/javagl/JglT} et la librairie \href{https://locationtech.github.io/jts/}{JTS}\footnote{https://locationtech.github.io/jts/} pour créer les nodes, les meshes, les materials et les textures des bâtiments. Toute la ligique concernant la création des fichiers glTF se trouve dans la classe \texttt{GltfBuilder}\footnote{baremaps-core/src/main/java/org/apache/baremaps/tdtiles/GltfBuilder.java}.
+Grâce à l'introduction du support des fichiers glTF ou plus précisément des fichiers glb dans la spécification 3D Tiles 1.1, il est devenu beaucoup plus facile de générer des fichiers 3D comparé à l'ancien système. Ici, j'utilise la librairie \href{https://github.com/javagl/JglTF}{jglTF}\footnote{https://github.com/javagl/JglT} et la librairie \href{https://locationtech.github.io/jts/}{JTS}\footnote{https://locationtech.github.io/jts/} pour créer les \textit{nodes}, les \textit{meshes}, les \textit{materials} et les textures des bâtiments. Toute la logique concernant la création des fichiers glTF se trouve dans la classe \texttt{GltfBuilder}\footnote{baremaps-core/src/main/java/org/apache/baremaps/tdtiles/GltfBuilder.java}.
 
 \subsection{Système de compression des géométries des bâtiments}
 
@@ -13,7 +13,7 @@ En fonction du \texttt{level} de leur tuile, les bâtiments subissent jusqu'à 3
     \item \texttt{level} 3 : Les bâtiments sont affichés avec une géométrie très simplifiée uniquement si ils ont des caractéristiques spécifiques enregistrées dans la base de données OSM.
 \end{itemize}
 
-Pour visualiser les différences entre les niveaux de compression, je vous invite à regarder la figure \ref{fig:lods-colors} où chaque niveau de détail est simbolisé par une couleur :
+Pour visualiser les différences entre les niveaux de compression, je vous invite à regarder la figure \ref{fig:lods-colors} où chaque niveau de détail est symbolisé par une couleur :
 
 \begin{itemize}
     \item \texttt{level} 0 : rouge
@@ -31,7 +31,9 @@ Pour visualiser les différences entre les niveaux de compression, je vous invit
     \label{fig:lods-colors}
 \end{figure}
 
-Faire ainsi permet de réduire drastiquement le temps passé à générer ces bâtiments tout en gardant une qualité d'affichage correcte.
+Faire ainsi permet de réduire drastiquement le temps passé à générer ces bâtiments ainsi que de garantir un affichage plus fluide chez le client tout en gardant une qualité d'affichage correcte.
+
+Outre la compression des géométries, une autre autre qui pourrait être développée est un filtrage des tuiles en fonction de leur quantité de bâtiments et de leur niveau de compression. Par exemple, si une tuile ne contient qu'un ou deux petits bâtiments pourrait être omise à l'affichage si elle se trouve assez loin de la caméra pour être à un niveau de compression élevé.
 
 \subsection{Géométries des bâtiments}
 
