@@ -1,21 +1,21 @@
 # Fdb version 3
-["biber build/report"] 1721915745 "build/report.bcf" "build/report.bbl" "build/report" 1721915797
+["biber build/report"] 1721915745 "build/report.bcf" "build/report.bbl" "build/report" 1721917390
   "bibliography.bib" 1721914288 2258 b52d4bc15c796af9851f4428ee1edce8 ""
-  "build/report.bcf" 1721915765 108570 bca6b60c9c03543aae6b38df55340e16 "pdflatex"
+  "build/report.bcf" 1721915815 108570 bca6b60c9c03543aae6b38df55340e16 "pdflatex"
   (generated)
   "build/report.bbl"
   "build/report.blg"
-["cusdep nlo nls build/report"] 1721915583 "build/report.nlo" "build/report.nls" "build/report" 1721915797
-  "build/report.nlo" 1721915765 1287 1730361b9607f8f71dad035a51256517 "pdflatex"
+["cusdep nlo nls build/report"] 1721915583 "build/report.nlo" "build/report.nls" "build/report" 1721917390
+  "build/report.nlo" 1721915815 1287 1730361b9607f8f71dad035a51256517 "pdflatex"
   (generated)
   "build/report.nls"
-["makeindex build/report.idx"] 1716413840 "build/report.idx" "build/report.ind" "build/report" 1721915797
-  "build/report.idx" 1721915754 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
+["makeindex build/report.idx"] 1716413840 "build/report.idx" "build/report.ind" "build/report" 1721917390
+  "build/report.idx" 1721915805 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
   (generated)
   "build/report.ilg"
   "build/report.ind"
-["pdflatex"] 1721915797 "report.tex" "build/report.pdf" "report" 1721915797
-  "/dev/null" 1721915332 0 d41d8cd98f00b204e9800998ecf8427e ""
+["pdflatex"] 1721917390 "report.tex" "build/report.pdf" "report" 1721917390
+  "/dev/null" 1721917362 0 d41d8cd98f00b204e9800998ecf8427e ""
   "/etc/texmf/web2c/texmf.cnf" 1662021339 475 c0e671620eb5563b2130f56340a5fde8 ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/adobe/zapfding/pzdr.tfm" 1136768653 1528 f853c4d1b4e0550255e02831fdc8496f ""
@@ -360,14 +360,14 @@
   "build/assets/figures/maxRank-flowchart.drawio.pdf" 1721915452 14599 c2ddc845458d8a45ea606353e7b6b647 ""
   "build/assets/figures/simple-flowchart.drawio.pdf" 1721680149 13647 527309f46ee0b3001d5507583637155a ""
   "build/assets/figures/subtree-classes.drawio.pdf" 1721643147 25198 c004bcd02a9a358a054ac0492b5eb466 ""
-  "build/report.aux" 1721915764 17491 b5c5ab97a43541345dbd42a4e48fe22c "pdflatex"
+  "build/report.aux" 1721915815 17506 68b22ee7f6d57a071997013dca97f4b9 "pdflatex"
   "build/report.bbl" 1721915745 8894 fdeddb5eaef4f820f195ca3fc3b3afde "biber build/report"
   "build/report.ind" 1721914908 0 d41d8cd98f00b204e9800998ecf8427e "makeindex build/report.idx"
-  "build/report.lof" 1721915765 3686 7bf69a05f128a14690ca8fb4fedfdb5c "pdflatex"
+  "build/report.lof" 1721915815 3686 7bf69a05f128a14690ca8fb4fedfdb5c "pdflatex"
   "build/report.nls" 1721915583 0 d41d8cd98f00b204e9800998ecf8427e "cusdep nlo nls build/report"
-  "build/report.out" 1721915764 5388 61c63c31eafe85004cc14db7bb658b19 "pdflatex"
-  "build/report.run.xml" 1721915765 2392 cd945acf90f44d141877f25c838915cf "pdflatex"
-  "build/report.toc" 1721915765 2752 17abd222050064838d5ce19866cd4500 "pdflatex"
+  "build/report.out" 1721915815 5388 61c63c31eafe85004cc14db7bb658b19 "pdflatex"
+  "build/report.run.xml" 1721915815 2392 cd945acf90f44d141877f25c838915cf "pdflatex"
+  "build/report.toc" 1721915815 2752 17abd222050064838d5ce19866cd4500 "pdflatex"
   "conclusion.tex" 1721857003 2628 a9ada9e264762e187acff482f4dc9d32 ""
   "glossary.tex" 1716543283 1059 1e10879d3f9c4b4200f1ef428a011f70 ""
   "heig-tb.cls" 1677456776 12571 d09b5c2f3defadc8c56779af07b82d62 ""
@@ -384,7 +384,7 @@
   "tex-Tiles/3DTILES_bv_S2_extension.tex" 1721915452 4775 8e97c93ac5e7310c47e36c3899ba1ed3 ""
   "tex-Tiles/LODs.tex" 1721915452 2376 d6985e0d10741f3ffa6091336c6b5dd9 ""
   "tex-Tiles/gltf.tex" 1721915452 12358 ca89a7d64c22432c70f17bc2fc669b8e ""
-  "tex-Tiles/implicit_tiling.tex" 1721915452 7378 b2cfff7caff89ab933b713f756706ecf ""
+  "tex-Tiles/implicit_tiling.tex" 1721917385 7368 e5e0992f180b42dcdfdc15c84480b9ee ""
   "tex-Tiles/tiles-intro.tex" 1721915452 1957 8e807d92102f48be473ec15c06a5d037 ""
   "tex-archi/archi.tex" 1721915452 1198 c2048d51c033f767368b5cb5f1e58acc ""
   "tex-archi/database.tex" 1721915452 3785 94734abc1409941fa9f5bd8f274a9b7c ""

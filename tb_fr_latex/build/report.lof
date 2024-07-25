@@ -4,14 +4,14 @@
 \addvspace {10\p@ }
 \contentsline {figure}{\numberline {2.1}{\ignorespaces Exemple de Tileset contenant un arbre de Tiles \blx@tocontentsinit {0}\cite {3d-tiles-reference-card-v1}\relax }}{3}{figure.caption.7}%
 \contentsline {figure}{\numberline {2.2}{\ignorespaces Division en quadtree par implicit tiling \blx@tocontentsinit {0}\cite {3d-tiles-specification}\relax }}{4}{figure.caption.8}%
-\contentsline {figure}{\numberline {2.3}{\ignorespaces Calcul du SSE \blx@tocontentsinit {0}\cite {3d-tiles-specification}\relax }}{8}{figure.caption.9}%
-\contentsline {figure}{\numberline {2.4}{\ignorespaces Partition du monde en 6 \textit {root cells} \blx@tocontentsinit {0}\cite {3DTILES_bounding_volume_S2-website}\relax }}{11}{figure.caption.10}%
-\contentsline {figure}{\numberline {2.5}{\ignorespaces Vue à l'horizon de la ville de Londres\relax }}{13}{figure.caption.11}%
-\contentsline {figure}{\numberline {2.6}{\ignorespaces Level 0\relax }}{13}{figure.caption.12}%
-\contentsline {figure}{\numberline {2.7}{\ignorespaces Level 1\relax }}{13}{figure.caption.12}%
-\contentsline {figure}{\numberline {2.8}{\ignorespaces Level 2\relax }}{13}{figure.caption.12}%
-\contentsline {figure}{\numberline {2.9}{\ignorespaces Level 3\relax }}{13}{figure.caption.12}%
-\contentsline {figure}{\numberline {2.10}{\ignorespaces Hauteur minimum d'un bâtiment \blx@tocontentsinit {0}\cite {MinLevel-image}\relax }}{16}{figure.caption.13}%
+\contentsline {figure}{\numberline {2.3}{\ignorespaces Calcul du SSE \blx@tocontentsinit {0}\cite {3d-tiles-specification}\relax }}{7}{figure.caption.9}%
+\contentsline {figure}{\numberline {2.4}{\ignorespaces Partition du monde en 6 \textit {root cells} \blx@tocontentsinit {0}\cite {3DTILES_bounding_volume_S2-website}\relax }}{10}{figure.caption.10}%
+\contentsline {figure}{\numberline {2.5}{\ignorespaces Vue à l'horizon de la ville de Londres\relax }}{12}{figure.caption.11}%
+\contentsline {figure}{\numberline {2.6}{\ignorespaces Level 0\relax }}{12}{figure.caption.12}%
+\contentsline {figure}{\numberline {2.7}{\ignorespaces Level 1\relax }}{12}{figure.caption.12}%
+\contentsline {figure}{\numberline {2.8}{\ignorespaces Level 2\relax }}{12}{figure.caption.12}%
+\contentsline {figure}{\numberline {2.9}{\ignorespaces Level 3\relax }}{12}{figure.caption.12}%
+\contentsline {figure}{\numberline {2.10}{\ignorespaces Hauteur minimum d'un bâtiment \blx@tocontentsinit {0}\cite {MinLevel-image}\relax }}{15}{figure.caption.13}%
 \addvspace {10\p@ }
 \contentsline {figure}{\numberline {3.1}{\ignorespaces Architecture de l'application\relax }}{17}{figure.caption.14}%
 \addvspace {10\p@ }
