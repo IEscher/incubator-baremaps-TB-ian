@@ -7,6 +7,23 @@ Scanning style file /usr/share/texlive/texmf-dist/makeindex/nomencl/nomencl.ist.
 ** Input style error (file = /usr/share/texlive/texmf-dist/makeindex/nomencl/nomencl.ist, line = 38):
    -- Unknown specifier lethead_flag.
 ....done (12 attributes redefined, 3 ignored).
-Scanning input file build/report.nlo...done (0 entries accepted, 0 rejected).
+Scanning input file build/report.nlo...
+!! Input index error (file = build/report.nlo, line = 1):
+   -- Illegal page number \c@page.
+!! Input index error (file = build/report.nlo, line = 2):
+   -- Illegal page number \c@page.
+!! Input index error (file = build/report.nlo, line = 3):
+   -- Illegal page number \c@page.
+!! Input index error (file = build/report.nlo, line = 4):
+   -- Illegal page number \c@page.
+!! Input index error (file = build/report.nlo, line = 5):
+   -- Illegal page number \c@page.
+!! Input index error (file = build/report.nlo, line = 6):
+   -- Illegal page number \c@page.
+!! Input index error (file = build/report.nlo, line = 7):
+   -- Illegal page number \c@page.
+!! Input index error (file = build/report.nlo, line = 8):
+   -- Illegal page number \c@page.
+done (0 entries accepted, 8 rejected).
 Nothing written in build/report.nls.
 Transcript written in build/report.ilg.

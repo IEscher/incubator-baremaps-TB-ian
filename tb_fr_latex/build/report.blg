@@ -1,5 +1,15 @@
 [0] Config.pm:307> INFO - This is Biber 2.17
-[1] Config.pm:310> INFO - Logfile is 'build/report.blg'
-[45] biber:340> INFO - === Thu Jul 25, 2024, 13:07:10
-[67] Utils.pm:398> ERROR - build/report.bcf is malformed, last biblatex run probably failed. Deleted build/report.bbl
-[67] Biber.pm:135> INFO - ERRORS: 1
+[0] Config.pm:310> INFO - Logfile is 'build/report.blg'
+[47] biber:340> INFO - === Thu Jul 25, 2024, 13:55:45
+[62] Biber.pm:418> INFO - Reading 'build/report.bcf'
+[116] Biber.pm:972> INFO - Found 7 citekeys in bib section 0
+[127] Biber.pm:4383> INFO - Processing section 0
+[134] Biber.pm:4574> INFO - Looking for bibtex file 'bibliography.bib' for section 0
+[139] bibtex.pm:1713> INFO - LaTeX decoding ...
+[144] bibtex.pm:1518> INFO - Found BibTeX data source 'bibliography.bib'
+[168] UCollate.pm:68> INFO - Overriding locale 'fr-FR' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[169] UCollate.pm:68> INFO - Overriding locale 'fr-FR' defaults 'variable = shifted' with 'variable = non-ignorable'
+[169] Biber.pm:4203> INFO - Sorting list 'ynt/global//global/global' of type 'entry' with template 'ynt' and locale 'fr-FR'
+[169] Biber.pm:4209> INFO - No sort tailoring available for locale 'fr-FR'
+[175] bbl.pm:654> INFO - Writing 'build/report.bbl' with encoding 'UTF-8'
+[179] bbl.pm:757> INFO - Output to build/report.bbl
