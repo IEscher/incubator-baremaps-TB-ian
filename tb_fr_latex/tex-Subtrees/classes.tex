@@ -5,17 +5,17 @@
     \label{fig:subtree-classes}
 \end{figure}
 
-\subsection*{Classe Subtree\footnote{org/apache/baremaps/tdtiles/Subtree/Subtree.java}}
+\subsection*{Classe Subtree\footnote{src/main/java/org/apache/baremaps/tdtiles/Subtree/Subtree.java}}
 \label{sec:subtree-class}
 
 La première classe écrite dans le but de gérer les Subtrees est la classe \texttt{Subtree}. Un objet de cette classe comporte tout les éléments nécessaires pour la gestion d'un Subtree. Il contient un objet \texttt{Availability} pour chaque type de disponibilité (tuile, contenu, enfants) ainsi que le nombre de levels contenu. La classe offre aussi tous les getters utiles pour accéder aux informations importantes. Elle fournit aussi une fonction statique de concaténation de 4 Subtrees en un d'ordre supérieur. Cette fonction sera utilisée pour la création de l'arbre de Subtrees. Finalement, elle offre deux fonction de debug pour afficher les \textit{Tile Availability} et le \textit{Child Availability} dans la console.
 
-\subsection*{Classe Availability\footnote{org/apache/baremaps/tdtiles/Subtree/Availability.java}}
+\subsection*{Classe Availability\footnote{src/main/java/org/apache/baremaps/tdtiles/Subtree/Availability.java}}
 \label{sec:availability-class}
 
-La classe Availability est celle qui se chargera de stocker les listes de disponibilités. Pour cela, elle utilise un \textit{BitSet} par soucis d'optimisation. Tout comme la classe Subtree, elle offre une fonction de concaténation de 4 \textit{Availability} en une seule. De plus, elle propose deux fonctions pour générer un Availability complet à partir d'un BitSet représentant le dernier level du Subtree.
+La classe Availability est celle qui se chargera de stocker les listes de disponibilités. Pour cela, elle utilise un \textit{BitSet} par soucis d'optimisation. Tout comme la classe Subtree, elle offre une fonction de concaténation de 4 \textit{Availability} en un seul. De plus, elle propose deux fonctions pour générer un Availability complet à partir d'un BitSet représentant le dernier level du Subtree.
 
-Trois types de disponibilités sont possibles : tuile, contenu et enfants. La disponibilité des tuiles indique si une tuile peut être accédée par le client Cesium. La disponibilité des contenus indique si une tuile contient des bâtiments ou non. Pour finir, la disponibilité des enfants indique si un Subtree enfant au Subtree actuel à une \textit{root tile} (cf. \autoref{fig:subtree-hierarchy}) qui est diponible. Cette dérnière information servira au client Cesium à savoir si il doit demander au serveur un Subtree enfant ou non.
+Trois types de disponibilités sont possibles : tuile, contenu et enfants. La disponibilité des tuiles indique si une tuile peut être accédée par le client Cesium. La disponibilité des contenus indique si une tuile contient des bâtiments ou non. Pour finir, la disponibilité des enfants indique si un Subtree enfant au Subtree actuel à une \textit{root tile} (cf. \autoref{fig:subtree-hierarchy}) qui est disponible. Cette dernière information servira au client Cesium à savoir si il doit demander à l'API un Subtree enfant ou non.
 
 Une liste de disponibilités est donc, comme précisé auparavant, une liste de boolean représentant un des trois types de disponibilité pour chaque tuile du Subtree. Cela veut dire qu'une seule liste de disponibilité s'occupe de tout les niveaux du Subtree. Ces listes de disponibilités sont en théorie stockées dans un seul Bitset qui comprend tous ces niveau. Dans mon implémentation, j'ai choisi de stocker chaque niveau dans un BitSet différent. Cela ne change rien car à l'envoi du Subtree au client, les BitSets seront concaténés dans un seul buffer binaire.
 
@@ -43,7 +43,7 @@ length = 4^{subtreeLevels}
 Dans l'exemple de la \autoref{fig:availability-levels}, les Subtrees sont composés de 3 niveaux (\texttt{subtreeLevels}). Les listes de disponibilités des tuiles et des contenus auront donc une longueur de 21 et la liste de disponibilités des enfants aura une longueur de 64.
 
 \newpage
-\subsection*{Classe TdSubtreeStore\footnote{org/apache/baremaps/tdtiles/TdSubtreeStore.java}}
+\subsection*{Classe TdSubtreeStore\footnote{src/main/java/org/apache/baremaps/tdtiles/TdSubtreeStore.java}}
 \label{sec:tdsubtreestore-class}
 
 Cette classe est celle qui orchestrera la création et la distribution des Subtrees. Ce processus suit le diagramme suivant :
@@ -51,7 +51,7 @@ Cette classe est celle qui orchestrera la création et la distribution des Subtr
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\textwidth]{assets/figures/simple-flowchart.drawio.pdf}
-    \caption{Classes utilisées pour la création d'une hiérarchie de Subtrees}
+    \caption{Flowchart de la classe \texttt{TdSubtreeStore}}
     \label{fig:ssimple-flowchart}
 \end{figure}
 
@@ -71,8 +71,8 @@ SELECT EXISTS (
 ) AS has_buildings
 \end{verbatim}
 
-Les deux méthodes ont des avantages et des inconvénients. La méthode calculant tous les Subtrees est énormément plus lente, mais les utilisateurs n'auront pas de temps d'attente supplémentaire lorsqu'ils se déplaceront dans la carte. La méthode calculant les Subtrees au fur et à mesure est quasiment instantanée, mais les utilisateurs devront attendre un peu plus longtemps lorsqu'ils se déplaceront dans la carte.
+Les deux méthodes ont des avantages et des inconvénients. La méthode calculant tous les Subtrees est énormément plus lente, mais les utilisateurs n'auront pas de temps d'attente supplémentaire lorsqu'ils se déplaceront dans la carte. La méthode calculant les Subtrees au fur et à mesure est quasiment instantanée, mais les utilisateurs devront attendre un peu plus longtemps lorsqu'ils se déplaceront dans la carte pour la première fois.
 
 Pour le développement de l'application, je recommande donc de ne pas calculer tous les Subtrees en avance car il y en a rarement besoins. Par contre, pour un usage en production, il serait préférable de les calculer en avance.
 
-Ce choix ainsi que le choix de re-créer les Subtrees ou les fichiers glTF des tuiles peuvent être modifiés dans la classe \texttt{TdTilesResources}\footnote{org/apache/baremaps/server/TdTilesResources.java}.
+Ce choix ainsi que le choix de re-créer les Subtrees ou les fichiers glTF des tuiles peuvent être modifiés dans la classe \texttt{TdTilesResources}\footnote{src/main/java/org/apache/baremaps/server/TdTilesResources.java}.

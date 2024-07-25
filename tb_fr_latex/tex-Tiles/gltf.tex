@@ -2,31 +2,31 @@ Grâce à l'introduction du support des fichiers glTF ou plus précisément des 
 
 \subsection{Système de compression des géométries des bâtiments}
 
-Comme vu à la section \ref{sec:lod}, il est nécessaire de pouvoir fournir plusieurs niveaux de détails en fonction du niveau de la tuile. Pour cela, j'ai implémenté un système de compression des géométries des bâtiments. Ce système se base sur les \texttt{levels} des tuiles discutés à la section \ref{sec:implicit-tiling}. Plus le \texttt{level} est élevé, plus les bâtiments sont proches de la caméra et donc plus les bâtiments doivent être détaillés. Pour effectuer la compression, j'utilise la class \texttt{DouglasPeuckerSimplifier} qui permet de simplifier une géométrie en fusionnant les points les plus proches d'une géométrie.
+Comme vu à la section \ref{sec:lod}, il est nécessaire de pouvoir fournir plusieurs niveaux de détails en fonction du niveau de la tuile. Pour cela, j'ai implémenté un système de compression des géométries des bâtiments. Ce système se base sur les \texttt{levels} des tuiles discutés à la section \ref{sec:implicit-tiling}. Plus le \texttt{level} est élevé, plus les bâtiments sont proches de la caméra et donc plus les bâtiments doivent être détaillés. Pour effectuer la compression, j'utilise la class \href{https://locationtech.github.io/jts/javadoc/org/locationtech/jts/simplify/TopologyPreservingSimplifier.html}{\textit{TopologyPreservingSimplifier}}\footnote{https://locationtech.github.io/jts/javadoc/org/locationtech/jts/simplify/TopologyPreservingSimplifier.html} de la librairie \texttt{org.locationtech.jts} qui permet de simplifier une géométrie en fusionnant les points les plus proches d'une géométrie.
 
-En fonction du \texttt{level} de leur tuile, les bâtiments subissent jusqu'à 3 niveau de compression :
+En fonction du niveau de compression de leur tuile, les bâtiments subissent jusqu'à 3 niveau de compression :
 
 \begin{itemize}
-    \item \texttt{level} 0 : Les bâtiments sont affichés avec toutes les géométries.
-    \item \texttt{level} 1 : Les bâtiments sont affichés avec une géométrie légèrement simplifiée.
-    \item \texttt{level} 2 : Les bâtiments sont affichés avec une géométrie très simplifiée.
-    \item \texttt{level} 3 : Les bâtiments sont affichés avec une géométrie très simplifiée uniquement si ils ont des caractéristiques spécifiques enregistrées dans la base de données OSM.
+    \item niveau de compression 0 : Les bâtiments sont affichés avec toutes les géométries.
+    \item niveau de compression 1 : Les bâtiments sont affichés avec une géométrie légèrement simplifiée.
+    \item niveau de compression 2 : Les bâtiments sont affichés avec une géométrie très simplifiée.
+    \item niveau de compression 3 : Les bâtiments sont affichés avec une géométrie très simplifiée uniquement si ils ont des caractéristiques spécifiques enregistrées dans la base de données OSM.
 \end{itemize}
 
 Pour visualiser les différences entre les niveaux de compression, je vous invite à regarder les figures ci-dessous où chaque niveau de détail est symbolisé par une couleur :
 
 \begin{itemize}
-    \item \texttt{level} 0 : rouge
-    \item \texttt{level} 1 : jaune
-    \item \texttt{level} 2 : vert
-    \item \texttt{level} 3 : bleu
+    \item niveau de compression 0 : rouge
+    \item niveau de compression 1 : jaune
+    \item niveau de compression 2 : vert
+    \item niveau de compression 3 : bleu
 \end{itemize}
 
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\textwidth]{assets/figures/lods-horizon.png}
-    \caption{Vue à l'horizon}
+    \caption{Vue à l'horizon de la ville de Londres}
     \label{fig:lods-horizon}
 \end{figure}
 
@@ -62,15 +62,15 @@ Pour visualiser les différences entre les niveaux de compression, je vous invit
 
 Faire ainsi permet de réduire drastiquement le temps passé à générer ces bâtiments ainsi que de garantir un affichage plus fluide chez le client tout en gardant une qualité d'affichage correcte.
 
-Outre la compression des géométries, une autre autre qui pourrait être développée est un filtrage des tuiles en fonction de leur quantité de bâtiments et de leur niveau de compression. Par exemple, si une tuile ne contient qu'un ou deux petits bâtiments pourrait être omise à l'affichage si elle se trouve assez loin de la caméra pour être à un niveau de compression élevé.
+Outre la compression des géométries, une autre optimisation qui pourrait être développée est un filtrage des tuiles en fonction de leur quantité de bâtiments et de leur niveau de compression. Par exemple, une tuile qui ne contient qu'un ou deux petits bâtiments pourrait être omise à l'affichage, si elle se trouve assez loin de la caméra pour être à un niveau de compression élevé.
 
 \subsection{Géométries des bâtiments}
 
-Avec le niveau de compression ainsi que la \texttt{Geometry}\footnote{org.locationtech.jts.geom.Geometry}, qui nous sert à déterminer le polygone au sol du bâtiment, nous pouvons extruder le bâtiment en 3D. Cependant une \texttt{Geometry} ne contient qu'une liste de points et il faut une liste de triangles pour pouvoir modéliser le bâtiment en 3D. Pour cela, il faut une méthode qui fonctionne avec des polygones concaves et qui déforme le moins possible les géométrie des bâtiments. Une méthode faisant explicitement cela est la méthode \texttt{simplify} de la classe \href{https://locationtech.github.io/jts/javadoc/org/locationtech/jts/simplify/TopologyPreservingSimplifier.html}{\textit{TopologyPreservingSimplifier}}\footnote{https://locationtech.github.io/jts/javadoc/org/locationtech/jts/simplify/TopologyPreservingSimplifier.html} de la librairie \texttt{org.locationtech.jts} qui fonctionne avec des polygones concaves et qui, comme son nom l'indique, préserve la topologie initiale de la géométrie. Cette librairie \texttt{org.locationtech.jts} propose aussi la classe \href{https://locationtech.github.io/jts/javadoc/org/locationtech/jts/triangulate/polygon/PolygonTriangulator.html}{\texttt{PolygonTriangulator}}\footnote{https://locationtech.github.io/jts/javadoc/org/locationtech/jts/triangulate/polygon/PolygonTriangulator.html} qui permet aussi de faire une triangulation de polygones concaves de manière moins optimisée mais plus rapide que la classe \textit{TopologyPreservingSimplifier}. C'est donc cette classe que j'ai utilisée pour trianguler les bâtiments.
+Avec le niveau de compression ainsi que la \texttt{Geometry}\footnote{org.locationtech.jts.geom.Geometry}, qui nous sert à déterminer le polygone au sol du bâtiment, nous pouvons extruder le bâtiment en 3D. Cependant une \texttt{Geometry} ne contient qu'une liste de points et il faut une liste de triangles pour pouvoir modéliser le bâtiment en 3D. Pour cela, il faut une méthode qui fonctionne avec des polygones concaves et qui déforme le moins possible les géométrie des bâtiments. Une méthode faisant explicitement cela est la méthode \texttt{simplify} de la classe \textit{TopologyPreservingSimplifier} qui fonctionne avec des polygones concaves et qui, comme son nom l'indique, préserve la topologie initiale de la géométrie. Cette librairie \texttt{org.locationtech.jts} propose aussi la classe \href{https://locationtech.github.io/jts/javadoc/org/locationtech/jts/triangulate/polygon/PolygonTriangulator.html}{\texttt{PolygonTriangulator}}\footnote{https://locationtech.github.io/jts/javadoc/org/locationtech/jts/triangulate/polygon/PolygonTriangulator.html} qui permet aussi de faire une triangulation de polygones concaves de manière moins optimisée mais plus rapide que la classe \textit{TopologyPreservingSimplifier}. Elle pourrait donc aussi être utilisée pour générer les bâtiments en 3D si souhaité.
 
 Grâce à cette triangulation, il est possible de modéliser les bâtiments en 3D correctement, même ceux comprenant des cours intérieures ou des trous dans leur structure.
 
-La classe \texttt{TopologyPreservingSimplifier} comporte un paramètre \texttt{tolerance} qui permet de définir la distance minimale entre deux points afin d'optimiser le coût de la triangulation.
+La classe \texttt{TopologyPreservingSimplifier} comporte un paramètre \texttt{tolerance} qui permet de définir la distance minimale entre deux points qui seront fusionnés.
 
 Si nous voulons pousser la génération des bâtiments plus loin, beaucoup de données sont disponibles concernant le toit des bâtiments. Ils peuvent être de différentes formes et comportent des défis très intéressants à relever. Un travail de Bachelor a été écrit par M. Philipp Shultz à propos de la visualisation de données OpenStreetMap en WebGL (disponible à l'adresse \href{https://ths.rwth-aachen.de/wp-content/uploads/sites/4/schulz20203d.pdf}{https://ths.rwth-aachen.de/wp-content/uploads/sites/4/schulz20203d.pdf}). Au chapitre 3.2, il parle de la génération de toits de bâtiments en fonction de leur tag OSM. Il serait intéressant de reprendre ces idées pour améliorer la génération des bâtiments en 3D.
 
@@ -102,10 +102,6 @@ Le calcul de la hauteur des bâtiments doit se faire en fonction de la \href{htt
               \item Si le tag \texttt{roof:levels} est présent,
                     \begin{itemize}
                         \item La hauteur du toit \texttt{roof:levels} multipliée par 3 mètres doit être additionnée à la hauteur du bâtiment.
-                    \end{itemize}
-              \item Si le tag \texttt{building:min\_level} est présent,
-                    \begin{itemize}
-                        \item La hauteur du vide en dessous du bâtiment est égale à la valeur du tag \texttt{building:min\_level} multipliée par 3 mètres.
                     \end{itemize}
           \end{itemize}
 \end{itemize}
@@ -144,4 +140,4 @@ Plus intéressant encore, générer ces fichiers 3D par bâtiment nous pousserai
 
 Pour pouvoir générer un fichier glTF par bâtiment, il faut utiliser le concept de \textit{Multiple Content} introduit dans la version 1.1 de la spécification 3D Tiles \cite{3d-tiles-reference-card-v1_1}. Pour utiliser cela, il faut remplacer le champ \texttt{content} de chaque tuile par un champ \texttt{contents} qui sera une liste de plusieurs \texttt{content}. Chaque \texttt{content} contiendra un \texttt{uri} qui pointera vers le fichier glTF du bâtiment.
 
-Cependant, un problème survient si l'on utilise en même temps l'implicit tiling lors de la génération des \textit{Subtrees}. Ces Subtrees, définits plus en profondeur dans leur chapitre dédié, nécessitent une liste de disponibilité (\autoref{sec:availability-class}) \textbf{par content}. En d'autres termes, si une tuile contient $X$ bâtiments, il faudra $X$ listes de disponibilité sur la tuile. Sur chacune de ces listes, une seule valeur sera à \texttt{true}, la valeur correspondant à l'index de la tuile sur laquelle le bâtiment se trouve. Cela rend donc la génération des Subtrees beaucoup plus complexe et énormément plus volumineuse. Pour plus de précisions sur le pourquoi de cette complexité, je vous invite à lire le chapitre dédié aux Subtrees.
+Cependant, un problème survient si l'on utilise en même temps l'implicit tiling lors de la génération des \textit{Subtrees}. Ces Subtrees, définis plus en profondeur dans leur chapitre dédié, nécessitent une liste de disponibilité (\autoref{sec:availability-class}) \textbf{par content}. En d'autres termes, si une tuile contient $X$ bâtiments, il faudra $X$ listes de disponibilité sur la tuile. Sur chacune de ces listes, une seule valeur sera à \texttt{true}, la valeur correspondant à l'index de la tuile sur laquelle le bâtiment se trouve. Cela rend donc la génération des Subtrees beaucoup plus complexe et énormément plus volumineuse.

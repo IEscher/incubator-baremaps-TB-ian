@@ -1,4 +1,4 @@
-Le Morton index, également connu sous le nom de code Z, est une technique d'encodage spatiale utilisée dans le contexte de l'implicit tiling. Cette méthode permet de convertir des coordonnées multidimensionnelles en une valeur unidimensionnelle tout en préservant la proximité spatiale des points. Dans le cas de Cesium, le Morton index facilite le découpage et l'organisation hiérarchique des tuiles, rendant plus efficace la gestion et le rendu des grandes quantités de données géospatiales. En encodant les coordonnées des tuiles dans une structure arborescente, le Morton index permet une récupération rapide des tuiles nécessaires pour afficher une vue spécifique, optimisant ainsi les performances et la fluidité de la visualisation.
+Le Morton index, également connu sous le nom \href{https://en.wikipedia.org/wiki/Z-order\_curve}{\textit{Z-Order Curve}}\footnote{{https://en.wikipedia.org/wiki/Z-order\_curve}}, est une technique d'encodage spatiale utilisée dans le contexte de l'implicit tiling. Cette méthode permet de convertir des coordonnées multidimensionnelles en une valeur unidimensionnelle tout en préservant la proximité spatiale des points. Dans le cas de Cesium, le Morton index facilite le découpage et l'organisation hiérarchique des tuiles, rendant plus efficace la gestion et le rendu des grandes quantités de données géospatiales. En encodant les coordonnées des tuiles dans une structure arborescente, le Morton index permet une récupération rapide des tuiles nécessaires pour afficher une vue spécifique, optimisant ainsi les performances et la fluidité de la visualisation.
 
 Il y a plusieurs opérations sur les indexes de Morton qui sont nécessaires pour la gestion des tuiles. Ces opérations sont les suivantes :
 
@@ -6,12 +6,11 @@ Il y a plusieurs opérations sur les indexes de Morton qui sont nécessaires pou
     \item Convertir des coordonnées (X, Y, Level) en un index de Morton.
     \item Convertir un index de Morton en des coordonnées (X, Y, Level).
     \item Obtenir les 4 indexes enfants d'un index de Morton.
-    \item Obtenir le nombre de bits nécessaires pour encoder un index de Morton.
 \end{itemize}
 
 \subsection*{Conversion de coordonnées en index de Morton}
 
-Pour convertir des coordonnées (X, Y, Level) en un index de Morton, nous devons les \textit{intercaler} pour former un seul entier. L'intercalation des bits est une technique qui consiste à mélanger les bits de deux entiers pour former un index de Morton. Supposons que nous ayons deux entiers \( X \) et \( Y \), et que nous voulons les combiner en un seul entier \( Zz \) en intercalant leurs bits.
+Pour convertir des coordonnées (X, Y, Level) en un index de Morton, nous devons les \textit{intercaler} pour former un seul entier. L'intercalation des bits est une technique qui consiste à mélanger les bits de deux entiers pour former un index de Morton. Supposons que nous ayons deux entiers \( X \) et \( Y \), et que nous voulons les combiner en un seul entier \( Z \) en intercalant leurs bits.
 
 1. \textbf{Représentation binaire}
 
@@ -65,7 +64,7 @@ Ainsi, l'index de Morton pour \( x = 5 \) et \( y = 3 \) est \( 27 \).
 
 \subsection*{Conversion d'un index de Morton en coordonnées}
 
-Le processus inverse du \textit{interleaving bits} consiste à séparer les bits d'un index de Morton \( Z \) pour récupérer les deux entiers \( X \) et \( X \).
+Le processus inverse du \textit{interleaving bits} consiste à séparer les bits d'un index de Morton \( Z \) pour récupérer les deux entiers \( X \) et \( Y \).
 
 1. \textbf{Représentation binaire} :
 
@@ -126,7 +125,7 @@ Par exemple, pour obtenir l'index de Morton de l'enfant 2 de l'index de Morton 2
 Ainsi, l'index de Morton de l'enfant 2 de l'index de Morton 27 est 110.
 
 \newpage
-Une distinction qui se trouve parfois pratique est la distinction d'un index local versus un index global. Un index global est un index de Morton qui représente une tuile sur l'entièreté du Tileset, en comptant donc depuis l'index 0 du level 0. Tandis qu'un index local est un index de Morton qui représente une tuile avec pour référence l'index 0 du subtree.
+Une distinction qui se trouve parfois pratique est la distinction d'un index local avec un index global. Un index global est un index de Morton qui représente une tuile sur l'entièreté du Tileset, en comptant donc depuis l'index 0 du level 0. Tandis qu'un index local est un index de Morton qui représente une tuile avec pour référence l'index 0 du subtree.
 
 \begin{figure}[H]
     \centering
