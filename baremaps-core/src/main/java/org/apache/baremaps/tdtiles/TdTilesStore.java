@@ -21,13 +21,10 @@ import static org.apache.baremaps.tdtiles.GltfBuilder.*;
 import static org.apache.baremaps.tdtiles.utils.MortonIndexes.*;
 
 import de.javagl.jgltf.model.NodeModel;
-
-import java.awt.event.TextEvent;
 import java.sql.*;
 import java.util.*;
 import javax.sql.DataSource;
 import org.apache.baremaps.tdtiles.building.Building;
-import org.apache.baremaps.tdtiles.tileset.*;
 import org.apache.baremaps.tdtiles.utils.Color;
 import org.apache.baremaps.tdtiles.utils.ColorUtility;
 import org.apache.baremaps.tilestore.TileStoreException;
@@ -68,11 +65,12 @@ public class TdTilesStore {
           "tags -> 'roof:angle', " + // 14
           "tags -> 'roof:direction', " + // 15
           "tags -> 'min_height', " + // 16
-          "tags -> 'building:min_height' " + // 17
+          "tags -> 'building:min_height', " + // 17
+          "id " + // 18
           "FROM osm_ways WHERE (tags ? 'building' or tags ? 'building:part') AND " +
           "st_intersects(geom, st_makeenvelope(%1$s, %2$s, %3$s, %4$s, 4326))" +
-      "UNION " +
-      "SELECT st_asbinary(geom), " + // 1
+          "UNION " +
+          "SELECT st_asbinary(geom), " + // 1
           "tags -> 'building', " + // 2
           "tags -> 'height', " + // 3
           "tags -> 'building:levels', " + // 4
@@ -88,17 +86,30 @@ public class TdTilesStore {
           "tags -> 'roof:angle', " + // 14
           "tags -> 'roof:direction', " + // 15
           "tags -> 'min_height', " + // 16
-          "tags -> 'building:min_height' " + // 17
+          "tags -> 'building:min_height', " + // 17
+          "id " + // 18
           "FROM osm_relations WHERE (tags ? 'building' or tags ? 'building:part') AND " +
           "st_intersects(geom, st_makeenvelope(%1$s, %2$s, %3$s, %4$s, 4326))";
 
-  private static final String UPSERT_QUERY =
+  private static final String CHECK_BUILDING_PRESENCE_QUERY =
+      "SELECT id FROM td_tile_buildings_in_tiles WHERE id = ? AND compression = ?";
+
+  private static final String INSERT_BUILDING_PRESENCE_QUERY =
+      "INSERT INTO td_tile_buildings_in_tiles (id, compression) VALUES (?, ?) ON CONFLICT (id, compression) DO NOTHING";
+
+  private static final String DELETE_BUILDING_PRESENCE_QUERY =
+      "DELETE FROM td_tile_buildings_in_tiles";
+
+  private static final String UPSERT_GLTF_QUERY =
       "INSERT INTO td_tile_gltf (x, y, level, gltf_binary) " +
           "VALUES (?, ?, ?, ?) " +
           "ON CONFLICT (x, y, level) DO UPDATE SET gltf_binary = ?";
 
-  private static final String READ_QUERY =
+  private static final String READ_GLTF_QUERY =
       "SELECT gltf_binary FROM td_tile_gltf WHERE x = ? AND y = ? AND level = ?";
+
+  private static final String DELETE_GLTF_QUERY =
+      "DELETE FROM td_tile_gltf";
 
   private final DataSource datasource;
   private final int maxCompression;
@@ -115,6 +126,11 @@ public class TdTilesStore {
     this.minLevel = minLevel;
     this.maxLevel = maxLevel;
     this.reloadTiles = reloadTiles;
+
+    if(reloadTiles) {
+      deleteBuildingPresence();
+      deleteGltf();
+    }
   }
 
   public byte[] getGlb(int level, long x, long y) throws Exception {
@@ -125,7 +141,7 @@ public class TdTilesStore {
     // Retrieve the gltf in the database if it exists
     byte[] tileExists = read(level, x, y);
 
-    if (tileExists != null && !reloadTiles) {
+    if (tileExists != null) {
       return tileExists;
     } else {
       // Find the unprocessed buildings in the tile
@@ -141,6 +157,9 @@ public class TdTilesStore {
 
       List<NodeModel> nodes = new LinkedList<>();
       for (Building building : buildings) {
+        if(checkBuildingAlreadyInTile(building.id(), compression)) {
+          continue;
+        }
         Optional<NodeModel> node = createNode(building, compression);
         node.ifPresent(nodes::add);
       }
@@ -174,6 +193,8 @@ public class TdTilesStore {
 
       try (ResultSet resultSet = statement.executeQuery(sql)) {
         while (resultSet.next()) {
+          // Check if the building has already been added to a Tile
+
           byte[] bytes = resultSet.getBytes(1);
           Geometry geometry = GeometryUtils.deserialize(bytes);
 
@@ -193,6 +214,7 @@ public class TdTilesStore {
           String roofDirection = resultSet.getString(15);
           String minHeight = resultSet.getString(16);
           String buildingMinHeight = resultSet.getString(17);
+          String idString = resultSet.getString(18);
 
           Color finalColor = new Color(1f, 1f, 1f);
           boolean informationFound = true;
@@ -201,65 +223,72 @@ public class TdTilesStore {
               && buildingColor == null && buildingMaterial == null && roofShape == null
               && roofLevels == null && roofHeight == null && roofColor == null
               && roofMaterial == null && roofAngle == null && roofDirection == null) {
-//            finalColor = new Color(1f, 0f, 0f);
+            // finalColor = new Color(1f, 0f, 0f);
             informationFound = false;
           }
 
-          if (buildingColor != null) {
-            try {
-              finalColor = ColorUtility.parseName(buildingColor);
-            } catch (Exception e) {
-              // System.out.println("osm_ways: Error parsing color: " + e); // TODO reput
-            }
-          }
+          // Parsing may result in a NumberFormatException if it is empty
+          try {
+            long id = Long.parseLong(idString);
 
-          float finalHeight = 10;
-          float finalMinHeight = 0;
-          if (height != null) {
-            finalHeight = Float.parseFloat(height.replaceAll("[^0-9.]", ""));
-            if (roofHeight != null) {
-              finalHeight -= Float.parseFloat(roofHeight.replaceAll("[^0-9.]", ""));
+            if (buildingColor != null) {
+              try {
+                finalColor = ColorUtility.parseName(buildingColor);
+              } catch (Exception e) {
+                // System.out.println("osm_ways: Error parsing color: " + e); // TODO reput
+              }
             }
-          } else if (buildingLevels != null || roofLevels != null) {
-            finalHeight = 0;
-            if (buildingLevels != null) {
-              finalHeight += Float.parseFloat(buildingLevels.replaceAll("[^0-9.]", "")) * 3;
-            }
-            if (roofLevels != null) {
-              finalHeight += Float.parseFloat(roofLevels.replaceAll("[^0-9.]", "")) * 3;
-            }
-          }
-          // The different minimum heights must also be added to the total height even if it is representing
-          // empty space underneath the building
-          if (buildingMinLevels != null) {
-            float value = Float.parseFloat(buildingMinLevels.replaceAll("[^0-9.]", "")) * 3;
-//            finalHeight += value;
-            finalMinHeight += value;
-          }
-          if (buildingMinHeight != null) {
-            float value = Float.parseFloat(buildingMinHeight.replaceAll("[^0-9.]", ""));
-//            finalHeight += value;
-            finalMinHeight += value;
-          }
-          if (minHeight != null) {
-            float value = Float.parseFloat(minHeight.replaceAll("[^0-9.]", ""));
-//            finalHeight += value;
-            finalMinHeight += value;
-          }
 
-          // Debug code
-          if (finalHeight < 0) {
-            System.out.println("Negative height: " + finalHeight);
-            finalHeight = 0;
-          }
+            float finalHeight = 10;
+            float finalMinHeight = 0;
+            if (height != null) {
+              finalHeight = Float.parseFloat(height.replaceAll("[^0-9.]", ""));
+              if (roofHeight != null) {
+                finalHeight -= Float.parseFloat(roofHeight.replaceAll("[^0-9.]", ""));
+              }
+            } else if (buildingLevels != null || roofLevels != null) {
+              finalHeight = 0;
+              if (buildingLevels != null) {
+                finalHeight += Float.parseFloat(buildingLevels.replaceAll("[^0-9.]", "")) * 3;
+              }
+              if (roofLevels != null) {
+                finalHeight += Float.parseFloat(roofLevels.replaceAll("[^0-9.]", "")) * 3;
+              }
+            }
+            // The different minimum heights must also be added to the total height even if it is
+            // representing
+            // empty space underneath the building
+            if (buildingMinLevels != null) {
+              float value = Float.parseFloat(buildingMinLevels.replaceAll("[^0-9.]", "")) * 3;
+              // finalHeight += value;
+              finalMinHeight += value;
+            }
+            if (buildingMinHeight != null) {
+              float value = Float.parseFloat(buildingMinHeight.replaceAll("[^0-9.]", ""));
+              // finalHeight += value;
+              finalMinHeight += value;
+            }
+            if (minHeight != null) {
+              float value = Float.parseFloat(minHeight.replaceAll("[^0-9.]", ""));
+              // finalHeight += value;
+              finalMinHeight += value;
+            }
 
-          buildings.add(new Building(
-              geometry,
-              informationFound,
-              finalHeight,
-              finalMinHeight,
-              finalColor,
-              null));
+            // Debug code
+            if (finalHeight < 0) {
+              System.out.println("Negative height: " + finalHeight);
+              finalHeight = 0;
+            }
+
+            buildings.add(new Building(
+                id,
+                geometry,
+                informationFound,
+                finalHeight,
+                finalMinHeight, finalColor, null));
+          } catch (NumberFormatException e) {
+             System.out.println("td_tile_gltf: Error parsing id: " + e);
+          }
         }
       }
       return buildings;
@@ -269,10 +298,62 @@ public class TdTilesStore {
     }
   }
 
+  public boolean checkBuildingAlreadyInTile(long buildingId, int compression) throws TileStoreException {
+    try (Connection connection = datasource.getConnection()) {
+      // Check if the building id with the specific compression is already present
+      logger.debug("Executing query: {}", CHECK_BUILDING_PRESENCE_QUERY);
+      try (PreparedStatement checkStmt = connection.prepareStatement(CHECK_BUILDING_PRESENCE_QUERY)) {
+        checkStmt.setLong(1, buildingId);
+        checkStmt.setInt(2, compression);
+        try (ResultSet resultSet = checkStmt.executeQuery()) {
+          if (resultSet.next()) {
+//            System.out.println("td_tile_gltf: Building id: " + buildingId + " with compression: " + compression + " already present");
+            return true; // Building id with the specific compression is already present
+          }
+        }
+      }
+
+      // Insert the building id with the specific compression into the table
+      logger.debug("Executing query: {}", INSERT_BUILDING_PRESENCE_QUERY);
+      try (PreparedStatement insertStmt = connection.prepareStatement(INSERT_BUILDING_PRESENCE_QUERY)) {
+        insertStmt.setLong(1, buildingId);
+        insertStmt.setInt(2, compression);
+        insertStmt.executeUpdate();
+      }
+
+//      System.out.println("td_tile_gltf: Building id: " + buildingId + " with compression: " + compression + " not present");
+      return false; // Building id with the specific compression was not present and has been inserted
+    } catch (SQLException e) {
+      throw new TileStoreException(e);
+    }
+  }
+
+  public void deleteBuildingPresence() {
+    try (Connection connection = datasource.getConnection()) {
+      logger.debug("Executing query: {}", DELETE_BUILDING_PRESENCE_QUERY);
+      try (PreparedStatement deleteStmt = connection.prepareStatement(DELETE_BUILDING_PRESENCE_QUERY)) {
+        deleteStmt.executeUpdate();
+      }
+    } catch (SQLException e) {
+      System.err.println("Error deleting building presence table: " + e);
+    }
+  }
+
+  public void deleteGltf() {
+    try (Connection connection = datasource.getConnection()) {
+      logger.debug("Executing query: {}", DELETE_GLTF_QUERY);
+      try (PreparedStatement deleteStmt = connection.prepareStatement(DELETE_GLTF_QUERY)) {
+        deleteStmt.executeUpdate();
+      }
+    } catch (SQLException e) {
+      System.err.println("Error deleting gltf: " + e);
+    }
+  }
+
   public void update(int level, long x, long y, byte[] data) throws TileStoreException {
     try (Connection connection = datasource.getConnection()) {
-      logger.debug("Executing query: {}", UPSERT_QUERY);
-      try (PreparedStatement preparedStatement = connection.prepareStatement(UPSERT_QUERY)) {
+      logger.debug("Executing query: {}", UPSERT_GLTF_QUERY);
+      try (PreparedStatement preparedStatement = connection.prepareStatement(UPSERT_GLTF_QUERY)) {
         preparedStatement.setLong(1, x);
         preparedStatement.setLong(2, y);
         preparedStatement.setInt(3, level);
@@ -289,11 +370,11 @@ public class TdTilesStore {
 
   public byte[] read(int level, long x, long y) throws TileStoreException {
     try (Connection connection = datasource.getConnection();
-        PreparedStatement statement = connection.prepareStatement(READ_QUERY)) {
+        PreparedStatement statement = connection.prepareStatement(READ_GLTF_QUERY)) {
       statement.setLong(1, x);
       statement.setLong(2, y);
       statement.setInt(3, level);
-      logger.debug("Executing query: {}", READ_QUERY);
+      logger.debug("Executing query: {}", READ_GLTF_QUERY);
       try (ResultSet resultSet = statement.executeQuery()) {
         if (resultSet.next()) {
           // System.out.println("td_tile_gltf: Tile found: " + level + "__" + x + "_" + y);

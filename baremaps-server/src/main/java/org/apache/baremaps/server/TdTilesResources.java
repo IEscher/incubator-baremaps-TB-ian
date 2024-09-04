@@ -91,7 +91,8 @@ public class TdTilesResources {
 
   public TdTilesResources(DataSource dataSource) {
     this.tdTilesStore =
-        new TdTilesStore(dataSource, MAX_COMPRESSION, COMPRESSION_LEVELS, MIN_LEVEL, MAX_LEVEL, RELOAD_TILES);
+        new TdTilesStore(dataSource, MAX_COMPRESSION, COMPRESSION_LEVELS, MIN_LEVEL, MAX_LEVEL,
+            RELOAD_TILES);
     this.tdSubtreeStore = new TdSubtreeStore(dataSource, MIN_LEVEL, MAX_LEVEL,
         SUBTREE_LEVELS, RANK_AMOUNT, RELOAD_SUBTREES, GENERATE_ALL_SUBTREES);
   }

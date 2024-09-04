@@ -35,9 +35,9 @@ import java.util.*;
 import org.apache.baremaps.tdtiles.building.Building;
 import org.apache.commons.lang3.ArrayUtils;
 import org.locationtech.jts.geom.*;
+import org.locationtech.jts.geom.util.GeometryFixer;
 import org.locationtech.jts.geomgraph.Edge;
 import org.locationtech.jts.math.Vector3D;
-import org.locationtech.jts.simplify.DouglasPeuckerSimplifier;
 import org.locationtech.jts.simplify.TopologyPreservingSimplifier;
 import org.locationtech.jts.triangulate.polygon.PolygonTriangulator;
 
@@ -56,43 +56,63 @@ public class GltfBuilder {
       return Optional.empty();
     }
 
-    Geometry geometry = building.geometry();
+    Geometry geometry = building.geometry().copy();
 
     switch (compression) {
       case 0:
         break;
       case 1:
-//        geometry = DouglasPeuckerSimplifier.simplify(building.geometry(), 0.00001);
+        // geometry = DouglasPeuckerSimplifier.simplify(building.geometry(), 0.00001);
         geometry = TopologyPreservingSimplifier.simplify(building.geometry(), 0.00001);
         break;
       case 2:
-//        geometry = DouglasPeuckerSimplifier.simplify(building.geometry(), 0.00005);
+        // geometry = DouglasPeuckerSimplifier.simplify(building.geometry(), 0.00005);
         geometry = TopologyPreservingSimplifier.simplify(building.geometry(), 0.00005);
         break;
       case 3:
         if (!building.informationFound()) {
           return Optional.empty();
         }
-//        geometry = DouglasPeuckerSimplifier.simplify(building.geometry(), 0.0001);
+        // geometry = DouglasPeuckerSimplifier.simplify(building.geometry(), 0.0001);
         geometry = TopologyPreservingSimplifier.simplify(building.geometry(), 0.0001);
         break;
       case 4:
         if (!building.informationFound()) {
           return Optional.empty();
         }
-//        geometry = DouglasPeuckerSimplifier.simplify(building.geometry(), 0.0001);
+        // geometry = DouglasPeuckerSimplifier.simplify(building.geometry(), 0.0001);
         geometry = TopologyPreservingSimplifier.simplify(building.geometry(), 0.0001);
         break;
     }
+//    geometry = TopologyPreservingSimplifier.simplify(building.geometry(), 0.0001);
 
     // Tessellate the vector data
     Geometry triangulation;
-    try { // can crash if the geometry is not a polygon, this can happen after simplifying the geometry too much
+    try { // can crash if the geometry is not a polygon, this can happen after simplifying the
+          // geometry too much
       triangulation = PolygonTriangulator.triangulate(geometry);
     } catch (Exception e) {
-      System.out.println("Error triangulating building.");
-      return Optional.empty();
+      // Trying again with the original geometry
+      try {
+        triangulation = PolygonTriangulator.triangulate(building.geometry());
+      } catch (Exception e1) {
+        try {
+          // Trying again with the geometry fixed
+          Geometry fixedGeometry = GeometryFixer.fix(building.geometry());
+          triangulation = PolygonTriangulator.triangulate(fixedGeometry);
+        } catch (Exception e2) {
+          // Trying again with the geometry without holes
+          try {
+            geometry = building.geometry().convexHull();
+            triangulation = PolygonTriangulator.triangulate(geometry);
+          } catch (Exception e3) {
+            System.out.println("Error triangulating building: " + e3.getMessage());
+            return Optional.empty();
+          }
+        }
+      }
     }
+
     if (triangulation.getNumGeometries() == 0) {
       return Optional.empty();
     }
@@ -144,11 +164,11 @@ public class GltfBuilder {
         break;
     }
 
-//    if (building.informationFound()) {
-//      materialBuilder.setBaseColorFactor(1.0f, 1.0f, 1.0f, 1.0f);
-//    } else {
-//      materialBuilder.setBaseColorFactor(0.3f, 0.3f, 0.3f, 1.0f);
-//    }
+    // if (building.informationFound()) {
+    // materialBuilder.setBaseColorFactor(1.0f, 1.0f, 1.0f, 1.0f);
+    // } else {
+    // materialBuilder.setBaseColorFactor(0.3f, 0.3f, 0.3f, 1.0f);
+    // }
 
     // materialBuilder.setBaseColorFactor(building.color().r(), building.color().g(),
     // building.color().b(), 1.0f);
@@ -217,7 +237,7 @@ public class GltfBuilder {
   private static void createWalls(Building building, float[] translation, List<Float> vertices,
       List<Integer> indices, HashSet<Edge> edges) {
     float elevation = building.minheight();
-//    float elevation = 50;
+    // float elevation = 50;
     for (Edge edge : edges) {
       Coordinate[] v = edge.getCoordinates();
 

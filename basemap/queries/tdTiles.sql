@@ -22,3 +22,11 @@ CREATE TABLE td_tile_gltf
     gltf_binary bytea,
     UNIQUE (x, y, level)
 );
+
+DROP TABLE IF EXISTS td_tile_buildings_in_tiles;
+CREATE TABLE td_tile_buildings_in_tiles
+(
+    id          bigint,
+    compression integer,
+    UNIQUE (id, compression)
+);

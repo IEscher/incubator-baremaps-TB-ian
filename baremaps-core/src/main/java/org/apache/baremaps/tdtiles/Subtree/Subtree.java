@@ -28,9 +28,9 @@ public class Subtree {
   private final int levels;
 
   public Subtree(Availability tileAvailability,
-                 Availability contentAvailability,
-                 Availability childSubtreeAvailability,
-                 int levels) {
+      Availability contentAvailability,
+      Availability childSubtreeAvailability,
+      int levels) {
     this.tileAvailability = tileAvailability;
     this.contentAvailability = contentAvailability;
     this.childSubtreeAvailability = childSubtreeAvailability;
@@ -121,10 +121,10 @@ public class Subtree {
     int contentCount = parentContentAvailability.getBitSet(false).cardinality();
 
     // TODO fix that
-//    if (parentChildSubtreeAvailability.getBitSet(true).isEmpty()) {
-//      System.err.println("Empty child subtree availability: "
-//          + parentChildSubtreeAvailability.getBitSet(true).toString());
-//    }
+    // if (parentChildSubtreeAvailability.getBitSet(true).isEmpty()) {
+    // System.err.println("Empty child subtree availability: "
+    // + parentChildSubtreeAvailability.getBitSet(true).toString());
+    // }
 
     return new Subtree(parentTileAvailability, parentContentAvailability,
         parentChildSubtreeAvailability,

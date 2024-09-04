@@ -17,15 +17,13 @@
 
 package org.apache.baremaps.tdtiles.utils;
 
-import org.apache.baremaps.tilestore.TileStoreException;
-import org.apache.baremaps.vectortile.tileset.Database;
-import org.slf4j.Logger;
-
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import javax.sql.DataSource;
+import org.apache.baremaps.tilestore.TileStoreException;
+import org.slf4j.Logger;
 
 public class MortonIndexes {
 
@@ -35,12 +33,12 @@ public class MortonIndexes {
           "FROM osm_ways " +
           "WHERE (tags ? 'building' OR tags ? 'building:part') " +
           "AND st_intersects(geom, st_makeenvelope(%1$s, %2$s, %3$s, %4$s, 4326))" +
-      ") OR EXISTS (" +
+          ") OR EXISTS (" +
           "SELECT 1 " +
           "FROM osm_relations " +
           "WHERE (tags ? 'building' OR tags ? 'building:part') " +
           "AND st_intersects(geom, st_makeenvelope(%1$s, %2$s, %3$s, %4$s, 4326))" +
-      ") AS has_buildings";
+          ") AS has_buildings";
 
 
   /**
@@ -77,9 +75,10 @@ public class MortonIndexes {
     return result;
   }
 
-  public static boolean readBuildingCount(long x, long y, int globalLevel, DataSource datasource, Logger logger) throws TileStoreException {
+  public static boolean readBuildingCount(long x, long y, int globalLevel, DataSource datasource,
+      Logger logger) throws TileStoreException {
     try (Connection connection = datasource.getConnection();
-         Statement statement = connection.createStatement()) {
+        Statement statement = connection.createStatement()) {
       float[] coords = xyzToLatLonRadians(x, y, globalLevel);
       String sql = "SELECT EXISTS (" +
           "SELECT 1 " +

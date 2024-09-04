@@ -20,6 +20,6 @@ package org.apache.baremaps.tdtiles.building;
 import org.apache.baremaps.tdtiles.utils.Color;
 import org.locationtech.jts.geom.Geometry;
 
-public record Building(Geometry geometry, boolean informationFound, float height, float minheight,
-    Color color, Roof roof) {
+public record Building(long id, Geometry geometry, boolean informationFound, float height, float minheight,
+                       Color color, Roof roof) {
 }

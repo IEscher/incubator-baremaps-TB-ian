@@ -73,7 +73,7 @@ public class TdSubtreeStore {
   }
 
   public TdSubtreeStore(DataSource datasource, int minLevel, int maxLevel,
-                        int subtreeLevels, int rankAmount, boolean reloadSubtrees, boolean generateAllSubtrees) {
+      int subtreeLevels, int rankAmount, boolean reloadSubtrees, boolean generateAllSubtrees) {
     this.datasource = datasource;
     this.minLevel = minLevel;
     this.maxLevel = maxLevel;
@@ -95,7 +95,7 @@ public class TdSubtreeStore {
     if (!reloadSubtrees) {
       byte[] subtree = readSubtree(mortonIndex, level);
       if (subtree != null) {
-         System.out.println("td_subtrees: Subtree found in db: " + level + "__" + x + "_" + y);
+        System.out.println("td_subtrees: Subtree found in db: " + level + "__" + x + "_" + y);
         return subtree;
       }
     }
@@ -313,7 +313,8 @@ public class TdSubtreeStore {
         // if(readBuildingCount(xy[0], xy[1], maxLevel) > 0) {
         // System.out.println("building at " + xy[0] + ", " + xy[1]);
         // }
-        buildingPresenceBitSet.set(i, readBuildingCount(xy[0], xy[1], maxLevel, datasource, logger));
+        buildingPresenceBitSet.set(i,
+            readBuildingCount(xy[0], xy[1], maxLevel, datasource, logger));
       }
     }
 
