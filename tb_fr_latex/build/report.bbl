@@ -164,6 +164,33 @@
       \endverb
       \keyw{implicit,tiling,3d-tiles}
     \endentry
+    \entry{MinLevel-image}{online}{}
+      \name{author}{1}{}{%
+        {{hash=7e9cea4fb21abc9cd4eeee5116f7e101}{%
+           family={OpenStreetMap},
+           familyi={O\bibinitperiod}}}%
+      }
+      \strng{namehash}{7e9cea4fb21abc9cd4eeee5116f7e101}
+      \strng{fullhash}{7e9cea4fb21abc9cd4eeee5116f7e101}
+      \strng{bibnamehash}{7e9cea4fb21abc9cd4eeee5116f7e101}
+      \strng{authorbibnamehash}{7e9cea4fb21abc9cd4eeee5116f7e101}
+      \strng{authornamehash}{7e9cea4fb21abc9cd4eeee5116f7e101}
+      \strng{authorfullhash}{7e9cea4fb21abc9cd4eeee5116f7e101}
+      \field{labelalpha}{Ope}
+      \field{sortinit}{9}
+      \field{sortinithash}{0a5ebc79d83c96b6579069544c73c7d4}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{addendum}{(accessed: 24.07.2024)}
+      \field{title}{Minimum level of buildings}
+      \verb{urlraw}
+      \verb https://wiki.openstreetmap.org/wiki/File:Minlevel.svg
+      \endverb
+      \verb{url}
+      \verb https://wiki.openstreetmap.org/wiki/File:Minlevel.svg
+      \endverb
+      \keyw{OpenStreetMap,OSM,building,MinLevel}
+    \endentry
     \entry{3DTILES_bounding_volume_S2-website}{online}{}
       \name{author}{1}{}{%
         {{hash=1cb71813949fcb3aebef1f6eadcd72df}{%

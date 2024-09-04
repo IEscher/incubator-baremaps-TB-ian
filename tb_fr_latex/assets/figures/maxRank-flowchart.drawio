@@ -1,71 +1,81 @@
-<mxfile host="app.diagrams.net" modified="2024-07-22T20:31:35.251Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36" version="24.7.3" etag="8sTOrv68lHXW19VKC1hF" type="device">
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36" version="24.7.4">
   <diagram id="zfGk0-KSVi7Sft8G-3vX" name="Page-1">
-    <mxGraphModel dx="2074" dy="1258" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="1562" dy="972" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="-gDlBy8a9iDTA-vuk_ET-1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="-gDlBy8a9iDTA-vuk_ET-2" target="-gDlBy8a9iDTA-vuk_ET-7">
+        <mxCell id="-gDlBy8a9iDTA-vuk_ET-1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="-gDlBy8a9iDTA-vuk_ET-2" target="-gDlBy8a9iDTA-vuk_ET-7" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="-gDlBy8a9iDTA-vuk_ET-2" value="Create a Subtree of maximum rank" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="-gDlBy8a9iDTA-vuk_ET-2" value="Create a Subtree of maximum rank" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="80" y="60" width="120" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="-gDlBy8a9iDTA-vuk_ET-3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="-gDlBy8a9iDTA-vuk_ET-7" target="-gDlBy8a9iDTA-vuk_ET-9">
+        <mxCell id="-gDlBy8a9iDTA-vuk_ET-3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="-gDlBy8a9iDTA-vuk_ET-7" target="-gDlBy8a9iDTA-vuk_ET-9" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="-gDlBy8a9iDTA-vuk_ET-4" value="Yes" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="-gDlBy8a9iDTA-vuk_ET-3">
+        <mxCell id="-gDlBy8a9iDTA-vuk_ET-4" value="Yes" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="-gDlBy8a9iDTA-vuk_ET-3" vertex="1" connectable="0">
           <mxGeometry x="-0.0667" y="3" relative="1" as="geometry">
             <mxPoint x="7" y="-11" as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="-gDlBy8a9iDTA-vuk_ET-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="-gDlBy8a9iDTA-vuk_ET-7" target="-gDlBy8a9iDTA-vuk_ET-27">
+        <mxCell id="-gDlBy8a9iDTA-vuk_ET-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="-gDlBy8a9iDTA-vuk_ET-7" target="-gDlBy8a9iDTA-vuk_ET-27" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="-gDlBy8a9iDTA-vuk_ET-6" value="No" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="-gDlBy8a9iDTA-vuk_ET-5">
+        <mxCell id="-gDlBy8a9iDTA-vuk_ET-6" value="No" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="-gDlBy8a9iDTA-vuk_ET-5" vertex="1" connectable="0">
           <mxGeometry x="-0.3796" y="2" relative="1" as="geometry">
             <mxPoint x="3" y="-66" as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="-gDlBy8a9iDTA-vuk_ET-7" value="Is there buildings in the tile?" style="rhombus;whiteSpace=wrap;html=1;spacing=15;" vertex="1" parent="1">
+        <mxCell id="-gDlBy8a9iDTA-vuk_ET-7" value="Is there buildings in the tile?" style="rhombus;whiteSpace=wrap;html=1;spacing=15;" parent="1" vertex="1">
           <mxGeometry x="85" y="180" width="110" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="-gDlBy8a9iDTA-vuk_ET-8" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="-gDlBy8a9iDTA-vuk_ET-9" target="-gDlBy8a9iDTA-vuk_ET-14">
+        <mxCell id="-gDlBy8a9iDTA-vuk_ET-8" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="-gDlBy8a9iDTA-vuk_ET-9" target="-gDlBy8a9iDTA-vuk_ET-14" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="280" y="320" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="-gDlBy8a9iDTA-vuk_ET-9" value="Create a BitSet" style="whiteSpace=wrap;html=1;spacing=15;" vertex="1" parent="1">
+        <mxCell id="-gDlBy8a9iDTA-vuk_ET-9" value="Create a BitSet" style="whiteSpace=wrap;html=1;spacing=15;" parent="1" vertex="1">
           <mxGeometry x="80" y="305" width="120" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="-gDlBy8a9iDTA-vuk_ET-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="-gDlBy8a9iDTA-vuk_ET-14" target="-gDlBy8a9iDTA-vuk_ET-17">
+        <mxCell id="-gDlBy8a9iDTA-vuk_ET-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="-gDlBy8a9iDTA-vuk_ET-14" target="-gDlBy8a9iDTA-vuk_ET-17" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="-gDlBy8a9iDTA-vuk_ET-11" value="Next tile" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="-gDlBy8a9iDTA-vuk_ET-10">
+        <mxCell id="-gDlBy8a9iDTA-vuk_ET-11" value="Next tile" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="-gDlBy8a9iDTA-vuk_ET-10" vertex="1" connectable="0">
           <mxGeometry x="-0.28" y="1" relative="1" as="geometry">
             <mxPoint y="-14" as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="-gDlBy8a9iDTA-vuk_ET-12" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="-gDlBy8a9iDTA-vuk_ET-14" target="-gDlBy8a9iDTA-vuk_ET-21">
+        <mxCell id="-gDlBy8a9iDTA-vuk_ET-12" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="-gDlBy8a9iDTA-vuk_ET-14" target="-gDlBy8a9iDTA-vuk_ET-21" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="-gDlBy8a9iDTA-vuk_ET-13" value="Then" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="-gDlBy8a9iDTA-vuk_ET-12">
+        <mxCell id="-gDlBy8a9iDTA-vuk_ET-13" value="Then" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="-gDlBy8a9iDTA-vuk_ET-12" vertex="1" connectable="0">
           <mxGeometry x="-0.45" relative="1" as="geometry">
             <mxPoint x="25" as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="-gDlBy8a9iDTA-vuk_ET-14" value="For every leaf tile of the Subtree" style="rhombus;whiteSpace=wrap;html=1;spacing=20;" vertex="1" parent="1">
+        <mxCell id="-gDlBy8a9iDTA-vuk_ET-14" value="For every leaf tile of the Subtree" style="rhombus;whiteSpace=wrap;html=1;spacing=20;" parent="1" vertex="1">
           <mxGeometry x="250" y="280" width="110" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="-gDlBy8a9iDTA-vuk_ET-15" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="-gDlBy8a9iDTA-vuk_ET-17" target="-gDlBy8a9iDTA-vuk_ET-19">
+        <mxCell id="-gDlBy8a9iDTA-vuk_ET-15" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="-gDlBy8a9iDTA-vuk_ET-17" target="-gDlBy8a9iDTA-vuk_ET-19" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="-gDlBy8a9iDTA-vuk_ET-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="-gDlBy8a9iDTA-vuk_ET-17" target="-gDlBy8a9iDTA-vuk_ET-14">
+        <mxCell id="dA8UzBmUhME5XwNOm2eI-2" value="Yes" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="-gDlBy8a9iDTA-vuk_ET-15">
+          <mxGeometry x="-0.1733" y="3" relative="1" as="geometry">
+            <mxPoint y="-12" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-gDlBy8a9iDTA-vuk_ET-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="-gDlBy8a9iDTA-vuk_ET-17" target="-gDlBy8a9iDTA-vuk_ET-14" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="-gDlBy8a9iDTA-vuk_ET-17" value="Is there buildings in the tile?" style="rhombus;whiteSpace=wrap;html=1;spacing=15;" vertex="1" parent="1">
+        <mxCell id="dA8UzBmUhME5XwNOm2eI-1" value="No" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="-gDlBy8a9iDTA-vuk_ET-16">
+          <mxGeometry x="-0.884" y="-2" relative="1" as="geometry">
+            <mxPoint x="13" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-gDlBy8a9iDTA-vuk_ET-17" value="Is there buildings in the tile?" style="rhombus;whiteSpace=wrap;html=1;spacing=15;" parent="1" vertex="1">
           <mxGeometry x="410" y="280" width="110" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="-gDlBy8a9iDTA-vuk_ET-18" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="-gDlBy8a9iDTA-vuk_ET-19" target="-gDlBy8a9iDTA-vuk_ET-14">
+        <mxCell id="-gDlBy8a9iDTA-vuk_ET-18" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="-gDlBy8a9iDTA-vuk_ET-19" target="-gDlBy8a9iDTA-vuk_ET-14" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="380" y="200" as="targetPoint" />
             <Array as="points">
@@ -74,34 +84,34 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="-gDlBy8a9iDTA-vuk_ET-19" value="Set the Nth bit of the BitSet to 1. N being the Morton index of the Tile" style="whiteSpace=wrap;html=1;spacing=15;" vertex="1" parent="1">
+        <mxCell id="-gDlBy8a9iDTA-vuk_ET-19" value="Set the Nth bit of the BitSet to 1. N being the Morton index of the Tile" style="whiteSpace=wrap;html=1;spacing=15;" parent="1" vertex="1">
           <mxGeometry x="580" y="287.5" width="135" height="65" as="geometry" />
         </mxCell>
-        <mxCell id="-gDlBy8a9iDTA-vuk_ET-20" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="-gDlBy8a9iDTA-vuk_ET-21" target="-gDlBy8a9iDTA-vuk_ET-23">
+        <mxCell id="-gDlBy8a9iDTA-vuk_ET-20" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="-gDlBy8a9iDTA-vuk_ET-21" target="-gDlBy8a9iDTA-vuk_ET-23" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="-gDlBy8a9iDTA-vuk_ET-21" value="Generate a tile Availability from the BitSet" style="whiteSpace=wrap;html=1;spacing=20;" vertex="1" parent="1">
+        <mxCell id="-gDlBy8a9iDTA-vuk_ET-21" value="Generate a tile Availability from the BitSet" style="whiteSpace=wrap;html=1;spacing=20;" parent="1" vertex="1">
           <mxGeometry x="245" y="400" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="-gDlBy8a9iDTA-vuk_ET-22" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="-gDlBy8a9iDTA-vuk_ET-23" target="-gDlBy8a9iDTA-vuk_ET-25">
+        <mxCell id="-gDlBy8a9iDTA-vuk_ET-22" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="-gDlBy8a9iDTA-vuk_ET-23" target="-gDlBy8a9iDTA-vuk_ET-25" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="-gDlBy8a9iDTA-vuk_ET-23" value="Generate a content Availability from the BitSet" style="whiteSpace=wrap;html=1;spacing=20;" vertex="1" parent="1">
+        <mxCell id="-gDlBy8a9iDTA-vuk_ET-23" value="Generate a content Availability from the BitSet" style="whiteSpace=wrap;html=1;spacing=20;" parent="1" vertex="1">
           <mxGeometry x="405" y="400" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="-gDlBy8a9iDTA-vuk_ET-24" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="-gDlBy8a9iDTA-vuk_ET-25" target="-gDlBy8a9iDTA-vuk_ET-28">
+        <mxCell id="-gDlBy8a9iDTA-vuk_ET-24" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="-gDlBy8a9iDTA-vuk_ET-25" target="-gDlBy8a9iDTA-vuk_ET-28" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="-gDlBy8a9iDTA-vuk_ET-25" value="Create a new Availability with an empty BitSet of length 4^subtreeLevels as child Availability" style="whiteSpace=wrap;html=1;spacing=20;" vertex="1" parent="1">
+        <mxCell id="-gDlBy8a9iDTA-vuk_ET-25" value="Create a new Availability with an empty BitSet of length 4^subtreeLevels as child Availability" style="whiteSpace=wrap;html=1;spacing=20;" parent="1" vertex="1">
           <mxGeometry x="557.5" y="400" width="180" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="-gDlBy8a9iDTA-vuk_ET-26" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="-gDlBy8a9iDTA-vuk_ET-27" target="-gDlBy8a9iDTA-vuk_ET-21">
+        <mxCell id="-gDlBy8a9iDTA-vuk_ET-26" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="-gDlBy8a9iDTA-vuk_ET-27" target="-gDlBy8a9iDTA-vuk_ET-21" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="-gDlBy8a9iDTA-vuk_ET-27" value="Create an empty BitSet" style="whiteSpace=wrap;html=1;spacing=15;" vertex="1" parent="1">
+        <mxCell id="-gDlBy8a9iDTA-vuk_ET-27" value="Create an empty BitSet" style="whiteSpace=wrap;html=1;spacing=15;" parent="1" vertex="1">
           <mxGeometry x="80" y="415" width="120" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="-gDlBy8a9iDTA-vuk_ET-28" value="Return the Subtree created from the 3 Availabilities" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="-gDlBy8a9iDTA-vuk_ET-28" value="Return the Subtree created from the 3 Availabilities" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="587.5" y="495" width="120" height="80" as="geometry" />
         </mxCell>
       </root>

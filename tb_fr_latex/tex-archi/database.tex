@@ -1,4 +1,4 @@
-La base de donnée \href{https://postgis.net/}{PostGIS}\footnote{https://postgis.net/} que j'utilise se distingue par deux catégories de tables différentes. Premièrement, il y a les tables qui on été générées par l'import de données OSM. Ces tables contiennent les informations des éléments OSM tels que les bâtiments, les routes, les rivières, etc. Deuxièmement, il y a les tables qui sont générées par mes propres scripts qui stockeront les tuiles 3D ainsi que les Subtrees pour éviter de le re-générer à chaque fois car cela peut prendre plusieurs heures si le dataset est grand.
+La base de donnée \href{https://postgis.net/}{PostGIS}\footnote{https://postgis.net/} que j'utilise se distingue par deux catégories de tables différentes. Premièrement, il y a les tables qui on été générées par l'import de données OSM. Ces tables contiennent les informations des éléments OSM tels que les bâtiments, les routes, les rivières, etc. Deuxièmement, il y a les tables qui sont générées par mon application qui stockeront les tuiles 3D ainsi que les Subtrees pour éviter de les re-générer à chaque fois car cela peut prendre plusieurs heures si le dataset est grand.
 
 Pour accéder aux données de ces tables, j'utilise la librairie java \texttt{javax.sql.DataSource} qui me permet de me connecter à la base de données.
 
@@ -10,6 +10,7 @@ La \href{https://wiki.openstreetmap.org/wiki/Simple_3D_Buildings}{documentation 
 
 Pour pouvoir récupérer toutes ces informations, j'utilise la requête SQL suivante :
 
+\newpage
 \begin{verbatim}
 SELECT st_asbinary(geom),
     tags -> building,
@@ -52,6 +53,7 @@ WHERE (tags ? building or tags ? building:part) and
 
 Grâce à cette requête, je récupère toutes les informations nécessaires pour définir et générer les bâtiments en fichiers glTF. \texttt{\%1\$s, \%2\$s, \%3\$s, \%4\$s, et \%5\$s} sont des espaces réservés qui seront remplacés par les coordonnées de la zone à charger lors de l'exécution de la requête.
 
+\newpage
 \subsection{Données générées}
 
 Les données générées sont stockées dans les tables \texttt{td\_subtrees} et \texttt{td\_tile\_gltf}. La première contient toutes les informations nécessaires à la définition d'un Subtree. La seconde contient les fichiers glTF des tuiles. Ces tables sont définies comme suit :

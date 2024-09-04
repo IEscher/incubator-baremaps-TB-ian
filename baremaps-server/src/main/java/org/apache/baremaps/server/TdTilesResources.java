@@ -57,21 +57,6 @@ public class TdTilesResources {
   private static final boolean RELOAD_TILES = true;
   private static final boolean GENERATE_ALL_SUBTREES = false;
 
-
-  // private static final int MIN_LEVEL = 0;
-  // private static final int MAX_LEVEL = 3; // Cannot be over Integer.BYTES * 8
-  //
-  // // Levels to which the compression is increased
-  // private static final int[] COMPRESSION_LEVELS = {0, 1, 2};
-  //
-  // // Subtree levels
-  // // See: https://github.com/CesiumGS/3d-tiles/issues/576 for subtree division
-  // private static final int AVAILABLE_LEVELS = MAX_LEVEL; // AVAILABLE_LEVELS + 1 should be a
-  // multiple of SUBTREE_LEVELS
-  // private static final int SUBTREE_LEVELS = 4;
-
-
-
   private static final int RANK_AMOUNT = (AVAILABLE_LEVELS + 1) / SUBTREE_LEVELS;
 
   private static final Logger logger = LoggerFactory.getLogger(TdTilesStore.class);

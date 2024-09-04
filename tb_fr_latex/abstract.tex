@@ -1,14 +1,13 @@
-Le travail devant être effectué durant ce travail consiste à utiliser la spécification \href{https://cesium.com/blog/2021/11/10/introducing-3d-tiles-next/}{3D Tiles Next}\footnote{https://cesium.com/blog/2021/11/10/introducing-3d-tiles-next/} de \href{https://cesium.com/}{Cesium}\footnote{https://cesium.com/} pour \textit{streamer} un rendu 3D de tuiles vectorielles à l'intérieur du \href{https://github.com/baremaps/baremaps}{framework Baremaps}\footnote{https://github.com/baremaps/baremaps} existant. Le produit final sera un prototype du support de cette spécification en utilisant une base de données \href{https://postgis.net/}{Postgis}\footnote{https://postgis.net/}. Les fonctionnalités offertes 3D Tiles Next seront pleinement utilisées pour produire un rendu de haute qualité et performant.
+Le tuilage de données géospatiales connaît une expansion rapide, notamment avec l'essor de la spécification 3D Tiles Next de Cesium. Cette spécification introduit l'Implicit Tiling, permettant la génération automatique de tuiles géospatiales pour le rendu 3D des bâtiments.
 
-Les rendus 3D que propose Cesium peuvent être distribués en deux catégories :
+L'enjeu est de créer un système efficace pour afficher des bâtiments 3D, en utilisant les données d'OpenStreetMap, de manière optimisée sur le client Cesium.
 
-\begin{itemize}
-    \item[1.] Le terrain géographique
-    \item[2.] Les bâtiments
-\end{itemize}
+Le projet vise à développer des ressources compatibles avec Cesium pour une visualisation fluide de bâtiments 3D. Les ressources incluent des fichiers glTF pour les objets 3D et des fichiers Subtree pour la gestion des disponibilités des tuiles.
 
-Produire le rendu du terrain ainsi que le rendu des bâtiments comporte chacun ses propres difficultés d'optimisation. Un système de \textit{level of details} devra être implémenté pour maintenir de hautes performances, même avec un nombre important de géométries affichées à l'écran.
+Les bâtiments sont modélisés en 3D avec différents niveaux de détails grâce au système de Screen Space Error de Cesium. Chaque tuile est indexée via des indices de Morton pour créer des Subtrees, qui sont ensuite hiérarchisés. La structure des Subtrees est paramétrable, permettant d'ajuster les niveaux de détails en fonction des besoins.
 
-Cependant, dans le cadre de ce travail, seul l'affichage des bâtiments sera traité. Pour cela, la spécification 3D Tiles Next propose une solution d'optimisation interne à son fonctionnement avec Cesium. Néanmoins, beaucoup reste à être fait quant à l'affichage des bâtiments ainsi que pour créer un système permettant de \textit{streamer} les informations de la base de données d'OpenStreetMap vers Cesium.
+Le programme créé permet une génération fonctionnelle et adaptable des Subtrees, optimisant ainsi l'affichage des bâtiments 3D à souhait. Les Subtrees sont transformés en fichiers JSON et buffers binaires pour une transmission efficace.
+
+Pour améliorer ce système, il est recommandé de continuer à affiner la quantité compression des géométries par niveau de détails. Une étude plus approfondie des performances sur différentes plateformes est également suggérée pour trouver le meilleur compromis entre qualité et efficacité. Explorer l'enrichissement des modèles 3D avec des détails supplémentaires comme les toits ou les textures est finalement ce qui manque le plus au programme actuel pour lui donner un aspect plus complet.
 
 % \asterism

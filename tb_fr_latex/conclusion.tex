@@ -6,9 +6,13 @@
 % Il est de coutume de signer la conclusion...
 %%fi
 
-Quelques obstacles sont survenus durant ce travail. Certains ont pu être traités dans ce rapport mais d'autres restent encore à résoudre. De plus, une majorité des \textit{features} listées dans le cahier des charges sont encore à implémenter.
+Pour conclure, ce travail a permis de mettre en place un prototype d'une utilisation du client Cesium pour afficher des bâtiments venant d'OpenStreetMap en 3D. Ce prototype a démontré qu'il était possible d'utiliser la fonctionnalité d'implicit tiling de la spécification 3D Tiles Next tout en gardant un résultat satisfaisant et qu'il était possible de le faire en traitant les données de manière uniforme pour l'entièreté du dataset d'OpenStreetMap.
 
-L'état de l'avancée du projet est néanmoins selon moi dans la bonne direction. Dans cette partie de mon TB, j'ai pu comprendre les fonctionnements de tous les outils et technologies utilisés. J'ai pu également commencer à les adapter pour qu'ils fonctionnent ensemble. 
+La génération des Subtrees est maintenant totalement fonctionnelle. Cette génération est régie par des paramètres pouvant changer intégralement la forme de la hiérarchie des Subtrees. Cela permet d'adapter à souhait quels niveaux de la division par implicit tiling contiendra du contenu 3D ainsi que de préciser leur niveaux de détails.
+
+Actuellement, ce prototype est parfaitement utilisable à condition de passer un peu de temps à trouver les bons niveaux de compression des géométries des bâtiments 3D et les bons niveaux auxquels appliquer ces compression. Pour cela, de nombreuses mesures doivent être prises sur différentes plateformes pour trouver le bon compromis entre qualité et performance. Autant cruciale qu'elle l'est, cette étape sort du carde de ce travail. Elle reste donc à être effectuée.
+
+Un autre point qui semble être la prochaine étape logique du développement de ce projet est l'amélioration de la génération des objets glTF représentant les bâtiments. Beaucoup d'informations sont mises à dispositions par le dataset proposé par OpenStreetMap. Comme expliqué dans le rapport du travail de Bachelor mentionné dans la section \ref{sec:gltf}, il est possible de pousser la génération des bâtiments plus loin en intégrant leur toit ou en ajoutant des textures. Mais ce rapport montre aussi qu'il est possible de générer bien plus que des bâtiments, comme les routes ou la végétation.
 
 \vfil
 \hspace{8cm}\makeatletter\@author\makeatother\par

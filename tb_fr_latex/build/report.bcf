@@ -2344,6 +2344,7 @@
     <bcf:datasource type="file" datatype="bibtex" glob="false">bibliography.bib</bcf:datasource>
   </bcf:bibdata>
   <bcf:section number="0">
+    <bcf:citekey order="9">implicit-tiling-gh</bcf:citekey>
     <bcf:citekey order="10">3d-tiles-reference-card-v1</bcf:citekey>
     <bcf:citekey order="11">3d-tiles-reference-card-v1</bcf:citekey>
     <bcf:citekey order="12">3d-tiles-specification</bcf:citekey>
@@ -2353,23 +2354,22 @@
     <bcf:citekey order="16">3d-tiles-specification</bcf:citekey>
     <bcf:citekey order="17">3DTILES_bounding_volume_S2-website</bcf:citekey>
     <bcf:citekey order="18">3DTILES_bounding_volume_S2-website</bcf:citekey>
-    <bcf:citekey order="19">3d-tiles-specification</bcf:citekey>
-    <bcf:citekey order="20">3d-tiles-specification</bcf:citekey>
+    <bcf:citekey order="19">MinLevel-image</bcf:citekey>
+    <bcf:citekey order="20">MinLevel-image</bcf:citekey>
     <bcf:citekey order="21">3d-tiles-reference-card-v1_1</bcf:citekey>
-    <bcf:citekey order="22">3d-tiles-specification</bcf:citekey>
-    <bcf:citekey order="23">3d-tiles-specification</bcf:citekey>
+    <bcf:citekey order="22">availability-gh</bcf:citekey>
+    <bcf:citekey order="23">availability-gh</bcf:citekey>
     <bcf:citekey order="24">availability-gh</bcf:citekey>
     <bcf:citekey order="25">availability-gh</bcf:citekey>
-    <bcf:citekey order="26">availability-gh</bcf:citekey>
-    <bcf:citekey order="27">availability-gh</bcf:citekey>
+    <bcf:citekey order="26">implicit-tiling-gh</bcf:citekey>
+    <bcf:citekey order="27">implicit-tiling-gh</bcf:citekey>
     <bcf:citekey order="28">implicit-tiling-gh</bcf:citekey>
-    <bcf:citekey order="29">implicit-tiling-gh</bcf:citekey>
-    <bcf:citekey order="30">3d-tiles-reference-card-v1</bcf:citekey>
-    <bcf:citekey order="31">3d-tiles-specification</bcf:citekey>
-    <bcf:citekey order="32">3DTILES_bounding_volume_S2-website</bcf:citekey>
+    <bcf:citekey order="29">3d-tiles-reference-card-v1</bcf:citekey>
+    <bcf:citekey order="30">3d-tiles-specification</bcf:citekey>
+    <bcf:citekey order="31">3DTILES_bounding_volume_S2-website</bcf:citekey>
+    <bcf:citekey order="32">MinLevel-image</bcf:citekey>
     <bcf:citekey order="33">3d-tiles-reference-card-v1_1</bcf:citekey>
     <bcf:citekey order="34">availability-gh</bcf:citekey>
-    <bcf:citekey order="35">implicit-tiling-gh</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->
   <bcf:sortingtemplate name="ynt">
