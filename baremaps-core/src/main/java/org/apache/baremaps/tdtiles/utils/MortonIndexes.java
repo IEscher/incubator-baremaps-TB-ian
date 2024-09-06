@@ -27,20 +27,6 @@ import org.slf4j.Logger;
 
 public class MortonIndexes {
 
-  private static final String GET_BUILDINGS_AMOUNT_QUERY =
-      "SELECT EXISTS (" +
-          "SELECT 1 " +
-          "FROM osm_ways " +
-          "WHERE (tags ? 'building' OR tags ? 'building:part') " +
-          "AND st_intersects(geom, st_makeenvelope(%1$s, %2$s, %3$s, %4$s, 4326))" +
-          ") OR EXISTS (" +
-          "SELECT 1 " +
-          "FROM osm_relations " +
-          "WHERE (tags ? 'building' OR tags ? 'building:part') " +
-          "AND st_intersects(geom, st_makeenvelope(%1$s, %2$s, %3$s, %4$s, 4326))" +
-          ") AS has_buildings";
-
-
   /**
    * See:
    * https://github.com/CesiumGS/3d-tiles/blob/main/specification/ImplicitTiling/AVAILABILITY.adoc
